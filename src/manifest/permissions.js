@@ -1,7 +1,7 @@
 // https://developer.chrome.com/docs/extensions/mv2/declare_permissions/
 
 module.exports = [
-  "activeTab",
+  // "activeTab",
   // "alarms",
   // "background",
   // "bookmarks",
@@ -58,13 +58,13 @@ module.exports = [
   // "system.display",
   // "system.memory",
   // "system.storage",
-  "tabCapture",
+  // "tabCapture",
   // "tabGroups",
   "tabs",
   // "topSites",
   // "tts",
   // "ttsEngine",
-  "unlimitedStorage",
+  // "unlimitedStorage",
   // "vpnProvider",
   // "wallpaper",
   // "webNavigation",

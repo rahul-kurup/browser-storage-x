@@ -42,6 +42,10 @@ export default function Root() {
           target: { tabId: +state.destTab },
           args: [state.destStorage, result],
           func: setAllItems,
+        }, () => {
+          setTimeout(() => {
+            window.close();
+          }, 500);
         });
       }
     );
