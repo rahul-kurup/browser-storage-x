@@ -1,19 +1,30 @@
-import { FormEvent, useEffect, useState } from "react";
-import Storages, { StorageType } from "../../model/storage";
+import { Button, Group, Text } from "@mantine/core";
+import { FormEvent, forwardRef, useEffect, useState } from "react";
+import Storages from "../../model/storage";
 import { getAllItems, setAllItems } from "../../utils/storage";
 import Select from "../select";
-import "./index.module.scss";
-
-type State = {
-  srcTab: number;
-  srcStorage: StorageType;
-  destTab: number;
-  destStorage: StorageType;
-};
+import { ChangeHandlerArgs } from "../select/type";
+import Wrapper, { Fieldset, Form, H1 } from "./style";
+import { ItemProps, State } from "./type";
 
 const StorageTypes = Object.keys(Storages).reduce(
   (a, c) => [...a, { label: c, value: Storages[c] }],
   []
+);
+
+const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
+  ({ data, label, ...others }: ItemProps, ref) => (
+    <div ref={ref} {...others}>
+      <Group noWrap>
+        <div>
+          <Text size="sm">{data.title}</Text>
+          <Text size="xs" color="dimmed">
+            {data.url}
+          </Text>
+        </div>
+      </Group>
+    </div>
+  )
 );
 
 export default function Root() {
@@ -24,7 +35,7 @@ export default function Root() {
     chrome.tabs.query({}, setTabs);
   }, []);
 
-  function handleChange({ target: { name, value } }: any) {
+  function handleChange({ name, value }: ChangeHandlerArgs) {
     setState((s) => ({ ...s, [name]: value }));
   }
 
@@ -38,27 +49,32 @@ export default function Root() {
         func: getAllItems,
       },
       ([{ result }]) => {
-        chrome.scripting.executeScript({
-          target: { tabId: +state.destTab },
-          args: [state.destStorage, result],
-          func: setAllItems,
-        }, () => {
-          setTimeout(() => {
-            window.close();
-          }, 500);
-        });
+        chrome.scripting.executeScript(
+          {
+            target: { tabId: +state.destTab },
+            args: [state.destStorage, result],
+            func: setAllItems,
+          },
+          () => {
+            setTimeout(() => {
+              window.close();
+            }, 500);
+          }
+        );
       }
     );
   }
 
   const hasAllValues = Object.values(state).filter(Boolean).length === 4;
 
-  return (
-    <section>
-      <h1>StorageX</h1>
+  console.log(state);
 
-      <form onSubmit={handleShare}>
-        <fieldset>
+  return (
+    <Wrapper>
+      <H1>StorageX</H1>
+
+      <Form onSubmit={handleShare}>
+        <Fieldset>
           <legend>Source</legend>
 
           <Select
@@ -67,9 +83,10 @@ export default function Root() {
             options={tabs}
             value={state.srcTab}
             onChange={handleChange}
+            itemComponent={SelectItem}
             fieldKey={{
               value: "id",
-              label: (e) => `${e.title} (${e.url})`,
+              label: "title",
             }}
           />
 
@@ -80,9 +97,9 @@ export default function Root() {
             value={state.srcStorage}
             onChange={handleChange}
           />
-        </fieldset>
+        </Fieldset>
 
-        <fieldset>
+        <Fieldset>
           <legend>Destination</legend>
 
           <Select
@@ -91,9 +108,10 @@ export default function Root() {
             options={tabs}
             value={state.destTab}
             onChange={handleChange}
+            itemComponent={SelectItem}
             fieldKey={{
               value: "id",
-              label: (e) => `${e.title} (${e.url})`,
+              label: "title",
             }}
           />
 
@@ -104,10 +122,12 @@ export default function Root() {
             value={state.destStorage}
             onChange={handleChange}
           />
-        </fieldset>
+        </Fieldset>
 
-        <button disabled={!hasAllValues}>Share Session</button>
-      </form>
-    </section>
+        <Button type="submit" disabled={!hasAllValues}>
+          Share Tab Storage
+        </Button>
+      </Form>
+    </Wrapper>
   );
 }

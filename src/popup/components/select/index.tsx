@@ -1,5 +1,6 @@
-import { ComponentProps, useCallback, useMemo } from "react";
-import "./index.module.scss";
+import { Select as MantineSelect } from "@mantine/core";
+import { useCallback, useMemo } from "react";
+import { SelectProps } from "./type";
 
 export default function Select<T>({
   options,
@@ -7,14 +8,7 @@ export default function Select<T>({
   name,
   label,
   ...props
-}: ComponentProps<"select"> & {
-  options: T[];
-  label?: string;
-  fieldKey?: {
-    label?: string | ((e: T) => any);
-    value?: string | ((e: T) => any);
-  };
-}) {
+}: SelectProps<T>) {
   const getContent = useCallback(
     (m: T, keyFor: "label" | "value") => {
       if (fieldKey?.[keyFor]) {
@@ -29,30 +23,25 @@ export default function Select<T>({
     [fieldKey]
   );
 
+  const dataItems = useMemo(() => {
+    return options.map((m) => {
+      const label = getContent(m, "label");
+      const value = String(getContent(m, "value"));
+      return { label, value, data: m };
+    });
+  }, [fieldKey, options, getContent]);
+
   return (
-    <label>
-      {label}
-
-      <select
-        id={name}
-        name={name}
-        {...props}
-        title={props.title || `Select ${label}`}
-        placeholder={props.placeholder || label}
-      >
-        <option value=''>{`Select ${label}`}</option>
-
-        {options.map((m) => {
-          const label = getContent(m, "label");
-          const value = getContent(m, "value");
-          return (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          );
-        })}
-
-      </select>
-    </label>
+    <MantineSelect
+      id={name}
+      name={name}
+      maxDropdownHeight={180}
+      {...props}
+      data={dataItems}
+      value={String(props.value ?? "")}
+      title={props.title || `Select ${label}`}
+      placeholder={props.placeholder || label}
+      onChange={(evValue) => props.onChange?.({ name, value: evValue })}
+    />
   );
 }

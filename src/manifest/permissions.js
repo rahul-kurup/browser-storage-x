@@ -53,7 +53,7 @@ module.exports = [
   // "search",
   // "sessions",
   // "signedInDevices",
-  "storage",
+  // "storage",
   // "system.cpu",
   // "system.display",
   // "system.memory",
