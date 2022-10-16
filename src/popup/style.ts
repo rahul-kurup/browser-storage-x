@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-export const H1 = styled.h1`
+export const Heading = styled.h1`
   text-align: center;
   margin: 1px;
 `;
@@ -18,6 +18,6 @@ export const Fieldset = styled.fieldset`
 `;
 
 export default styled.section`
-  width: 450px;
+  width: 500px;
   padding: 10px;
 `;

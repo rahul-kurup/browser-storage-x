@@ -1,14 +1,14 @@
-
-import { StorageType } from "../../model/storage";
+import { StorageType } from "lib-models/storage";
+import { Tab } from "lib-models/tab";
 
 export interface ItemProps extends React.ComponentPropsWithoutRef<"div"> {
-  data: chrome.tabs.Tab;
+  data: Tab;
   label: string;
 }
 
 export type State = {
-  srcTab: number;
+  srcTab: Tab;
   srcStorage: StorageType;
-  destTab: number;
+  destTab: Tab;
   destStorage: StorageType;
 };

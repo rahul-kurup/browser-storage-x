@@ -1,23 +1,16 @@
 const CopyPlugin = require("copy-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
-const {
-  DefinePlugin,
-  optimize
-} = require("webpack");
+const { DefinePlugin, optimize } = require("webpack");
 const GenerateJsonFromJsPlugin = require("generate-json-from-js-webpack-plugin");
-const {
-  BundleAnalyzerPlugin
-} = require("webpack-bundle-analyzer");
-const {
-  join
-} = require("path");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+const { join } = require("path");
 const dotenv = require("dotenv");
 
 const prodPlugins = [],
   isProd = process.env.NODE_ENV === "production";
 
 if (isProd) {
-  prodPlugins.push(new optimize.AggressiveMergingPlugin(), new optimize.OccurrenceOrderPlugin());
+  prodPlugins.push(new optimize.AggressiveMergingPlugin());
 }
 
 const Root = join(__dirname, "..");
@@ -34,7 +27,7 @@ const Option = join(Source, "option");
 const config = {
   mode: process.env.NODE_ENV,
   target: "web",
-  devtool: isProd ? "none" : "cheap-source-map",
+  devtool: isProd ? undefined : "eval-source-map",
   entry: {
     background: join(Background, "index.ts"),
     popup: join(Popup, "index.tsx"),
@@ -46,9 +39,10 @@ const config = {
     filename: "[name].js",
   },
   module: {
-    rules: [{
+    rules: [
+      {
         test: /\.tsx?$/,
-        loader: "ts-loader"
+        loader: "ts-loader",
       },
       {
         test: /\.jsx?$/,
@@ -61,19 +55,21 @@ const config = {
               [
                 "@babel/plugin-transform-react-jsx",
                 // { "pragma":"h" }
-              ]
-            ]
-          }
-        }
+              ],
+            ],
+          },
+        },
       },
       {
         test: /\.(png|jpe?g|gif)$/i,
-        use: [{
-          loader: "file-loader",
-          options: {
-            name: "assets/[name].[ext]",
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "assets/[name].[ext]",
+            },
           },
-        }, ],
+        ],
       },
       {
         test: /\.(gql)$/,
@@ -82,13 +78,16 @@ const config = {
       },
       {
         test: /\.css$/i,
-        use: ["style-loader", {
-          loader: "css-loader",
-          options: {
-            importLoaders: 1,
-            modules: true,
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1,
+              modules: true,
+            },
           },
-        }],
+        ],
       },
       {
         test: /\.svg$/,
@@ -106,9 +105,9 @@ const config = {
             loader: "css-loader",
             options: {
               importLoaders: 1,
-            }
+            },
           },
-          "postcss-loader"
+          "postcss-loader",
         ],
       },
     ],
@@ -117,12 +116,16 @@ const config = {
     new DefinePlugin({
       "process.env": JSON.stringify(
         dotenv.config({
-          path: join(Root, `.env.${process.env.TARGET_ENV || process.env.NODE_ENV}`),
-        }).parsed,
+          path: join(
+            Root,
+            `.env.${process.env.TARGET_ENV || process.env.NODE_ENV}`
+          ),
+        }).parsed
       ),
     }),
     new CopyPlugin({
-      patterns: [{
+      patterns: [
+        {
           from: join(Assets, "html"),
           to: "assets/html",
         },
@@ -133,8 +136,8 @@ const config = {
         {
           from: join(Assets, "json"),
           to: "assets/json",
-        }
-      ]
+        },
+      ],
     }),
     ...(process.env.STATS ? [new BundleAnalyzerPlugin()] : []),
     ...prodPlugins,
@@ -148,14 +151,19 @@ const config = {
       popup: Popup,
       assets: Assets,
       option: Option,
+      "lib-models": join(Source, "lib", "models"),
+      "lib-utils": join(Source, "lib", "utils"),
+      "lib-components": join(Source, "lib", "components"),
     },
   },
   optimization: {
     minimize: true,
-    minimizer: [new TerserPlugin({
-      extractComments: false
-    })],
-  }
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false,
+      }),
+    ],
+  },
 };
 
 const buildConfig = (browser, path) => ({

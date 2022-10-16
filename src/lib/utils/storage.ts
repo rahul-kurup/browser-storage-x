@@ -1,4 +1,4 @@
-import { StorageType } from "../model/storage";
+import Storages, { StorageType } from "../models/storage";
 
 export function getAllItems(storageType: StorageType) {
   const obj = {};
@@ -17,3 +17,10 @@ export function setAllItems(storageType: StorageType, data: any) {
     storage.setItem(key, data[key]);
   });
 }
+
+export const StorageTypeList = Object.keys(Storages).reduce(
+  (a, c) => (c === "cookie" ? a : [...a, { label: c, value: Storages[c] }]),
+  []
+);
+
+export const isCookieType = (storage: StorageType) => storage === "cookie";

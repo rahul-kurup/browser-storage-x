@@ -15,7 +15,12 @@
     "downlevelIteration": true,
     "baseUrl": "./src",
     "outDir": "./build",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "lib-models/*": ["lib/models/*"],
+      "lib-utils/*": ["lib/utils/*"],
+      "lib-components/*": ["lib/components/*"],
+    }
   },
   "include": ["src", "typings.d.ts"],
   "exclude": ["node_modules", "src/**/*.spec.ts"]
