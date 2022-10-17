@@ -1,12 +1,8 @@
-import { Button } from "@mantine/core";
+import { Alert, Button } from "@mantine/core";
 import Select, { ChangeHandlerArgs } from "lib-components/select";
+import { Progress } from "lib-models/progress";
 import { Tab } from "lib-models/tab";
-import {
-  getAllItems,
-  isCookieType,
-  setAllItems,
-  StorageTypeList
-} from "lib-utils/storage";
+import { getAllItems, setAllItems, StorageTypeList } from "lib-utils/storage";
 import { FormEvent, useEffect, useState } from "react";
 import CustomSelectOption from "./select-option";
 import Wrapper, { Fieldset, Form, Heading } from "./style";
@@ -15,7 +11,7 @@ import { State } from "./type";
 export default function App() {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [state, setState] = useState({} as State);
-  const [inProgress, setProgress] = useState(false);
+  const [progress, setProgress] = useState<Progress>(Progress.idle);
 
   useEffect(() => {
     chrome.tabs.query({}, setTabs);
@@ -25,46 +21,53 @@ export default function App() {
     setState((s) => ({ ...s, [name]: value }));
   }
 
+  function resetSubmission() {
+    setTimeout(() => {
+      setProgress(Progress.idle);
+    }, 1500);
+  }
+
   function handleShare(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setProgress(true);
+    setProgress(Progress.started);
 
     const { srcStorage, srcTab, destStorage, destTab } = state;
 
     try {
-      if (isCookieType(srcStorage) || isCookieType(destStorage)) {
-        // TODO: maybe in future update
-      } else {
-        chrome.scripting.executeScript(
-          {
-            target: { tabId: srcTab.id },
-            args: [srcStorage],
-            func: getAllItems,
-          },
-          ([{ result }]) => {
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: srcTab.id },
+          args: [srcStorage],
+          func: getAllItems,
+        },
+        ([output]) => {
+          if (output?.result) {
             chrome.scripting.executeScript(
               {
                 target: { tabId: destTab.id },
-                args: [destStorage, result],
+                args: [destStorage, output.result],
                 func: setAllItems,
               },
               () => {
-                setProgress(false);
-                setTimeout(() => {
-                  window.close();
-                }, 100);
+                setProgress(Progress.pass);
+                resetSubmission();
               }
             );
+          } else {
+            setProgress(Progress.stopped);
+            resetSubmission();
           }
-        );
-      }
+        }
+      );
     } catch (error) {
-      console.error(error);
-      setProgress(false);
+      console.error("submit", error);
+      setProgress(Progress.fail);
+      resetSubmission();
     }
   }
 
   const hasAllValues = Object.values(state).filter(Boolean).length === 4;
+  const disabledField = progress !== Progress.idle;
 
   return (
     <Wrapper>
@@ -81,6 +84,7 @@ export default function App() {
             valueAsObject
             value={state.srcTab}
             onChange={handleChange}
+            disabled={disabledField}
             itemComponent={CustomSelectOption}
             fieldKey={{
               value: "id",
@@ -93,6 +97,7 @@ export default function App() {
             name="srcStorage"
             options={StorageTypeList}
             value={state.srcStorage}
+            disabled={disabledField}
             onChange={handleChange}
           />
         </Fieldset>
@@ -107,6 +112,7 @@ export default function App() {
             valueAsObject
             value={state.destTab}
             onChange={handleChange}
+            disabled={disabledField}
             itemComponent={CustomSelectOption}
             fieldKey={{
               value: "id",
@@ -119,13 +125,43 @@ export default function App() {
             name="destStorage"
             options={StorageTypeList}
             value={state.destStorage}
+            disabled={disabledField}
             onChange={handleChange}
           />
         </Fieldset>
 
-        <Button type="submit" disabled={inProgress || !hasAllValues}>
-          {inProgress ? "Sharing..." : "Share Tab Storage"}
-        </Button>
+        {progress === Progress.idle ? (
+          <Button type="submit" disabled={!hasAllValues}>
+            Share Tab Storage
+          </Button>
+        ) : (
+          <>
+            {progress === Progress.started && (
+              <Alert color="blue" title="🔁 Sharing">
+                Storage is being transferred...
+              </Alert>
+            )}
+
+            {progress === Progress.stopped && (
+              <Alert color="blue" title="⏹ Aborted">
+                No data found to be transferred
+              </Alert>
+            )}
+
+            {progress === Progress.pass && (
+              <Alert color="green" title="✅ Done">
+                Storage transfer completed!
+              </Alert>
+            )}
+
+            {progress === Progress.fail && (
+              <Alert color="red" title="❌ Some error occurred">
+                You may share the logged error in console with the extension
+                author
+              </Alert>
+            )}
+          </>
+        )}
       </Form>
     </Wrapper>
   );

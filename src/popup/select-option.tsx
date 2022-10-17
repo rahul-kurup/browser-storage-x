@@ -7,11 +7,13 @@ export default forwardRef<HTMLDivElement, ItemProps>(
     <div ref={ref} {...others}>
       <Group noWrap>
         <Avatar src={data.favIconUrl} size='sm' />
+
         <div>
           <Text size="sm">
             {data.incognito && "🕶"} {data.title}{" "}
             {data.audible && (data.mutedInfo.muted ? "🔇" : "🔊")}
           </Text>
+
           <Text size="xs">
             {data.url}
           </Text>
