@@ -1,5 +1,5 @@
+import { Tab } from "lib-models/browser";
 import { StorageType } from "lib-models/storage";
-import { Tab } from "lib-models/tab";
 
 export interface ItemProps extends React.ComponentPropsWithoutRef<"div"> {
   data: Tab;

@@ -1187,34 +1187,34 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@mantine/core@^5.5.5":
-  version "5.5.5"
-  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-5.5.5.tgz#e2d11a6d950801f616afacbde1b607bffc8ef1dc"
-  integrity sha512-VjNpz5mvV1hg6RbVuLkA9uY+iS3Ocpg9C0ZjnBuMKbDA9TYmpxgLJ1Eo56OMfJvQ03W8qG/prIwY8QNZddtNBg==
+"@mantine/core@^5.5.6":
+  version "5.5.6"
+  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-5.5.6.tgz#cc2f3a36916ca8aa5763648d81ae9a074b43e35c"
+  integrity sha512-os8vh3zCp2tMtU8j2nBwn8ecLoU4dNe5LfI2aZ+xrl8nRKOz4HZy72EpbuSWHUvAtuTrOQdI4i5QtIdaTPl+lg==
   dependencies:
     "@floating-ui/react-dom-interactions" "^0.10.1"
-    "@mantine/styles" "5.5.5"
-    "@mantine/utils" "5.5.5"
+    "@mantine/styles" "5.5.6"
+    "@mantine/utils" "5.5.6"
     "@radix-ui/react-scroll-area" "1.0.0"
     react-textarea-autosize "8.3.4"
 
-"@mantine/hooks@^5.5.5":
-  version "5.5.5"
-  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.5.5.tgz#cffe0080d940e951d69a1496d4a4b8484163711e"
-  integrity sha512-qWZAZm203s0knYk6Ut4VPvur9H5BMul02cCb9E09s60iSjnLRHDC3f73VmSzmLZNVfgE+7hXUhguR/1lC7js4Q==
+"@mantine/hooks@^5.5.6":
+  version "5.5.6"
+  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.5.6.tgz#98c2f0654ec1f006b47eb58ec384fd3ff526e999"
+  integrity sha512-AecrtNxg1QsTekxHj3OOH3HM+L9Iu/ix8OsfXt1mhLgSvUMhpAGnO/ouQ5KVn1vzaQkzQ2k4XZXULjBIxfOWGw==
 
-"@mantine/styles@5.5.5":
-  version "5.5.5"
-  resolved "https://registry.yarnpkg.com/@mantine/styles/-/styles-5.5.5.tgz#1bb49031f68c3c2d54cbd5c3ac62131ced4fa110"
-  integrity sha512-cAYLoqQbnyoJepD7zstFF+A2/rj8DJblBzEdri0V+CWQccpqfP5xOTPEvCHVwQUODg40uT9PyVwFZ4h+zyyzvg==
+"@mantine/styles@5.5.6":
+  version "5.5.6"
+  resolved "https://registry.yarnpkg.com/@mantine/styles/-/styles-5.5.6.tgz#de5ea457c04f612e14632d6a253479314b075446"
+  integrity sha512-D9H4i7N1CooIRDSIChWBjrTC1eBfzU3Y9xJgKimINWQqBwSAUzgZgj06YDqp9OskB7QO79RDG6cKUsR4rNhv9w==
   dependencies:
     clsx "1.1.1"
     csstype "3.0.9"
 
-"@mantine/utils@5.5.5":
-  version "5.5.5"
-  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.5.5.tgz#22b412b6e9d78f2515f9f98db3f5ed83deca91ca"
-  integrity sha512-nt8+A0N1cV4cJNqlKuXazShoEwqtLohHNKFuywEdF3B6vHWdbY799PbT2WmqGTwNQ+se8y5/nBMmamBZrUN4fg==
+"@mantine/utils@5.5.6":
+  version "5.5.6"
+  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.5.6.tgz#769fce79028ac6842b15753e0e9c16480be0b585"
+  integrity sha512-uEeMwTPmt7HMdtdbu7pZQ3en5F3Dj7cavhWGRcokj7PluuzNM+79iR/g4bJ3C4SKhj5LdHi7KjX8+zp6GKyrBg==
 
 "@mdn/browser-compat-data@5.2.6":
   version "5.2.6"
@@ -6717,10 +6717,10 @@ wcwidth@^1.0.0:
   dependencies:
     defaults "^1.0.3"
 
-web-ext@^7.3.0:
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/web-ext/-/web-ext-7.3.0.tgz#3978c11fafc94ab1cf00217aac1774061e40c0fc"
-  integrity sha512-w8ZaeD4b+P84/RJJaGCRtuUu+3jEOWC3wT+xu1Sebt7WkO1zfDseBxXk+P3KaRf19dlvcH/1dYdMSMAtrH2dww==
+web-ext@^7.3.1:
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/web-ext/-/web-ext-7.3.1.tgz#d63e02c996cd7f119d24b150ecbba04016eb5b81"
+  integrity sha512-ZTfktd1zcQpWaFAM3U+IQW674G89d1IW/Oh0Ncw9LwFvKvAcW/nA5EB4pwqB8LiW/6OSYQhHBP4x2XUTBu1SKg==
   dependencies:
     "@babel/runtime" "7.19.4"
     "@devicefarmer/adbkit" "3.2.3"

@@ -31,3 +31,5 @@ export const StorageTypeList = Object.keys(Storages).reduce(
   (a, c) => [...a, { label: c, value: Storages[c] }],
   []
 );
+
+export const isCookieType = (storage: StorageType) => storage === "cookie";

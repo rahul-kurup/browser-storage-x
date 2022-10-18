@@ -1,10 +1,13 @@
 {
   "name": "browser-ext-storage-x",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "displayName": "StorageX",
   "description": "StorageX extension is a toolset to manage any/all browser tab's Application Storage",
   "author": "Rahul Kurup <raulsrule@gmail.com>",
   "private": true,
+  "bugs": {
+    "email": "me@rahulkurup.com"
+  },
   "engines": {
     "node": ">=16.18.0",
     "yarn": "1.22.19"
@@ -36,8 +39,8 @@
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@mantine/core": "^5.5.5",
-    "@mantine/hooks": "^5.5.5",
+    "@mantine/core": "^5.5.6",
+    "@mantine/hooks": "^5.5.6",
     "dexie": "^3.2.2",
     "emotion": "^11.0.0",
     "lodash": "^4.17.21",
@@ -71,7 +74,7 @@
     "terser-webpack-plugin": "^5.3.6",
     "ts-loader": "^9.4.1",
     "typescript": "^4.8.4",
-    "web-ext": "^7.3.0",
+    "web-ext": "^7.3.1",
     "webextension-polyfill": "^0.10.0",
     "webpack": "^5.74.0",
     "webpack-bundle-analyzer": "^4.6.1",

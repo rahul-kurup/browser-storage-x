@@ -14,7 +14,7 @@ module.exports = [
   // "document.execCommand('cut')",
   // "contentSettings",
   // "contextMenus",
-  // "cookies",
+  "cookies",
   // "debugger",
   // "declarativeContent",
   // "declarativeNetRequest",

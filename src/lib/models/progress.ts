@@ -4,5 +4,5 @@ export enum Progress {
   stopped = 2,
   pass = 3,
   fail = 4,
-  cancel = 5,
+  abort = 5,
 }
