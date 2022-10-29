@@ -27,7 +27,7 @@ const Option = join(Source, "option");
 const config = {
   mode: process.env.NODE_ENV,
   target: "web",
-  devtool: isProd ? undefined : "eval-source-map",
+  devtool: isProd ? undefined : "cheap-module-source-map", // https://stackoverflow.com/a/49100966/1848466
   entry: {
     background: join(Background, "index.ts"),
     popup: join(Popup, "index.tsx"),
@@ -157,7 +157,7 @@ const config = {
     },
   },
   optimization: {
-    minimize: true,
+    minimize: isProd,
     minimizer: [
       new TerserPlugin({
         extractComments: false,
