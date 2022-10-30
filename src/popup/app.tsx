@@ -71,7 +71,7 @@ export default function App() {
    * 
    */
    const tabReplaceListener = (addedTabId: number, removedTabId: number) => {
-     console.log("🚀 ~ file: app.tsx ~ line 48 ~ tabReplaceListener", "removedTabId", removedTabId, "addedTabId", addedTabId)
+    //  console.log("🚀 ~ file: app.tsx ~ line 48 ~ tabReplaceListener", "removedTabId", removedTabId, "addedTabId", addedTabId)
 
      // update the tabs list for select dropdown
      const indexOfReplacedTab = tabs.findIndex((oneTab) => oneTab.id == removedTabId)
@@ -100,7 +100,7 @@ export default function App() {
   }
 
   async function handleChange({ name, value }: ChangeHandlerArgs<Tab>) {
-    console.log("🚀 ~ file: app.tsx ~ line 32 ~ handleChange ~ { name, value }", { name, value })
+    // console.log("🚀 ~ file: app.tsx ~ line 32 ~ handleChange ~ { name, value }", { name, value })
     setState((s) => {
       return { ...s, [name]: value };
     });
@@ -209,7 +209,7 @@ export default function App() {
         }]
       if(isCookieType(srcStorage)){
         const srcCookies = await getCookies(srcTab);
-        console.log("🚀 ~ file: app.tsx ~ line 141 ~ updateCheckboxTree ~ srcCookies", srcCookies)
+        // console.log("🚀 ~ file: app.tsx ~ line 141 ~ updateCheckboxTree ~ srcCookies", srcCookies)
         checkboxTreeData[0].children = srcCookies.map((cookie) => {
           const label = cookieId(cookie)
           return {
@@ -279,8 +279,6 @@ export default function App() {
             disabled={disabledField}
             onChange={handleSrcChange}
           />
-
-          {/* TODO: implement checkbox filtering while saving */}
 
           <CheckboxTree
             nodes={checkboxData.nodes}
