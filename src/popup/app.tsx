@@ -10,7 +10,7 @@ import {
   setAllItems,
   StorageTypeList
 } from "lib-utils/storage";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import alerts from "./alerts";
 import { CustomSelectOption, CheckboxTreeLabel} from "./components"
 import Wrapper, { Fieldset, Form, Heading } from "./style";
@@ -20,9 +20,14 @@ import {CheckboxProps} from 'react-checkbox-tree';
 
 const browser = detectBrowser();
 
-const SEP = '|:|';
+const CONSTANTS = {
+  SEP: '|:|',
+  ALL: '__all__'
+};
 
 export default function App() {
+
+  const checkboxTreeRef = useRef<CheckboxTree>();
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [state, setState] = useState({} as State);
   const [checkboxData, setCheckboxData] = useState<CheckboxTreeState>({
@@ -30,6 +35,7 @@ export default function App() {
     checked: [],
     expanded: []
   })
+  const [selectChecbox, setSelectChecbox] = useState(false);
   const [progress, setProgress] = useState<
     Progress | { title: string; color: string; message: string }
   >(Progress.idle);
@@ -45,6 +51,19 @@ export default function App() {
       browser.tabs.onReplaced.removeListener(tabReplaceListener)
     }
   }, [state, tabs])
+
+  useEffect(() => {
+    /**
+     * this effect is to select all checkboxes by default, 
+     * stupidly the checkboxtree lib doesn't give this functionality
+     * https://github.com/jakezatecky/react-checkbox-tree/issues/174#issuecomment-558874694
+     */
+    if(selectChecbox){
+      //@ts-ignore
+      checkboxTreeRef?.current?.onCheck({ value: CONSTANTS.ALL, checked: true });
+      setSelectChecbox(false)
+    }
+  }, [selectChecbox])
 
   /**
    * when tab is discarded, the tab is replaced, so we must update the srcTab in State as well
@@ -181,14 +200,14 @@ export default function App() {
     if(srcTab?.id && srcStorage){
       const checkboxTreeData: CheckboxTreeState['nodes'] =  [{
           label: 'All',
-          value: 'All',
+          value: CONSTANTS.ALL,
           children: []
         }]
       if(isCookieType(srcStorage)){
         const srcCookies = await getCookies(srcTab);
         console.log("🚀 ~ file: app.tsx ~ line 141 ~ updateCheckboxTree ~ srcCookies", srcCookies)
         checkboxTreeData[0].children = srcCookies.map((cookie) => {
-          const label = cookie.name + SEP + cookie.domain
+          const label = cookie.name + CONSTANTS.SEP + cookie.domain
           return {
             label: <CheckboxTreeLabel name={label} value={cookie.value} />,
             value: label
@@ -224,8 +243,10 @@ export default function App() {
 
       setCheckboxData({
         ...checkboxData,
-        nodes: checkboxTreeData
+        nodes: checkboxTreeData,
+        expanded: [CONSTANTS.ALL]
       })
+      setSelectChecbox(true);
     }
   }
 
@@ -274,12 +295,15 @@ export default function App() {
             onChange={handleChange}
           />
 
+          {/* TODO: implement checkbox filtering while saving */}
+
           <CheckboxTree
             nodes={checkboxData.nodes}
             checked={checkboxData.checked}
             expanded={checkboxData.expanded}
             onCheck={onCheckHandler}
             onExpand={onExpandHandler}
+            ref={checkboxTreeRef}
           />
 
         </Fieldset>
