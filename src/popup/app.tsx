@@ -2,7 +2,7 @@ import { Alert, Button } from "@mantine/core";
 import Select, { ChangeHandlerArgs } from "lib-components/select";
 import { Tab } from "lib-models/browser";
 import { Progress } from "lib-models/progress";
-import detectBrowser from "lib-utils/browser";
+import detectBrowser, { safelyExecuteScript } from "lib-utils/browser";
 import {
   getAllItems,
   getCookies,
@@ -94,10 +94,13 @@ export default function App() {
        })
      }
    }
+  async function handleSrcChange(tab: ChangeHandlerArgs<Tab>) {
+    Promise.resolve(updateCheckboxTree(tab.name, tab.value));
+    await handleChange(tab)
+  }
+
   async function handleChange({ name, value }: ChangeHandlerArgs<Tab>) {
     console.log("🚀 ~ file: app.tsx ~ line 32 ~ handleChange ~ { name, value }", { name, value })
-
-    Promise.resolve(updateCheckboxTree(name, value));
     setState((s) => {
       return { ...s, [name]: value };
     });
@@ -131,17 +134,19 @@ export default function App() {
                 domain = `.${domain}`;
               }
               try {
-                await browser.cookies.set({
-                  domain,
-                  url: destTab.url,
-                  path: cookie.path,
-                  name: cookie.name,
-                  value: String(cookie.value || ""),
-                  secure: cookie.secure,
-                  httpOnly: cookie.httpOnly,
-                  sameSite: cookie.sameSite,
-                  expirationDate: cookie.expirationDate,
-                });
+                if(checkboxData?.checked?.indexOf(cookieId(cookie)) > -1){
+                  await browser.cookies.set({
+                    domain,
+                    url: destTab.url,
+                    path: cookie.path,
+                    name: cookie.name,
+                    value: String(cookie.value || ""),
+                    secure: cookie.secure,
+                    httpOnly: cookie.httpOnly,
+                    sameSite: cookie.sameSite,
+                    expirationDate: cookie.expirationDate,
+                  });
+                }
               } catch (error) {
                 console.error(error);
               }
@@ -155,17 +160,16 @@ export default function App() {
             });
           }
         } else {
-          const [getAll] = await browser.scripting.executeScript({
-            target: { tabId: srcTab.id },
-            args: [srcStorage],
-            func: getAllItems,
-          });
-          if (getAll?.result) {
-            await browser.scripting.executeScript({
-              target: { tabId: destTab.id },
-              args: [destStorage, getAll.result],
-              func: setAllItems,
-            });
+          const getAll = await safelyExecuteScript(srcTab, [srcStorage], getAllItems, browser, false)
+          const result = getAll?.result
+          if (result) {
+            const filteredData = {}
+            Object.keys(result).forEach((storageKey) => {
+              if(checkboxData?.checked?.indexOf(storageKey) > -1){
+                filteredData[storageKey] = result[storageKey]
+              }
+            })
+            await safelyExecuteScript(destTab, [destStorage, filteredData], setAllItems, browser, true)
             setProgress(Progress.pass);
           } else {
             setProgress(Progress.stopped);
@@ -207,32 +211,13 @@ export default function App() {
         const srcCookies = await getCookies(srcTab);
         console.log("🚀 ~ file: app.tsx ~ line 141 ~ updateCheckboxTree ~ srcCookies", srcCookies)
         checkboxTreeData[0].children = srcCookies.map((cookie) => {
-          const label = cookie.name + CONSTANTS.SEP + cookie.domain
+          const label = cookieId(cookie)
           return {
             label: <CheckboxTreeLabel name={label} value={cookie.value} />,
             value: label
           }})
       }else{
-        /**
-         * if tab is discarded/unloaded from memory, executescript fails
-         * so we reload the tab first and then fetch storage
-         */
-        const isTabUnloaded = srcTab.discarded || srcTab.status === 'unloaded' // type TabStatus exists in chrome docs but not in TS types https://developer.chrome.com/docs/extensions/reference/tabs/#type-TabStatus
-        isTabUnloaded && await browser.tabs.reload(srcTab.id)
-        const [getAll] = await browser.scripting.executeScript({
-          target: { tabId: srcTab.id },
-          args: [srcStorage],
-          func: getAllItems,
-        });
-        console.log("🚀 ~ file: app.tsx ~ line 139 ~ updateCheckboxTree ~ getAll", getAll.result)
-        /**
-         * So we discard the tab again as it was discarded earlier and don't want to consume user's memory
-         * BUT BUT BUT due to discarding the tab, tab is replaced, and the tab we have in srcTab is not the same
-         * so we use browser.tabs.onReplaced, check on top
-         * this discard also returns the new tab, but onReplace handles more cases like tab getting discarded automatically
-         * so we use that
-         */
-        isTabUnloaded && await browser.tabs.discard(srcTab.id)
+        const getAll = await safelyExecuteScript(srcTab, [srcStorage], getAllItems, browser, true)
         checkboxTreeData[0].children = (getAll.result && Object.entries(getAll.result).map((storageEntry) => {
           return {
             label: <CheckboxTreeLabel name={storageEntry[0]} value={storageEntry[1]} />,
@@ -277,7 +262,7 @@ export default function App() {
             options={tabs}
             valueAsObject
             value={state.srcTab}
-            onChange={handleChange}
+            onChange={handleSrcChange}
             disabled={disabledField}
             itemComponent={CustomSelectOption}
             fieldKey={{
@@ -292,7 +277,7 @@ export default function App() {
             options={StorageTypeList}
             value={state.srcStorage}
             disabled={disabledField}
-            onChange={handleChange}
+            onChange={handleSrcChange}
           />
 
           {/* TODO: implement checkbox filtering while saving */}
@@ -348,4 +333,8 @@ export default function App() {
   );
 }
 
+
+function cookieId(cookie: chrome.cookies.Cookie) {
+  return cookie.name + CONSTANTS.SEP + cookie.domain;
+}
 
