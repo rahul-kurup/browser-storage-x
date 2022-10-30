@@ -3,7 +3,7 @@ import detectBrowser from "lib-utils/browser";
 
 const browser = detectBrowser();
 
-export function getAllItems(storageType: StorageType) {
+export function getAllItems(storageType: StorageType): Record<string, string> | undefined {
   try {
     const obj = {};
     const storage = storageType === "local" ? localStorage : sessionStorage;

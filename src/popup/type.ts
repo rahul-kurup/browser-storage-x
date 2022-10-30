@@ -7,12 +7,11 @@ export interface ItemProps extends React.ComponentPropsWithoutRef<"div"> {
   label: string;
 }
 
-type CheckboxTreeState = Pick<CheckboxProps, 'nodes' | 'expanded'| 'checked'>
+export type CheckboxTreeState = Pick<CheckboxProps, 'nodes' | 'expanded'| 'checked'>
 
 export type State = {
   srcTab: Tab;
   srcStorage: StorageType;
-  selectedVals?: CheckboxTreeState;
   destTab: Tab;
   destStorage: StorageType;
 };

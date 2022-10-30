@@ -12,16 +12,24 @@ import {
 } from "lib-utils/storage";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import alerts from "./alerts";
-import CustomSelectOption from "./select-option";
+import { CustomSelectOption, CheckboxTreeLabel} from "./components"
 import Wrapper, { Fieldset, Form, Heading } from "./style";
-import { State } from "./type";
+import { CheckboxTreeState, State } from "./type";
 import CheckboxTree from 'react-checkbox-tree';
+import {CheckboxProps} from 'react-checkbox-tree';
 
 const browser = detectBrowser();
+
+const SEP = '|:|';
 
 export default function App() {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [state, setState] = useState({} as State);
+  const [checkboxData, setCheckboxData] = useState<CheckboxTreeState>({
+    nodes: [],
+    checked: [],
+    expanded: []
+  })
   const [progress, setProgress] = useState<
     Progress | { title: string; color: string; message: string }
   >(Progress.idle);
@@ -171,22 +179,33 @@ export default function App() {
       [name]: value
     } as State
     if(srcTab?.id && srcStorage){
-      // TODO: make storage/cookie data suitable for checkbox-tree
+      const checkboxTreeData: CheckboxTreeState['nodes'] =  [{
+          label: 'All',
+          value: 'All',
+          children: []
+        }]
       if(isCookieType(srcStorage)){
         const srcCookies = await getCookies(srcTab);
         console.log("🚀 ~ file: app.tsx ~ line 141 ~ updateCheckboxTree ~ srcCookies", srcCookies)
+        checkboxTreeData[0].children = srcCookies.map((cookie) => {
+          const label = cookie.name + SEP + cookie.domain
+          return {
+            label: <CheckboxTreeLabel name={label} value={cookie.value} />,
+            value: label
+          }})
       }else{
         /**
          * if tab is discarded/unloaded from memory, executescript fails
          * so we reload the tab first and then fetch storage
          */
-        const isTabUnloaded = srcTab.status === 'unloaded' // type TabStatus exists in chrome docs but not in TS types https://developer.chrome.com/docs/extensions/reference/tabs/#type-TabStatus
+        const isTabUnloaded = srcTab.discarded || srcTab.status === 'unloaded' // type TabStatus exists in chrome docs but not in TS types https://developer.chrome.com/docs/extensions/reference/tabs/#type-TabStatus
         isTabUnloaded && await browser.tabs.reload(srcTab.id)
         const [getAll] = await browser.scripting.executeScript({
           target: { tabId: srcTab.id },
           args: [srcStorage],
           func: getAllItems,
         });
+        console.log("🚀 ~ file: app.tsx ~ line 139 ~ updateCheckboxTree ~ getAll", getAll.result)
         /**
          * So we discard the tab again as it was discarded earlier and don't want to consume user's memory
          * BUT BUT BUT due to discarding the tab, tab is replaced, and the tab we have in srcTab is not the same
@@ -194,17 +213,33 @@ export default function App() {
          * this discard also returns the new tab, but onReplace handles more cases like tab getting discarded automatically
          * so we use that
          */
-        isTabUnloaded && await browser.tabs.discard(srcTab.id) 
-        console.log("🚀 ~ file: app.tsx ~ line 139 ~ updateCheckboxTree ~ getAll", getAll.result)
+        isTabUnloaded && await browser.tabs.discard(srcTab.id)
+        checkboxTreeData[0].children = (getAll.result && Object.entries(getAll.result).map((storageEntry) => {
+          return {
+            label: <CheckboxTreeLabel name={storageEntry[0]} value={storageEntry[1]} />,
+            value: storageEntry[0]
+          }
+        })) ?? []
       }
-      // setState({
-      //   ...state,
-      //   selectedVals: {
-      //     ...(state.selectedVals),
-      //     nodes: []
-      //   }
-      // })
+
+      setCheckboxData({
+        ...checkboxData,
+        nodes: checkboxTreeData
+      })
     }
+  }
+
+  const onCheckHandler: CheckboxProps['onCheck'] = (checked) => {
+    setCheckboxData({
+      ...checkboxData,
+      checked
+    })
+  }
+  const onExpandHandler: CheckboxProps['onExpand']  = (expanded) => {
+    setCheckboxData({
+      ...checkboxData,
+      expanded
+    })
   }
 
   return (
@@ -238,15 +273,15 @@ export default function App() {
             disabled={disabledField}
             onChange={handleChange}
           />
-{/* 
-            <CheckboxTree 
-                          nodes={}
-                          checked={}
-                          expanded={}
-                          onCheck={}
-                          onExpand={}
-                           /> */}
-            
+
+          <CheckboxTree
+            nodes={checkboxData.nodes}
+            checked={checkboxData.checked}
+            expanded={checkboxData.expanded}
+            onCheck={onCheckHandler}
+            onExpand={onExpandHandler}
+          />
+
         </Fieldset>
 
         <Fieldset>
