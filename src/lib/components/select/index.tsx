@@ -1,2 +1,2 @@
-export { default } from "./select";
-export * from "./type";
+export { default } from './select';
+export * from './type';

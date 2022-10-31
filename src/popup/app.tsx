@@ -1,19 +1,19 @@
-import { Alert, Button } from "@mantine/core";
-import Select, { ChangeHandlerArgs } from "lib-components/select";
-import { Tab } from "lib-models/browser";
-import { Progress } from "lib-models/progress";
-import detectBrowser from "lib-utils/browser";
+import { Alert, Button } from '@mantine/core';
+import Select, { ChangeHandlerArgs } from 'lib-components/select';
+import { Tab } from 'lib-models/browser';
+import { Progress } from 'lib-models/progress';
+import detectBrowser from 'lib-utils/browser';
 import {
   getAllItems,
   isCookieType,
   setAllItems,
   StorageTypeList
-} from "lib-utils/storage";
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import alerts from "./alerts";
-import CustomSelectOption from "./select-option";
-import Wrapper, { Fieldset, Form, Heading } from "./style";
-import { State } from "./type";
+} from 'lib-utils/storage';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import alerts from './alerts';
+import CustomSelectOption from './select-option';
+import Wrapper, { Fieldset, Form, Heading } from './style';
+import { State } from './type';
 
 const browser = detectBrowser();
 
@@ -29,7 +29,7 @@ export default function App() {
   }, []);
 
   function handleChange({ name, value }: ChangeHandlerArgs<Tab>) {
-    setState((s) => ({ ...s, [name]: value }));
+    setState(s => ({ ...s, [name]: value }));
   }
 
   function resetSubmission() {
@@ -53,12 +53,12 @@ export default function App() {
         if (isSrcCookie || isDestCookie) {
           if (isSrcCookie && isDestCookie) {
             const cookies = await browser.cookies.getAll({});
-            const srcCookies = cookies.filter((f) =>
-              srcTab.url.includes(f.domain.split(".").filter(Boolean).join("."))
+            const srcCookies = cookies.filter(f =>
+              srcTab.url.includes(f.domain.split('.').filter(Boolean).join('.'))
             );
             for (const cookie of srcCookies) {
               let domain = new URL(destTab.url).hostname;
-              if (cookie.domain.startsWith(".")) {
+              if (cookie.domain.startsWith('.')) {
                 domain = `.${domain}`;
               }
               try {
@@ -67,11 +67,11 @@ export default function App() {
                   url: destTab.url,
                   path: cookie.path,
                   name: cookie.name,
-                  value: String(cookie.value || ""),
+                  value: String(cookie.value || ''),
                   secure: cookie.secure,
                   httpOnly: cookie.httpOnly,
                   sameSite: cookie.sameSite,
-                  expirationDate: cookie.expirationDate,
+                  expirationDate: cookie.expirationDate
                 });
               } catch (error) {
                 console.error(error);
@@ -80,22 +80,22 @@ export default function App() {
             setProgress(Progress.pass);
           } else {
             setProgress({
-              color: "red",
-              title: "🛑 Mismatch",
-              message: 'Source and destination storage should be "cookie"',
+              color: 'red',
+              title: '🛑 Mismatch',
+              message: 'Source and destination storage should be "cookie"'
             });
           }
         } else {
           const [getAll] = await browser.scripting.executeScript({
             target: { tabId: srcTab.id },
             args: [srcStorage],
-            func: getAllItems,
+            func: getAllItems
           });
           if (getAll?.result) {
             await browser.scripting.executeScript({
               target: { tabId: destTab.id },
               args: [destStorage, getAll.result],
-              func: setAllItems,
+              func: setAllItems
             });
             setProgress(Progress.pass);
           } else {
@@ -104,7 +104,7 @@ export default function App() {
         }
       }
     } catch (error) {
-      console.error("submit", error);
+      console.error('submit', error);
       setProgress(Progress.fail);
     }
     resetSubmission();
@@ -114,7 +114,7 @@ export default function App() {
   const disabledField = progress !== Progress.idle;
 
   const PresetAlert = useMemo<JSX.Element>(() => {
-    return typeof progress === "number" ? (
+    return typeof progress === 'number' ? (
       alerts[progress]
     ) : (
       <Alert color={progress.color} title={progress.title}>
@@ -132,8 +132,8 @@ export default function App() {
           <legend>Source</legend>
 
           <Select
-            label="Tab"
-            name="srcTab"
+            label='Tab'
+            name='srcTab'
             options={tabs}
             valueAsObject
             value={state.srcTab}
@@ -141,14 +141,14 @@ export default function App() {
             disabled={disabledField}
             itemComponent={CustomSelectOption}
             fieldKey={{
-              value: "id",
-              label: "title",
+              value: 'id',
+              label: 'title'
             }}
           />
 
           <Select
-            label="Storage"
-            name="srcStorage"
+            label='Storage'
+            name='srcStorage'
             options={StorageTypeList}
             value={state.srcStorage}
             disabled={disabledField}
@@ -160,8 +160,8 @@ export default function App() {
           <legend>Destination</legend>
 
           <Select
-            label="Tab"
-            name="destTab"
+            label='Tab'
+            name='destTab'
             options={tabs}
             valueAsObject
             value={state.destTab}
@@ -169,14 +169,14 @@ export default function App() {
             disabled={disabledField}
             itemComponent={CustomSelectOption}
             fieldKey={{
-              value: "id",
-              label: "title",
+              value: 'id',
+              label: 'title'
             }}
           />
 
           <Select
-            label="Storage"
-            name="destStorage"
+            label='Storage'
+            name='destStorage'
             options={StorageTypeList}
             value={state.destStorage}
             disabled={disabledField}
@@ -185,7 +185,7 @@ export default function App() {
         </Fieldset>
 
         {progress === Progress.idle ? (
-          <Button type="submit" disabled={!hasAllValues}>
+          <Button type='submit' disabled={!hasAllValues}>
             Share Tab Storage
           </Button>
         ) : (

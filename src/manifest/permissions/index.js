@@ -14,7 +14,7 @@ module.exports = [
   // "document.execCommand('cut')",
   // "contentSettings",
   // "contextMenus",
-  "cookies",
+  'cookies',
   // "debugger",
   // "declarativeContent",
   // "declarativeNetRequest",
@@ -49,7 +49,7 @@ module.exports = [
   // "privacy",
   // "processes",
   // "proxy",
-  "scripting",
+  'scripting',
   // "search",
   // "sessions",
   // "signedInDevices",
@@ -60,7 +60,7 @@ module.exports = [
   // "system.storage",
   // "tabCapture",
   // "tabGroups",
-  "tabs",
+  'tabs'
   // "topSites",
   // "tts",
   // "ttsEngine",
@@ -70,4 +70,4 @@ module.exports = [
   // "webNavigation",
   // "webRequest",
   // "webRequestBlocking"
-]
+];

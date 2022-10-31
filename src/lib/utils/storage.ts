@@ -1,29 +1,29 @@
-import Storages, { StorageType } from "../models/storage";
+import Storages, { StorageType } from '../models/storage';
 
 export function getAllItems(storageType: StorageType) {
   try {
     const obj = {};
-    const storage = storageType === "local" ? localStorage : sessionStorage;
+    const storage = storageType === 'local' ? localStorage : sessionStorage;
     for (let i = 0; i < storage.length; i++) {
       const key = storage.key(i);
       obj[key] = storage.getItem(key);
     }
     return obj;
   } catch (error) {
-    console.error("get", error);
+    console.error('get', error);
   }
   return undefined;
 }
 
 export function setAllItems(storageType: StorageType, data: any) {
   try {
-    const storage = storageType === "local" ? localStorage : sessionStorage;
+    const storage = storageType === 'local' ? localStorage : sessionStorage;
     const keys = Object.keys(data);
-    keys.forEach((key) => {
+    keys.forEach(key => {
       storage.setItem(key, data[key]);
     });
   } catch (error) {
-    console.error("set", error);
+    console.error('set', error);
   }
 }
 
@@ -32,4 +32,4 @@ export const StorageTypeList = Object.keys(Storages).reduce(
   []
 );
 
-export const isCookieType = (storage: StorageType) => storage === "cookie";
+export const isCookieType = (storage: StorageType) => storage === 'cookie';

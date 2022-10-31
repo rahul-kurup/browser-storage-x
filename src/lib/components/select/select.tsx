@@ -1,7 +1,7 @@
-import { Select as MantineSelect } from "@mantine/core";
-import { isNully } from "lib-utils/common";
-import { useCallback, useMemo } from "react";
-import { SelectProps } from "./type";
+import { Select as MantineSelect } from '@mantine/core';
+import { isNully } from 'lib-utils/common';
+import { useCallback, useMemo } from 'react';
+import { SelectProps } from './type';
 
 export default function Select<T>({
   name,
@@ -13,16 +13,16 @@ export default function Select<T>({
   ...props
 }: SelectProps<T>) {
   const getContent = useCallback(
-    (m: T, keyFor: "label" | "value") => {
+    (m: T, keyFor: 'label' | 'value') => {
       if (isNully(m)) {
         return m;
       } else if (fieldKey?.[keyFor]) {
-        return typeof fieldKey[keyFor] === "string"
+        return typeof fieldKey[keyFor] === 'string'
           ? m[fieldKey[keyFor] as string]
-          : typeof fieldKey[keyFor] === "function"
+          : typeof fieldKey[keyFor] === 'function'
           ? (fieldKey[keyFor] as Function)(m)
           : m[keyFor];
-      } else if (typeof m === "object") {
+      } else if (typeof m === 'object') {
         return m[keyFor];
       } else {
         return m;
@@ -34,25 +34,25 @@ export default function Select<T>({
   const selectedValue = useMemo(() => {
     let val = value;
     if (valueAsObject) {
-      val = getContent(value as T, "value");
+      val = getContent(value as T, 'value');
     }
-    return String(val ?? "");
+    return String(val ?? '');
   }, [value, getContent]);
 
   const dataItems = useMemo(() => {
-    return options.map((m) => {
-      const label = getContent(m, "label");
-      const value = String(getContent(m, "value"));
+    return options.map(m => {
+      const label = getContent(m, 'label');
+      const value = String(getContent(m, 'value'));
       return { label, value, data: m };
     });
   }, [fieldKey, options, getContent]);
 
   function handleChange(value: string) {
-    const data = dataItems.find((f) => f.value === value)?.data;
+    const data = dataItems.find(f => f.value === value)?.data;
     props.onChange?.({
       name,
       data,
-      value: valueAsObject ? data : value,
+      value: valueAsObject ? data : value
     });
   }
 

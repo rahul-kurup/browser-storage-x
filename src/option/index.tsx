@@ -1,11 +1,9 @@
-import React from "react";
-import {
-  createRoot
-} from "react-dom/client";
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 
-import App from "./components/app";
+import App from './components/app';
 
-const container = document.createElement("popup");
+const container = document.createElement('popup');
 document.body.appendChild(container);
 
 const root = createRoot(container);
