@@ -1,3 +1,13 @@
+**What is browser-storage-x ?**
+
+It's a browser extension for chrome based/firefox/safari browsers which lets you copy localstorage/sessionstorage/cookies across different domains.
+
+
+**Extension links**
+- Chrome - https://chrome.google.com/webstore/detail/storagex/pafddkhaocklakonboekmgodcmgmfcbp
+- Firefox - https://addons.mozilla.org/en-US/firefox/addon/storagex/
+
+
 **Setup**
 
 - This project uses `yarn`, so make sure to have that globally installed
