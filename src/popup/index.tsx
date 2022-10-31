@@ -1,8 +1,8 @@
-import { MantineProvider } from "@mantine/core";
-import { createRoot } from "react-dom/client";
-import App from "./app";
+import { MantineProvider } from '@mantine/core';
+import { createRoot } from 'react-dom/client';
+import App from './app';
 
-const container = document.createElement("popup");
+const container = document.createElement('popup');
 document.body.appendChild(container);
 
 const root = createRoot(container);
