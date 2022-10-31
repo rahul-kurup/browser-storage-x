@@ -16,7 +16,7 @@ export async function safelyExecuteScript(
    * so we reload the tab first and then fetch storage
    */
   const isTabUnloaded =
-    tabToExecuteOn.discarded || tabToExecuteOn.status === 'unloaded';
+    tabToExecuteOn.discarded || tabToExecuteOn.status === 'unloaded'; // 'unloaded' comes from type TabStatus which exists in chrome docs but not in TS types https://developer.chrome.com/docs/extensions/reference/tabs/#type-TabStatus
 
   if (isTabUnloaded) {
     await browser.tabs.reload(tabToExecuteOn.id);
@@ -34,9 +34,9 @@ export async function safelyExecuteScript(
   );
   /**
    * So we discard the tab again as it was discarded earlier and don't want to consume user's memory
-   * BUT BUT BUT due to discarding the tab, tab is replaced, and the tab we have in srcTab is not the same
-   * so we use browser.tabs.onReplaced, check on top
-   * this discard also returns the new tab, but onReplace handles more cases like tab getting discarded automatically
+   * BUT BUT BUT due to discarding the tab, tab is replaced, and is not the same
+   * so we use browser.tabs.onReplaced, check in main app file, we add a listener there
+   * the discard fn here also returns the new tab, but onReplace handles more cases like tab getting discarded automatically
    * so we use that
    */
   if (discardAfterExecution && isTabUnloaded) {
