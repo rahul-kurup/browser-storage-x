@@ -19,7 +19,7 @@
     "paths": {
       "lib-models/*": ["lib/models/*"],
       "lib-utils/*": ["lib/utils/*"],
-      "lib-components/*": ["lib/components/*"],
+      "lib-components/*": ["lib/components/*"]
     }
   },
   "include": ["src", "typings.d.ts"],

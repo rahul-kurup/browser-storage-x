@@ -8,4 +8,4 @@ module.exports = {
   //     strict_min_version: "42.0"
   //   }
   // }
-}
+};

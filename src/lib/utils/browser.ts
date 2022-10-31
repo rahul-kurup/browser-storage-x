@@ -1,21 +1,37 @@
-export default function browser() {
-  return chrome;
+import { Tab } from 'lib-models/browser';
+
+export default async function detectBrowser() {
+  return Promise.resolve(chrome); // Promisified to handle future browser async detection
 }
 
-
-export const safelyExecuteScript = async (tabToExecuteOn: chrome.tabs.Tab, args, func, browser: typeof chrome, discardAfterExecution=true) => {
+export async function safelyExecuteScript(
+  tabToExecuteOn: Tab,
+  args: any[],
+  func: (...args: any[]) => unknown,
+  discardAfterExecution = true
+) {
+  const browser = await detectBrowser();
   /**
    * if tab is discarded/unloaded from memory, executescript fails
    * so we reload the tab first and then fetch storage
    */
-  const isTabUnloaded = tabToExecuteOn.discarded || tabToExecuteOn.status === 'unloaded' // type TabStatus exists in chrome docs but not in TS types https://developer.chrome.com/docs/extensions/reference/tabs/#type-TabStatus
-  isTabUnloaded && await browser.tabs.reload(tabToExecuteOn.id)
-  const [getAll] = await browser.scripting.executeScript({
+  const isTabUnloaded =
+    tabToExecuteOn.discarded || tabToExecuteOn.status === 'unloaded';
+
+  if (isTabUnloaded) {
+    await browser.tabs.reload(tabToExecuteOn.id);
+  }
+
+  const [execOutput] = await browser.scripting.executeScript({
     target: { tabId: tabToExecuteOn.id },
     args: [...args],
-    func: func,
+    func,
   });
-  console.log("🚀 ~ file: app.tsx ~ line 139 ~ updateCheckboxTree ~ getAll", getAll.result)
+
+  console.log(
+    '🚀 ~ file: app.tsx ~ line 139 ~ updateCheckboxTree ~ getAll',
+    execOutput.result
+  );
   /**
    * So we discard the tab again as it was discarded earlier and don't want to consume user's memory
    * BUT BUT BUT due to discarding the tab, tab is replaced, and the tab we have in srcTab is not the same
@@ -23,6 +39,8 @@ export const safelyExecuteScript = async (tabToExecuteOn: chrome.tabs.Tab, args,
    * this discard also returns the new tab, but onReplace handles more cases like tab getting discarded automatically
    * so we use that
    */
-   discardAfterExecution && isTabUnloaded && await browser.tabs.discard(tabToExecuteOn.id)
-   return getAll
+  if (discardAfterExecution && isTabUnloaded) {
+    await browser.tabs.discard(tabToExecuteOn.id);
+  }
+  return execOutput;
 }
