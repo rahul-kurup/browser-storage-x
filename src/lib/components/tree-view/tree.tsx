@@ -1,45 +1,54 @@
-import { useState } from 'react';
-import View, { Node, NodeChkBx, NodeLabel, NodeLabelContainer } from './style';
-import { TreeNodeProps, TreeViewProps } from './type';
+import { useMemo, useState } from 'react';
+import Ctx from './context';
+import {
+  genNodes,
+  getItemsChildToParent,
+  getItemsParentToChild
+} from './helper';
+import { LabelCheckBox } from './style';
+import TreeNode from './tree-node';
+import { ExternalProps, NodeWithIdProps, TreeViewProps } from './type';
 
-function NodeView({ name, nodes, parentName, ...props }: TreeNodeProps) {
-  let nodeId = name;
-  const [expanded, setExpanded] = useState(false);
+export default function Tree({
+  name = 'root',
+  items,
+  ...props
+}: TreeViewProps & ExternalProps) {
+  const [selections, setSelections] = useState([] as string[]);
 
-  if (parentName) {
-    nodeId = `${parentName}.${name}`.split(' ').join('_');
+  const nodeProps = useMemo(() => genNodes({ name, items }), [name, items]);
+
+  function handleSelection(itemId: string) {
+    setSelections(prev => {
+      const p2c = getItemsParentToChild(itemId, nodeProps as NodeWithIdProps);
+      if (prev.includes(itemId)) {
+        const c2p = getItemsChildToParent(itemId, nodeProps as NodeWithIdProps);
+        const toRemove = [...new Set([...p2c, ...c2p])];
+        return [...prev.filter(f => !toRemove.includes(f))];
+      }
+
+      prev.push(...p2c);
+
+      return [...prev];
+    });
   }
 
   return (
-    <Node {...props} data-node-id={nodeId}>
-      <NodeLabelContainer>
-        <NodeChkBx>
-          <input type='checkbox' name={nodeId} id={nodeId} />
-        </NodeChkBx>
-
-        <NodeLabel onClick={() => setExpanded(s => !s)}>{name}</NodeLabel>
-      </NodeLabelContainer>
-
-      {nodes?.length && expanded && (
-        <TreeView
-          name={name}
-          parentName={nodeId}
-          nodes={nodes}
-          style={{ marginLeft: 15 }}
-        />
+    <Ctx.Provider value={{ selections, setSelections: handleSelection }}>
+      {props.enableSelection && (
+        <LabelCheckBox>
+          <input
+            id={nodeProps.itemId}
+            name={nodeProps.itemId}
+            type='checkbox'
+            checked={selections.includes(nodeProps.itemId)}
+            onChange={() => handleSelection(nodeProps.itemId)}
+          />
+          All
+        </LabelCheckBox>
       )}
-    </Node>
+
+      <TreeNode {...props} {...nodeProps} />
+    </Ctx.Provider>
   );
 }
-
-function TreeView({ nodes, parentName, ...props }: TreeViewProps) {
-  return (
-    <View {...props}>
-      {nodes.map(m => (
-        <NodeView key={m.name} {...m} parentName={parentName} />
-      ))}
-    </View>
-  );
-}
-
-export default TreeView;

@@ -6,8 +6,8 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { join } = require('path');
 const dotenv = require('dotenv');
 
-const prodPlugins = [],
-  isProd = process.env.NODE_ENV === 'production';
+const prodPlugins = [];
+const isProd = process.env.NODE_ENV === 'production';
 
 if (isProd) {
   prodPlugins.push(new optimize.AggressiveMergingPlugin());

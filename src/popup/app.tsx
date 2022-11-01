@@ -17,8 +17,6 @@ import { CheckboxTreeLabel, CustomSelectOption } from './components';
 import Wrapper, { Fieldset, Form, Heading } from './style';
 import { CheckboxTreeState, State } from './type';
 
-const browser = detectBrowser();
-
 const CONSTANTS = {
   SEP: '|:|',
   ALL: '__all__',

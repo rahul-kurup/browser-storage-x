@@ -21,6 +21,7 @@
     "init:profile": "mkdirp tmp/profile/chrome tmp/profile/brave tmp/profile/firefox",
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production webpack",
+    "build:local": "cross-env NODE_ENV=development webpack",
     "build:chrome": "cross-env NODE_ENV=development webpack --config ./webpack/chrome.js",
     "build:firefox": "cross-env NODE_ENV=development webpack --config ./webpack/firefox.js",
     "build:safari": "cross-env NODE_ENV=development webpack --config ./webpack/safari.js && xcrun safari-web-extension-converter dist/safari-prebuild --project-location dist/safari --force --no-open && rimraf safari-prebuild",

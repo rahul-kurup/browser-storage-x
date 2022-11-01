@@ -3,16 +3,18 @@ import TreeView from 'lib-components/tree-view';
 export default function TreeViewTest() {
   return (
     <TreeView
-      nodes={[
+      enableSelection={true}
+      showGuidelines={true}
+      items={[
         {
           name: 'vehicle',
-          nodes: [
+          items: [
             {
               name: 'car',
-              nodes: [
+              items: [
                 {
                   name: 'hyundai',
-                  nodes: [
+                  items: [
                     { name: 'i10' },
                     { name: 'i20' },
                     { name: 'i30' },
@@ -21,7 +23,7 @@ export default function TreeViewTest() {
                 },
                 {
                   name: 'tata',
-                  nodes: [
+                  items: [
                     { name: 'punch' },
                     { name: 'tiago' },
                     { name: 'nexon' },
@@ -30,7 +32,7 @@ export default function TreeViewTest() {
                 },
                 {
                   name: 'mahindra',
-                  nodes: [
+                  items: [
                     { name: 'kuv 300' },
                     { name: 'xuv 300' },
                     { name: 'xuv 500' },
@@ -39,7 +41,7 @@ export default function TreeViewTest() {
                 },
                 {
                   name: 'audi',
-                  nodes: [{ name: 'q4' }, { name: 'a4' }, { name: 's5' }],
+                  items: [{ name: 'q4' }, { name: 'a4' }, { name: 's5' }],
                 },
               ],
             },
@@ -47,13 +49,13 @@ export default function TreeViewTest() {
         },
         {
           name: 'mobile',
-          nodes: [
+          items: [
             {
               name: 'apple',
-              nodes: [
+              items: [
                 {
                   name: '12',
-                  nodes: [
+                  items: [
                     { name: 'pro' },
                     { name: 'pro max' },
                     { name: 'mini' },
@@ -61,7 +63,7 @@ export default function TreeViewTest() {
                 },
                 {
                   name: '13',
-                  nodes: [
+                  items: [
                     { name: 'mini' },
                     { name: 'pro' },
                     { name: 'pro max' },
@@ -71,14 +73,14 @@ export default function TreeViewTest() {
             },
             {
               name: 'samsung',
-              nodes: [
+              items: [
                 {
                   name: 's22',
-                  nodes: [{ name: 'edge' }, { name: 'ultra' }],
+                  items: [{ name: 'edge' }, { name: 'ultra' }],
                 },
                 {
                   name: 's23',
-                  nodes: [{ name: 'ultra' }, { name: 'node' }],
+                  items: [{ name: 'ultra' }, { name: 'note' }],
                 },
               ],
             },
