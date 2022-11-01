@@ -12,3 +12,10 @@ export type State = {
   destTab: Tab;
   destStorage: StorageType;
 };
+
+export type SpecificProps = {
+  open: boolean;
+  shareState: State;
+  setOpen: (state: boolean) => void;
+  onShare: (content: any) => void;
+};

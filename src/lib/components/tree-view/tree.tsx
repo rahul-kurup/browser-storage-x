@@ -5,14 +5,14 @@ import {
   genNodes,
   getData,
   getItemsChildToParent,
-  getItemsParentToChild
+  getItemsParentToChild,
 } from './helper';
 import { LabelCheckBox } from './style';
 import TreeNode from './tree-node';
 import { ExternalProps, NodeWithIdProps, TreeViewProps } from './type';
 
 export default function Tree({
-  name = CONSTANTS.rootItemId,
+  uniqName: name = CONSTANTS.rootItemPath,
   items,
   allSelectedByDefault,
   onChecked,
@@ -21,15 +21,21 @@ export default function Tree({
   const refMount = useRef(false);
   const [selections, setSelections] = useState([] as string[]);
 
-  const nodeProps = useMemo(() => genNodes({ name, items }), [name, items]);
+  const nodeProps = useMemo(
+    () => genNodes({ uniqName: name, items }),
+    [name, items]
+  );
 
-  function handleSelection(itemId: string) {
+  function handleSelection(itemPath: string) {
     if (props.enableSelection) {
       setSelections(prev => {
-        const p2c = getItemsParentToChild(itemId, nodeProps as NodeWithIdProps);
-        if (prev.includes(itemId)) {
+        const p2c = getItemsParentToChild(
+          itemPath,
+          nodeProps as NodeWithIdProps
+        );
+        if (prev.includes(itemPath)) {
           const c2p = getItemsChildToParent(
-            itemId,
+            itemPath,
             nodeProps as NodeWithIdProps
           );
           const toRemove = [...new Set([...p2c, ...c2p])];
@@ -46,16 +52,16 @@ export default function Tree({
   }, []);
 
   useEffect(() => {
-    if (props.enableSelection && allSelectedByDefault) {
-      handleSelection(CONSTANTS.rootItemId);
+    if (props.enableSelection && allSelectedByDefault && nodeProps) {
+      handleSelection(CONSTANTS.rootItemPath);
     }
-  }, [allSelectedByDefault, props.enableSelection]);
+  }, [allSelectedByDefault, props.enableSelection, nodeProps]);
 
   useEffect(() => {
     if (props.enableSelection && refMount.current) {
       const sels = [...selections].sort();
       const obj = getData(sels, nodeProps as NodeWithIdProps);
-      onChecked?.(Object.values(obj))
+      onChecked?.(Object.values(obj));
     }
   }, [selections, props.enableSelection]);
 
@@ -64,11 +70,11 @@ export default function Tree({
       {props.enableSelection && (
         <LabelCheckBox>
           <input
-            id={nodeProps.itemId}
-            name={nodeProps.itemId}
+            id={nodeProps.itemPath}
+            name={nodeProps.itemPath}
             type='checkbox'
-            checked={selections.includes(nodeProps.itemId)}
-            onChange={() => handleSelection(nodeProps.itemId)}
+            checked={selections.includes(nodeProps.itemPath)}
+            onChange={() => handleSelection(nodeProps.itemPath)}
           />
           All
         </LabelCheckBox>

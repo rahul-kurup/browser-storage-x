@@ -2,7 +2,7 @@ import type {
   Browser as BrowserType,
   Cookie,
   CookieSetInfo,
-  Tab
+  Tab,
 } from 'lib-models/browser';
 
 export default class Browser {
@@ -11,9 +11,16 @@ export default class Browser {
   }
 
   static cookies = {
-    getAll: async (cbSuccess?: (cookies: Cookie[]) => void) => {
+    getAll: async (tab?: Tab, cbSuccess?: (cookies: Cookie[]) => void) => {
       const browser = await this.detect();
       const result = await browser.cookies.getAll({});
+      if (tab) {
+        const filtered = result.filter(f =>
+          tab.url.includes(f.domain.split('.').filter(Boolean).join('.'))
+        );
+        cbSuccess?.(filtered);
+        return filtered;
+      }
       cbSuccess?.(result);
       return result;
     },

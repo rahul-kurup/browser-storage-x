@@ -1,7 +1,7 @@
 import { ComponentProps } from 'react';
 
 export type NodeProps = {
-  name: string;
+  uniqName: string;
   items?: NodeProps[];
 };
 
@@ -17,28 +17,28 @@ export type DataProps = {
 };
 
 export type NodeWithIdProps = DataProps & {
-  itemId: string;
-  name: string;
-  parentItemId?: string;
+  itemPath: string;
+  uniqName: string;
+  parentItemPath?: string;
   items?: NodeWithIdProps[];
 };
 
 export type TreeViewProps = ComponentProps<'ul'> &
   DataProps & {
-    name?: string;
+    uniqName?: string;
     items?: TreeViewProps[];
   };
 
 export type NodeViewProps = ComponentProps<'ul'> & {
-  name?: string;
-  itemId: string;
-  parentItemId?: string;
+  uniqName?: string;
+  itemPath: string;
+  parentItemPath?: string;
   items: (ComponentProps<'li'> & NodeWithIdProps)[];
 };
 
 export type GenNodeArgs = {
-  name?: string;
-  parentItemId?: string;
+  uniqName?: string;
+  parentItemPath?: string;
   items?: GenNodeArgs[];
 };
 
@@ -62,4 +62,9 @@ export type ExternalProps = {
 
   /** @default true */
   showGuidelines?: boolean;
+
+  /**
+   * custom node renderer
+   */
+  nodeRenderer?: (args: NodeWithIdProps) => JSX.Element;
 };

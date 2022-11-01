@@ -4,84 +4,84 @@ import UlView, {
   LabelCheckBox,
   LiNode,
   NodeText,
-  TextContainer
+  TextContainer,
 } from './style';
 import { ExternalProps, NodeViewProps } from './type';
 
 export default function TreeNode({
-  name: mainName,
+  uniqName: mainName,
   items: mainNodes,
-  itemId: mainNodeId,
+  itemPath: mainItemPath,
   enableSelection = false,
   showGuidelines = true,
+  nodeRenderer,
   ...mainProps
 }: NodeViewProps & ExternalProps) {
   const [expanded, setExpanded] = useState([]);
 
   const { selections, setSelections } = useContext(Ctx);
 
-  function handleExpansion(itemId: string) {
+  function handleExpansion(itemPath: string) {
     setExpanded(prev => {
-      if (prev.includes(itemId)) {
-        return [...prev.filter(f => f !== itemId)];
+      if (prev.includes(itemPath)) {
+        return [...prev.filter(f => f !== itemPath)];
       }
-      prev.push(itemId);
+      prev.push(itemPath);
       return [...prev];
     });
   }
 
   return (
-    <UlView {...mainProps} data-item-id={mainNodeId}>
-      {mainNodes.map(
-        ({
-          name: subName,
+    <UlView {...mainProps} data-item-id={mainItemPath}>
+      {mainNodes.map(node => {
+        const {
+          uniqName: subName,
           items: subNodes,
-          itemId: subNodeId,
+          itemPath: subItemPath,
           ...subProps
-        }) => {
-          return (
-            <LiNode
-              {...subProps}
-              key={subNodeId}
-              data-item-id={subNodeId}
-              enableSelection={enableSelection}
-              showGuidelines={showGuidelines}
-            >
-              <TextContainer>
-                {enableSelection && (
-                  <LabelCheckBox>
-                    <input
-                      id={subNodeId}
-                      name={subNodeId}
-                      type='checkbox'
-                      checked={selections.includes(subNodeId)}
-                      onChange={() => setSelections(subNodeId)}
-                    />
-                  </LabelCheckBox>
-                )}
-
-                <NodeText
-                  hasItems={!!subNodes?.length}
-                  expanded={expanded.includes(subNodeId)}
-                  onClick={() => handleExpansion(subNodeId)}
-                >
-                  {subName}
-                </NodeText>
-              </TextContainer>
-
-              {subNodes?.length && expanded.includes(subNodeId) && (
-                <TreeNode
-                  name={subName}
-                  items={subNodes}
-                  itemId={subNodeId}
-                  enableSelection={enableSelection}
-                  showGuidelines={showGuidelines}
-                />
+        } = node;
+        return (
+          <LiNode
+            {...subProps}
+            key={subItemPath}
+            data-item-id={subItemPath}
+            enableSelection={enableSelection}
+            showGuidelines={showGuidelines}
+          >
+            <TextContainer>
+              {enableSelection && (
+                <LabelCheckBox>
+                  <input
+                    id={subItemPath}
+                    name={subItemPath}
+                    type='checkbox'
+                    checked={selections.includes(subItemPath)}
+                    onChange={() => setSelections(subItemPath)}
+                  />
+                </LabelCheckBox>
               )}
-            </LiNode>
-          );
-        }
-      )}
+
+              <NodeText
+                hasItems={!!subNodes?.length}
+                expanded={expanded.includes(subItemPath)}
+                onClick={() => handleExpansion(subItemPath)}
+              >
+                {nodeRenderer ? nodeRenderer(node) : subName}
+              </NodeText>
+            </TextContainer>
+
+            {subNodes?.length && expanded.includes(subItemPath) && (
+              <TreeNode
+                uniqName={subName}
+                items={subNodes}
+                itemPath={subItemPath}
+                enableSelection={enableSelection}
+                showGuidelines={showGuidelines}
+              />
+            )}
+          </LiNode>
+        );
+      })}
     </UlView>
   );
 }
