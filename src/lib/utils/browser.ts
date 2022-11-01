@@ -5,9 +5,11 @@ import type {
   Tab,
 } from 'lib-models/browser';
 
+type TabReplaceEvent = (addedTabId: number, removedTabId: number) => void;
 export default class Browser {
   static async detect(): Promise<BrowserType> {
-    return Promise.resolve(chrome); // Promisified to handle future browser async detection
+    // Promisified to handle future browser async detection
+    return Promise.resolve(chrome);
   }
 
   static cookies = {
@@ -24,6 +26,7 @@ export default class Browser {
       cbSuccess?.(result);
       return result;
     },
+
     set: async (info: CookieSetInfo) => {
       const browser = await this.detect();
       await browser.cookies.set(info);
@@ -33,9 +36,22 @@ export default class Browser {
   static tab = {
     getAll: async (cbSuccess?: (tabs: Tab[]) => void) => {
       const browser = await this.detect();
-      const result = await browser.tabs.query({});
+      const result = (await browser.tabs.query({})) as Tab[];
       cbSuccess?.(result);
       return result;
+    },
+
+    get: async (tabId: number, cb: (tab: Tab) => void) => {
+      const browser = await this.detect();
+      browser.tabs.get(+tabId, cb);
+    },
+
+    onReplaced: {
+      addListener: async (cb: TabReplaceEvent) =>
+        (await this.detect()).tabs.onReplaced.addListener(cb),
+
+      removeListener: async (cb: TabReplaceEvent) =>
+        (await this.detect()).tabs.onReplaced.removeListener(cb),
     },
   };
 
@@ -51,7 +67,7 @@ export default class Browser {
        * if tab is discarded/unloaded from memory, executescript fails
        * so we reload the tab first and then fetch storage
        */
-      const isTabUnloaded = tab.discarded || tab.status === 'unloaded'; // 'unloaded' comes from type TabStatus which exists in chrome docs but not in TS types https://developer.chrome.com/docs/extensions/reference/tabs/#type-TabStatus
+      const isTabUnloaded = tab.discarded || tab.status === 'unloaded';
 
       if (isTabUnloaded) {
         await browser.tabs.reload(tab.id);

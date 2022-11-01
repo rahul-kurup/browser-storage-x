@@ -23,8 +23,38 @@ export default function ShareUI() {
     Progress | { title: string; color: string; message: string }
   >(Progress.idle);
 
+  const tabReplaceListener = (addedTabId: number, removedTabId: number) => {
+    // update the tabs list for select dropdown
+    const indexOfReplacedTab = tabs.findIndex(t => t.id === removedTabId);
+    if (indexOfReplacedTab > -1) {
+      Browser.tab.get(addedTabId, tab => {
+        const newTabs = [...tabs];
+        newTabs[indexOfReplacedTab] = tab;
+        setTabs(newTabs);
+
+        // update the srcTab/destTab to reflect current value
+        let { srcTab, destTab } = state;
+        if (srcTab?.id === removedTabId) {
+          srcTab = tab;
+        }
+        if (destTab?.id === removedTabId) {
+          destTab = tab;
+        }
+        setState({
+          ...state,
+          srcTab,
+          destTab,
+        });
+      });
+    }
+  };
+
   useEffect(() => {
     Browser.tab.getAll(setTabs);
+    Browser.tab.onReplaced.addListener(tabReplaceListener);
+    return () => {
+      Browser.tab.onReplaced.removeListener(tabReplaceListener);
+    };
   }, []);
 
   function handleChange({ name, value }: ChangeHandlerArgs<Tab>) {

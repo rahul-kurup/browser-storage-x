@@ -7,7 +7,7 @@ import {
   convertCookieToTreeNode,
   convertStorageToTreeNode,
   convertTreeNodeToCookie,
-  convertTreeNodeToStorage,
+  convertTreeNodeToStorage
 } from './helper';
 import { NodeKey, NodeValue, StyledTreeView } from './style';
 import { SpecificProps } from './type';
@@ -62,7 +62,7 @@ export default function ShareSpecificModal({
             }
             return (
               <>
-                <NodeKey title={`${name} => ${value}`}>{name}</NodeKey>
+                <NodeKey title={`${name} ⇒ ${value}`}>{name}</NodeKey>
                 <NodeValue title={value}>{value}</NodeValue>
               </>
             );
