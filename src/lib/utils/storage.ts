@@ -1,4 +1,4 @@
-import detectBrowser from 'lib-utils/browser';
+import Browser from 'lib-utils/browser';
 import Storages, { StorageType } from '../models/storage';
 
 export function getAllItems(
@@ -38,8 +38,7 @@ export const StorageTypeList = Object.keys(Storages).reduce(
 export const isCookieType = (storage: StorageType) => storage === 'cookie';
 
 export async function getCookies(srcTab: chrome.tabs.Tab) {
-  const browser = await detectBrowser();
-  const cookies = await browser.cookies.getAll({});
+  const cookies = await Browser.cookies.getAll();
   const srcCookies = cookies.filter(f =>
     srcTab.url.includes(f.domain.split('.').filter(Boolean).join('.'))
   );

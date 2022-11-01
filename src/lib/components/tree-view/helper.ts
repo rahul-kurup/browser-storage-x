@@ -1,11 +1,18 @@
 import { GenNodeArgs, NodeViewProps, NodeWithIdProps } from './type';
 
+export const CONSTANTS = {
+  separator: { itemId: '§' },
+  rootItemId: 'root',
+};
+
 export function genNodes({ name, items, parentItemId, ...rest }: GenNodeArgs) {
   let itemId = name;
   let mappedItems = items;
 
   if (parentItemId) {
-    itemId = `${parentItemId}.${name}`.split(' ').join('_');
+    itemId = `${parentItemId}${CONSTANTS.separator.itemId}${name}`
+      .split(' ')
+      .join('_');
   }
 
   if (items?.length) {
@@ -38,7 +45,7 @@ export function getItemsParentToChild(
       });
     } else {
       _nodeInfo.items?.forEach(f => {
-        _prevFindings.push(...findRelation(itemId, f));
+        _prevFindings.push(...findRelation(_itemId, f));
       });
     }
 
@@ -60,15 +67,15 @@ export function getItemsChildToParent(
     _prevFindings: string[] = []
   ) {
     if (_nodeInfo.itemId === _itemId) {
-      const split = itemId.split('.');
+      const split = itemId.split(CONSTANTS.separator.itemId);
       _prevFindings.push(_nodeInfo.itemId);
       for (let i = 0; i < split.length; i++) {
-        const parentId = split.slice(0, i + 1).join('.');
+        const parentId = split.slice(0, i + 1).join(CONSTANTS.separator.itemId);
         _prevFindings.push(parentId);
       }
     } else {
       _nodeInfo.items?.forEach(f => {
-        _prevFindings.push(...findRelation(itemId, f));
+        _prevFindings.push(...findRelation(_itemId, f));
       });
     }
     return _prevFindings;
@@ -77,4 +84,24 @@ export function getItemsChildToParent(
   const prevFindings = findRelation(itemId, nodeInfo);
 
   return [...new Set(prevFindings)];
+}
+
+export function getData(itemIds: string[], nodeInfo: NodeWithIdProps) {
+  const prevFindings = {};
+
+  function findData(_itemId: string, _info: NodeWithIdProps) {
+    if (_info.itemId === _itemId) {
+      prevFindings[_itemId] = _info.data;
+    } else {
+      _info.items?.forEach(item => {
+        findData(_itemId, item);
+      });
+    }
+  }
+
+  itemIds.forEach(itemId => {
+    findData(itemId, nodeInfo);
+  });
+
+  return prevFindings;
 }
