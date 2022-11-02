@@ -52,7 +52,7 @@ export default function Select<T>({
     props.onChange?.({
       name,
       data,
-      value: valueAsObject ? data : value
+      value: valueAsObject ? data : value,
     });
   }
 

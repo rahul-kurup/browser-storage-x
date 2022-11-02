@@ -1,7 +1,7 @@
 const base = require('./base/v2');
 
 module.exports = {
-  ...base
+  ...base,
   // browser_specific_settings: {
   //   gecko: {
   //     id: "browser@extension.com",

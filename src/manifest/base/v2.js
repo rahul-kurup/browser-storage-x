@@ -1,7 +1,7 @@
 const {
   version,
   displayName: name,
-  description
+  description,
 } = require('../../../package.json');
 const permissions = require('../permissions');
 
@@ -14,22 +14,22 @@ module.exports = {
   permissions: [...permissions, 'https://*/*'],
   browser_action: {
     default_title: name,
-    default_popup: 'assets/html/popup.html'
+    default_popup: 'assets/html/popup.html',
   },
   content_scripts: [
     {
       matches: ['<all_urls>'],
       // "css": ["myStyles.css"],
-      js: ['content.js']
-    }
+      js: ['content.js'],
+    },
   ],
   icons: {
-    128: 'assets/images/logo.png'
+    128: 'assets/images/logo.png',
   },
   background: {
-    scripts: ['background.js']
+    scripts: ['background.js'],
   },
-  web_accessible_resources: ['assets/**']
+  web_accessible_resources: ['assets/**'],
   // ...(process.env.NODE_ENV === 'development' ? {
   //   content_security_policy: "script-src 'self' 'unsafe-eval'; font-src 'self' data: https://fonts.gstatic.com/s/dmsans; object-src 'self';"
   // } : {})
