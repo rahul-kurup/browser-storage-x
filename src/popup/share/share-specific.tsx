@@ -66,7 +66,7 @@ export default function ShareSpecific({
               value = '';
             if (isCookie) {
               const d = node.data as Cookie;
-              name = d.name;
+              name = `${d.name} (${d.domain})`;
               value = d.value;
             } else {
               [name, value] = node.data;
