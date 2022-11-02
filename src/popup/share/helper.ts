@@ -25,7 +25,10 @@ export function convertCookieToTreeNode(
 ): TreeViewProps['items'] {
   const nodeItems: TreeViewProps['items'] = [];
   cookies.forEach(cookie =>
-    nodeItems.push({ uniqName: `${cookie.name} (${cookie.domain})` , data: cookie })
+    nodeItems.push({
+      uniqName: `${cookie.name} (${cookie.domain})`,
+      data: cookie,
+    })
   );
   return nodeItems;
 }
