@@ -5,7 +5,7 @@ import { getAllItems, isCookieType } from 'lib-utils/storage';
 import { useEffect, useState } from 'react';
 import { convertCookieToTreeNode, convertStorageToTreeNode } from './helper';
 import { NodeKey, NodeValue, StyledTreeView } from './style';
-import { SpecificProps } from './type';
+import { SpecificProps, TreeDataState } from './type';
 
 export default function ShareSpecific({
   onSelection,
@@ -14,25 +14,27 @@ export default function ShareSpecific({
   disabled,
   ...props
 }: SpecificProps) {
-  const [open, setOpen] = useState(false);
+  const [treeDataState, setTreeDataState] = useState<TreeDataState>('HIDDEN');
   const [storageContent, setStorageContent] = useState([]);
   const isCookie = isCookieType(srcStorage);
 
   useEffect(() => {
-    if (open && srcTab && srcStorage) {
+    if (treeDataState != 'HIDDEN' && srcTab && srcStorage) {
       if (isCookie) {
-        Browser.cookies
-          .getAll(srcTab)
-          .then(output => setStorageContent(convertCookieToTreeNode(output)));
+        Browser.cookies.getAll(srcTab).then(output => {
+          setTreeDataState('LOADED');
+          setStorageContent(convertCookieToTreeNode(output));
+        });
       } else {
         Browser.script
           .execute(srcTab, getAllItems, [srcStorage])
-          .then(output =>
-            setStorageContent(convertStorageToTreeNode(output.result))
-          );
+          .then(output => {
+            setTreeDataState('LOADED');
+            setStorageContent(convertStorageToTreeNode(output.result));
+          });
       }
     }
-  }, [open, srcTab, srcStorage]);
+  }, [treeDataState, srcTab, srcStorage]);
 
   return (
     <>
@@ -41,14 +43,15 @@ export default function ShareSpecific({
         color='cyan'
         fullWidth={false}
         disabled={disabled}
-        onClick={() => setOpen(true)}
+        onClick={() => setTreeDataState('LOADING')}
+        loading={treeDataState === 'LOADING'}
       >
         Pick items
       </Button>
 
       <Modal
-        opened={open}
-        onClose={() => setOpen(false)}
+        opened={treeDataState == 'LOADED'}
+        onClose={() => setTreeDataState('HIDDEN')}
         title='Select items to share'
       >
         <StyledTreeView
