@@ -13,9 +13,13 @@ export type State = {
   destStorage: StorageType;
 };
 
-export type SpecificProps = {
-  open: boolean;
-  shareState: State;
-  setOpen: (state: boolean) => void;
-  onShare: (content: any) => void;
+export type ShareState = {
+  mode: string;
+  selectedItems: string[];
+  selectedValues: any;
+  onSelection: (content: Partial<Omit<ShareState, 'onSelection'>>) => void;
+};
+
+export type SpecificProps = Pick<State, 'srcStorage' | 'srcTab'> & ShareState & {
+  disabled: boolean;
 };

@@ -53,12 +53,13 @@ export type ExternalProps = {
    * */
   allSelectedByDefault?: boolean;
 
+  checkedItems?: string[];
+
   /**
-   * @default false
    *
    * @description Event fires when tree nodes are checked. Works only when _enableSelection_ is `true`
    * */
-  onChecked?: (args: string[]) => void;
+  onChecked?: (args: Record<string, any>) => void;
 
   /** @default true */
   showGuidelines?: boolean;

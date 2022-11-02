@@ -13,12 +13,6 @@ export const Legend = styled.legend`
   font-size: 0.9rem;
 `;
 
-export const Actions = styled.div`
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-`;
-
 export const NodeKey = styled.b`
   display: inline-block;
 `;

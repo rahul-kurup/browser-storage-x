@@ -7,18 +7,30 @@ import {
   getAllItems,
   isCookieType,
   setAllItems,
-  StorageTypeList,
+  StorageTypeList
 } from 'lib-utils/storage';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { CustomSelectOption, PresetAlerts } from './components';
-import ShareSpecificModal from './share-specific-modal';
-import Form, { Actions, Fieldset, Legend } from './style';
-import { State } from './type';
+import {
+  convertTreeNodeToCookie,
+  convertTreeNodeToStorage,
+  ShareMode
+} from './helper';
+import ShareSpecific from './share-specific';
+import Form, { Fieldset, Legend } from './style';
+import { ShareState, State } from './type';
 
 export default function ShareUI() {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [state, setState] = useState({} as State);
-  const [opened, setOpened] = useState(false);
+  const refPrevState = useRef(state);
+  const [shareState, setShareState] = useState<Omit<ShareState, 'onSelection'>>(
+    {
+      mode: ShareMode.everything,
+      selectedItems: [],
+      selectedValues: {},
+    }
+  );
   const [progress, setProgress] = useState<
     Progress | { title: string; color: string; message: string }
   >(Progress.idle);
@@ -57,6 +69,18 @@ export default function ShareUI() {
     };
   }, []);
 
+  useEffect(() => {
+    const prevState = refPrevState.current;
+    if (
+      prevState.srcTab !== state.srcTab ||
+      prevState.srcStorage !== state.srcStorage
+    ) {
+      prevState.srcTab = state.srcTab;
+      prevState.srcStorage = state.srcStorage;
+      setShareState(s => ({ ...s, selectedItems: [], selectedValues: {} }));
+    }
+  }, [state.srcStorage, state.srcTab]);
+
   function handleChange({ name, value }: ChangeHandlerArgs<Tab>) {
     setState(s => ({ ...s, [name]: value }));
   }
@@ -65,12 +89,6 @@ export default function ShareUI() {
     setTimeout(() => {
       setProgress(Progress.idle);
     }, 2000);
-  }
-
-  async function shareCookie() {
-    const { srcTab } = state;
-    const cookies = await Browser.cookies.getAll(srcTab);
-    shareCookieContent(cookies);
   }
 
   async function shareCookieContent(cookies: Cookie[]) {
@@ -99,14 +117,6 @@ export default function ShareUI() {
     setProgress(Progress.pass);
   }
 
-  async function shareStorage() {
-    const { srcStorage, srcTab } = state;
-    const output = await Browser.script.execute(srcTab, getAllItems, [
-      srcStorage,
-    ]);
-    shareStorageContent(output?.result);
-  }
-
   async function shareStorageContent(content: any) {
     const { destStorage, destTab } = state;
     if (content) {
@@ -120,10 +130,8 @@ export default function ShareUI() {
     }
   }
 
-  async function validateAndShare(
-    cbCookie?: () => Promise<void>,
-    cbStorage?: () => Promise<void>
-  ) {
+  async function handleShare(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     setProgress(Progress.started);
 
     const { srcStorage, srcTab, destStorage, destTab } = state;
@@ -136,7 +144,14 @@ export default function ShareUI() {
         const isDestCookie = isCookieType(destStorage);
         if (isSrcCookie || isDestCookie) {
           if (isSrcCookie && isDestCookie) {
-            await cbCookie?.();
+            if (shareState.mode === ShareMode.everything) {
+              const cookies = await Browser.cookies.getAll(srcTab);
+              await shareCookieContent(cookies);
+            } else {
+              await shareCookieContent(
+                convertTreeNodeToCookie(shareState.selectedValues)
+              );
+            }
           } else {
             setProgress({
               color: 'red',
@@ -146,7 +161,16 @@ export default function ShareUI() {
             });
           }
         } else {
-          await cbStorage?.();
+          if (shareState.mode === ShareMode.everything) {
+            const output = await Browser.script.execute(srcTab, getAllItems, [
+              srcStorage,
+            ]);
+            shareStorageContent(output?.result);
+          } else {
+            await shareStorageContent(
+              convertTreeNodeToStorage(shareState.selectedValues)
+            );
+          }
         }
       }
     } catch (error) {
@@ -154,11 +178,6 @@ export default function ShareUI() {
       setProgress(Progress.fail);
     }
     resetSubmission();
-  }
-
-  async function handleShare(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    await validateAndShare(shareCookie, shareStorage);
   }
 
   const hasAllValues = Object.values(state).filter(Boolean).length === 4;
@@ -203,6 +222,18 @@ export default function ShareUI() {
             disabled={disabledField}
             onChange={handleChange}
           />
+
+          {state.srcTab && state.srcStorage && (
+            <ShareSpecific
+              disabled={disabledField}
+              srcTab={state.srcTab}
+              srcStorage={state.srcStorage}
+              {...shareState}
+              onSelection={updatedState =>
+                setShareState(s => ({ ...s, ...updatedState }))
+              }
+            />
+          )}
         </Fieldset>
 
         <Fieldset>
@@ -234,40 +265,15 @@ export default function ShareUI() {
         </Fieldset>
 
         {progress === Progress.idle ? (
-          <Actions>
+          <>
             <Button type='submit' disabled={!hasAllValues}>
-              Share Everything
+              Share Storage
             </Button>
-
-            <Button
-              type='button'
-              color='indigo'
-              disabled={!hasAllValues}
-              onClick={async () => {
-                const cb = () => Promise.resolve(setOpened(true));
-                await validateAndShare(cb, cb);
-              }}
-            >
-              Share Specific
-            </Button>
-          </Actions>
+          </>
         ) : (
           PresetAlert
         )}
       </Form>
-
-      <ShareSpecificModal
-        open={opened}
-        shareState={state}
-        setOpen={setOpened}
-        onShare={async data => {
-          setOpened(false);
-          await validateAndShare(
-            () => shareCookieContent(data),
-            () => shareStorageContent(data)
-          );
-        }}
-      />
     </>
   );
 }

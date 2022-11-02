@@ -24,6 +24,11 @@ export function convertCookieToTreeNode(
   return nodeItems;
 }
 
-export function convertTreeNodeToCookie(nodeData: Cookie[]): {} {
+export function convertTreeNodeToCookie(nodeData: Cookie[]): Cookie[] {
   return nodeData.reduce((a, c) => [...a, c], []);
 }
+
+export const ShareMode = {
+  specific: '0',
+  everything: '1',
+};

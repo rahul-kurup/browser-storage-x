@@ -5,25 +5,26 @@ import {
   genNodes,
   getData,
   getItemsChildToParent,
-  getItemsParentToChild,
+  getItemsParentToChild
 } from './helper';
 import { LabelCheckBox } from './style';
 import TreeNode from './tree-node';
 import { ExternalProps, NodeWithIdProps, TreeViewProps } from './type';
 
 export default function Tree({
-  uniqName: name = CONSTANTS.rootItemPath,
+  uniqName = CONSTANTS.rootItemPath,
   items,
-  allSelectedByDefault,
   onChecked,
+  checkedItems,
+  allSelectedByDefault,
   ...props
 }: TreeViewProps & ExternalProps) {
   const refMount = useRef(false);
-  const [selections, setSelections] = useState([] as string[]);
+  const [selections, setSelections] = useState(checkedItems);
 
   const nodeProps = useMemo(
-    () => genNodes({ uniqName: name, items }),
-    [name, items]
+    () => genNodes({ uniqName, items }),
+    [uniqName, items]
   );
 
   function handleSelection(itemPath: string) {
@@ -59,9 +60,9 @@ export default function Tree({
 
   useEffect(() => {
     if (props.enableSelection && refMount.current) {
-      const sels = [...selections].sort();
-      const obj = getData(sels, nodeProps as NodeWithIdProps);
-      onChecked?.(Object.values(obj));
+      const selItems = [...selections].sort();
+      const values = getData(selItems, nodeProps as NodeWithIdProps);
+      onChecked?.(values);
     }
   }, [selections, props.enableSelection]);
 
@@ -70,9 +71,9 @@ export default function Tree({
       {props.enableSelection && (
         <LabelCheckBox>
           <input
-            id={nodeProps.itemPath}
-            name={nodeProps.itemPath}
             type='checkbox'
+            id={nodeProps.uniqName}
+            name={nodeProps.uniqName}
             checked={selections.includes(nodeProps.itemPath)}
             onChange={() => handleSelection(nodeProps.itemPath)}
           />
