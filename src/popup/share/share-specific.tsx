@@ -1,13 +1,9 @@
-import { Button, Modal, Radio } from '@mantine/core';
+import { Button, Modal } from '@mantine/core';
 import { Cookie } from 'lib-models/browser';
 import Browser from 'lib-utils/browser';
 import { getAllItems, isCookieType } from 'lib-utils/storage';
 import { useEffect, useState } from 'react';
-import {
-  convertCookieToTreeNode,
-  convertStorageToTreeNode,
-  ShareMode
-} from './helper';
+import { convertCookieToTreeNode, convertStorageToTreeNode } from './helper';
 import { NodeKey, NodeValue, StyledTreeView } from './style';
 import { SpecificProps } from './type';
 
@@ -38,34 +34,17 @@ export default function ShareSpecific({
     }
   }, [open, srcTab, srcStorage]);
 
-  const selCount = props.selectedItems.filter(f => f !== 'root').length;
-
   return (
     <>
-      <Radio.Group
-        name='shareMode'
-        label='Share...'
-        value={props.mode}
-        onChange={mode => onSelection({ mode })}
+      <Button
+        type='button'
+        color='cyan'
+        fullWidth={false}
+        disabled={disabled}
+        onClick={() => setOpen(true)}
       >
-        <Radio
-          size='xs'
-          disabled={disabled}
-          value={ShareMode.everything}
-          label='All items'
-        />
-        <Radio
-          size='sm'
-          disabled={disabled}
-          value={ShareMode.specific}
-          onClick={() => setOpen(true)}
-          label={
-            props.mode === ShareMode.specific && selCount
-              ? `${selCount} item(s) selected`
-              : 'Specific items'
-          }
-        />
-      </Radio.Group>
+        Pick items
+      </Button>
 
       <Modal
         opened={open}
@@ -74,6 +53,7 @@ export default function ShareSpecific({
       >
         <StyledTreeView
           enableSelection
+          selecteAllByDefault
           items={storageContent}
           checkedItems={props.selectedItems}
           onChecked={itemValueMap => {
@@ -99,16 +79,6 @@ export default function ShareSpecific({
             );
           }}
         />
-
-        <br />
-
-        <Button
-          type='button'
-          disabled={disabled || !selCount}
-          onClick={() => setOpen(false)}
-        >
-          {selCount ? `Pick ${selCount} item(s)` : 'Pick'}
-        </Button>
       </Modal>
     </>
   );

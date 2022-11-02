@@ -1,6 +1,12 @@
 import styled from '@emotion/styled';
 import TreeView from 'lib-components/tree-view';
 
+export const SourceContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 5px;
+`;
+
 export const Fieldset = styled.fieldset`
   display: flex;
   flex-direction: column;

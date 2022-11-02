@@ -11,7 +11,13 @@ export function convertStorageToTreeNode(data = {}): TreeViewProps['items'] {
 }
 
 export function convertTreeNodeToStorage(nodeData: [string, any][]): {} {
-  return nodeData.reduce((a, [k, v]) => ({ ...a, [k]: v }), {});
+  return nodeData.reduce((a, c) => {
+    if (c) {
+      const [k, v] = c;
+      return { ...a, [k]: v };
+    }
+    return a;
+  }, {});
 }
 
 export function convertCookieToTreeNode(
@@ -25,10 +31,5 @@ export function convertCookieToTreeNode(
 }
 
 export function convertTreeNodeToCookie(nodeData: Cookie[]): Cookie[] {
-  return nodeData.reduce((a, c) => [...a, c], []);
+  return nodeData.reduce((a, c) => (c ? [...a, c] : a), []);
 }
-
-export const ShareMode = {
-  specific: '0',
-  everything: '1',
-};

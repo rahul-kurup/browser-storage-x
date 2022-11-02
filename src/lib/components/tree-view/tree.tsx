@@ -5,7 +5,7 @@ import {
   genNodes,
   getData,
   getItemsChildToParent,
-  getItemsParentToChild
+  getItemsParentToChild,
 } from './helper';
 import { LabelCheckBox } from './style';
 import TreeNode from './tree-node';
@@ -16,7 +16,7 @@ export default function Tree({
   items,
   onChecked,
   checkedItems,
-  allSelectedByDefault,
+  selecteAllByDefault,
   ...props
 }: TreeViewProps & ExternalProps) {
   const refMount = useRef(false);
@@ -53,10 +53,15 @@ export default function Tree({
   }, []);
 
   useEffect(() => {
-    if (props.enableSelection && allSelectedByDefault && nodeProps) {
-      handleSelection(CONSTANTS.rootItemPath);
+    if (props.enableSelection && selecteAllByDefault && nodeProps) {
+      setSelections(
+        getItemsParentToChild(
+          CONSTANTS.rootItemPath,
+          nodeProps as NodeWithIdProps
+        )
+      );
     }
-  }, [allSelectedByDefault, props.enableSelection, nodeProps]);
+  }, [selecteAllByDefault, props.enableSelection, nodeProps]);
 
   useEffect(() => {
     if (props.enableSelection && refMount.current) {

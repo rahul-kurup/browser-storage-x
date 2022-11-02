@@ -7,17 +7,13 @@ import {
   getAllItems,
   isCookieType,
   setAllItems,
-  StorageTypeList
+  StorageTypeList,
 } from 'lib-utils/storage';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { CustomSelectOption, PresetAlerts } from './components';
-import {
-  convertTreeNodeToCookie,
-  convertTreeNodeToStorage,
-  ShareMode
-} from './helper';
+import { convertTreeNodeToCookie, convertTreeNodeToStorage } from './helper';
 import ShareSpecific from './share-specific';
-import Form, { Fieldset, Legend } from './style';
+import Form, { Fieldset, Legend, SourceContainer } from './style';
 import { ShareState, State } from './type';
 
 export default function ShareUI() {
@@ -26,7 +22,6 @@ export default function ShareUI() {
   const refPrevState = useRef(state);
   const [shareState, setShareState] = useState<Omit<ShareState, 'onSelection'>>(
     {
-      mode: ShareMode.everything,
       selectedItems: [],
       selectedValues: {},
     }
@@ -144,13 +139,13 @@ export default function ShareUI() {
         const isDestCookie = isCookieType(destStorage);
         if (isSrcCookie || isDestCookie) {
           if (isSrcCookie && isDestCookie) {
-            if (shareState.mode === ShareMode.everything) {
-              const cookies = await Browser.cookies.getAll(srcTab);
-              await shareCookieContent(cookies);
-            } else {
+            if (shareState.selectedValues.length) {
               await shareCookieContent(
                 convertTreeNodeToCookie(shareState.selectedValues)
               );
+            } else {
+              const cookies = await Browser.cookies.getAll(srcTab);
+              await shareCookieContent(cookies);
             }
           } else {
             setProgress({
@@ -161,15 +156,15 @@ export default function ShareUI() {
             });
           }
         } else {
-          if (shareState.mode === ShareMode.everything) {
-            const output = await Browser.script.execute(srcTab, getAllItems, [
-              srcStorage,
-            ]);
-            shareStorageContent(output?.result);
-          } else {
+          if (shareState.selectedValues.length) {
             await shareStorageContent(
               convertTreeNodeToStorage(shareState.selectedValues)
             );
+          } else {
+            const output = await Browser.script.execute(srcTab, getAllItems, [
+              srcStorage,
+            ]);
+            await shareStorageContent(output?.result);
           }
         }
       }
@@ -214,26 +209,28 @@ export default function ShareUI() {
             }}
           />
 
-          <Select
-            label='Storage'
-            name='srcStorage'
-            options={StorageTypeList}
-            value={state.srcStorage}
-            disabled={disabledField}
-            onChange={handleChange}
-          />
-
-          {state.srcTab && state.srcStorage && (
-            <ShareSpecific
+          <SourceContainer>
+            <Select
+              label='Storage'
+              name='srcStorage'
+              options={StorageTypeList}
+              value={state.srcStorage}
               disabled={disabledField}
-              srcTab={state.srcTab}
-              srcStorage={state.srcStorage}
-              {...shareState}
-              onSelection={updatedState =>
-                setShareState(s => ({ ...s, ...updatedState }))
-              }
+              onChange={handleChange}
             />
-          )}
+
+            {state.srcTab && state.srcStorage && (
+              <ShareSpecific
+                disabled={disabledField}
+                srcTab={state.srcTab}
+                srcStorage={state.srcStorage}
+                {...shareState}
+                onSelection={updatedState =>
+                  setShareState(s => ({ ...s, ...updatedState }))
+                }
+              />
+            )}
+          </SourceContainer>
         </Fieldset>
 
         <Fieldset>
