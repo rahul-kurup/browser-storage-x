@@ -38,6 +38,13 @@ export default function ShareSpecific({
 
   async function handleModalClose() {
     setTreeDataState('HIDDEN');
+    /**
+     * So we discard the tab again as it was discarded earlier and don't want to consume user's memory
+     * BUT BUT BUT due to discarding the tab, tab is replaced, and is not the same
+     * so we use browser.tabs.onReplaced, search for onReplaced we add a listener there
+     * the discard fn here also returns the new tab, but onReplace handles more cases like tab getting discarded automatically
+     * so we use that
+     */
     const tabWasDiscarded = Browser.tab.isDiscarded(srcTab);
     if (tabWasDiscarded) {
       await Browser.tab.discard(srcTab);
