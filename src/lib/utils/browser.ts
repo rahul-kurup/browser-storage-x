@@ -79,6 +79,10 @@ export default class Browser {
     ) => {
       const browser = await this.detect();
 
+      /**
+       * if tab is discarded/unloaded from memory, executescript fails
+       * so we reload the tab first and then fetch storage
+       */
       await this.tab.reloadIfDiscarded(tab);
 
       const [execOutput] = await browser.scripting.executeScript({
