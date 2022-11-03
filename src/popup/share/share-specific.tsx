@@ -19,22 +19,30 @@ export default function ShareSpecific({
   const isCookie = isCookieType(srcStorage);
 
   useEffect(() => {
-    if (treeDataState != 'HIDDEN' && srcTab && srcStorage) {
+    if (treeDataState !== 'HIDDEN' && srcTab && srcStorage) {
       if (isCookie) {
         Browser.cookies.getAll(srcTab).then(output => {
-          setTreeDataState('LOADED');
           setStorageContent(convertCookieToTreeNode(output));
+          setTreeDataState('LOADED');
         });
       } else {
         Browser.script
           .execute(srcTab, getAllItems, [srcStorage])
           .then(output => {
-            setTreeDataState('LOADED');
             setStorageContent(convertStorageToTreeNode(output.result));
+            setTreeDataState('LOADED');
           });
       }
     }
   }, [treeDataState, srcTab, srcStorage]);
+
+  async function handleModalClose() {
+    setTreeDataState('HIDDEN');
+    const tabWasDiscarded = Browser.tab.isDiscarded(srcTab);
+    if (tabWasDiscarded) {
+      await Browser.tab.discard(srcTab);
+    }
+  }
 
   return (
     <>
@@ -50,8 +58,8 @@ export default function ShareSpecific({
       </Button>
 
       <Modal
-        opened={treeDataState == 'LOADED'}
-        onClose={() => setTreeDataState('HIDDEN')}
+        opened={treeDataState === 'LOADED'}
+        onClose={handleModalClose}
         title='Select items to share'
       >
         <StyledTreeView

@@ -34,6 +34,22 @@ export default class Browser {
   };
 
   static tab = {
+    isDiscarded: (tab: Tab) => tab.discarded || tab.status === 'unloaded',
+
+    discard: async (tab: Tab) => {
+      const browser = await this.detect();
+      return await browser.tabs.discard(tab.id);
+    },
+
+    reloadIfDiscarded: async (tab: Tab) => {
+      const browser = await this.detect();
+      const isTabUnloaded = this.tab.isDiscarded(tab);
+      if (isTabUnloaded) {
+        await browser.tabs.reload(tab.id);
+      }
+      return isTabUnloaded;
+    },
+
     getAll: async (cbSuccess?: (tabs: Tab[]) => void) => {
       const browser = await this.detect();
       const result = (await browser.tabs.query({})) as Tab[];
@@ -59,19 +75,11 @@ export default class Browser {
     execute: async <T = any>(
       tab: Tab,
       func: (...args: T[]) => unknown,
-      args: T[],
-      discardAfterExecution = true
+      args: T[]
     ) => {
       const browser = await this.detect();
-      /**
-       * if tab is discarded/unloaded from memory, executescript fails
-       * so we reload the tab first and then fetch storage
-       */
-      const isTabUnloaded = tab.discarded || tab.status === 'unloaded';
 
-      if (isTabUnloaded) {
-        await browser.tabs.reload(tab.id);
-      }
+      await this.tab.reloadIfDiscarded(tab);
 
       const [execOutput] = await browser.scripting.executeScript({
         target: { tabId: tab.id },
@@ -79,16 +87,6 @@ export default class Browser {
         func,
       });
 
-      /**
-       * So we discard the tab again as it was discarded earlier and don't want to consume user's memory
-       * BUT BUT BUT due to discarding the tab, tab is replaced, and is not the same
-       * so we use browser.tabs.onReplaced, check in main app file, we add a listener there
-       * the discard fn here also returns the new tab, but onReplace handles more cases like tab getting discarded automatically
-       * so we use that
-       */
-      if (discardAfterExecution && isTabUnloaded) {
-        await browser.tabs.discard(tab.id);
-      }
       return execOutput;
     },
   };

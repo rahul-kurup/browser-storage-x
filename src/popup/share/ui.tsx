@@ -20,6 +20,7 @@ export default function ShareUI() {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [state, setState] = useState({} as State);
   const refPrevState = useRef(state);
+  const refTabs = useRef(tabs);
   const [shareState, setShareState] = useState<Omit<ShareState, 'onSelection'>>(
     {
       selectedItems: [],
@@ -32,12 +33,14 @@ export default function ShareUI() {
 
   const tabReplaceListener = (addedTabId: number, removedTabId: number) => {
     // update the tabs list for select dropdown
-    const indexOfReplacedTab = tabs.findIndex(t => t.id === removedTabId);
-    if (indexOfReplacedTab > -1) {
+    const allTabs = tabs;
+    const idxOfReplacedTab = allTabs.findIndex(t => t.id === removedTabId);
+    if (idxOfReplacedTab > -1) {
       Browser.tab.get(addedTabId, tab => {
-        const newTabs = [...tabs];
-        newTabs[indexOfReplacedTab] = tab;
+        const newTabs = [...allTabs];
+        newTabs[idxOfReplacedTab] = tab;
         setTabs(newTabs);
+        refTabs.current = newTabs;
 
         // update the srcTab/destTab to reflect current value
         let { srcTab, destTab } = state;
@@ -57,12 +60,18 @@ export default function ShareUI() {
   };
 
   useEffect(() => {
-    Browser.tab.getAll(setTabs);
+    Browser.tab.getAll(tabs => {
+      setTabs(tabs);
+      refTabs.current = tabs;
+    });
+  }, []);
+
+  useEffect(() => {
     Browser.tab.onReplaced.addListener(tabReplaceListener);
     return () => {
       Browser.tab.onReplaced.removeListener(tabReplaceListener);
     };
-  }, []);
+  }, [state, tabs]);
 
   useEffect(() => {
     const prevState = refPrevState.current;
