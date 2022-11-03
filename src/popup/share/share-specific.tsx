@@ -58,9 +58,9 @@ export default function ShareSpecific({
       </Button>
 
       <Modal
+        title='Select items to share'
         opened={treeDataState === 'LOADED'}
         onClose={handleModalClose}
-        title='Select items to share'
       >
         <StyledTreeView
           enableSelection
