@@ -23,3 +23,5 @@ export type SpecificProps = Pick<State, 'srcStorage' | 'srcTab'> &
   ShareState & {
     disabled: boolean;
   };
+
+export type TreeDataState = 'HIDDEN' | 'LOADING' | 'LOADED';

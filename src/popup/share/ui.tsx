@@ -30,13 +30,14 @@ export default function ShareUI() {
     Progress | { title: string; color: string; message: string }
   >(Progress.idle);
 
-  const tabReplaceListener = (addedTabId: number, removedTabId: number) => {
+  const handleTabReplace = (addedTabId: number, removedTabId: number) => {
     // update the tabs list for select dropdown
-    const indexOfReplacedTab = tabs.findIndex(t => t.id === removedTabId);
-    if (indexOfReplacedTab > -1) {
+    const allTabs = tabs;
+    const idxOfReplacedTab = allTabs.findIndex(t => t.id === removedTabId);
+    if (idxOfReplacedTab > -1) {
       Browser.tab.get(addedTabId, tab => {
-        const newTabs = [...tabs];
-        newTabs[indexOfReplacedTab] = tab;
+        const newTabs = [...allTabs];
+        newTabs[idxOfReplacedTab] = tab;
         setTabs(newTabs);
 
         // update the srcTab/destTab to reflect current value
@@ -58,11 +59,14 @@ export default function ShareUI() {
 
   useEffect(() => {
     Browser.tab.getAll(setTabs);
-    Browser.tab.onReplaced.addListener(tabReplaceListener);
-    return () => {
-      Browser.tab.onReplaced.removeListener(tabReplaceListener);
-    };
   }, []);
+
+  useEffect(() => {
+    Browser.tab.onReplaced.addListener(handleTabReplace);
+    return () => {
+      Browser.tab.onReplaced.removeListener(handleTabReplace);
+    };
+  }, [state, tabs]);
 
   useEffect(() => {
     const prevState = refPrevState.current;
@@ -188,6 +192,8 @@ export default function ShareUI() {
     );
   }, [progress]);
 
+  const isSrcSelected = Boolean(state.srcTab && state.srcStorage);
+
   return (
     <>
       <Form onSubmit={handleShare}>
@@ -209,7 +215,7 @@ export default function ShareUI() {
             }}
           />
 
-          <SourceContainer>
+          <SourceContainer sourceSelected={isSrcSelected}>
             <Select
               label='Storage'
               name='srcStorage'
@@ -219,7 +225,7 @@ export default function ShareUI() {
               onChange={handleChange}
             />
 
-            {state.srcTab && state.srcStorage && (
+            {isSrcSelected && (
               <ShareSpecific
                 disabled={disabledField}
                 srcTab={state.srcTab}

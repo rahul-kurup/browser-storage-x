@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import TreeView from 'lib-components/tree-view';
 
-export const SourceContainer = styled.div`
+export const SourceContainer = styled.div<{ sourceSelected: boolean }>`
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr ${p => (p.sourceSelected ? 'auto' : '')};
   gap: 5px;
 `;
 
