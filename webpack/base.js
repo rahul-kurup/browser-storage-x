@@ -5,6 +5,7 @@ const GenerateJsonFromJsPlugin = require('generate-json-from-js-webpack-plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { join } = require('path');
 const dotenv = require('dotenv');
+const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 
 const prodPlugins = [];
 const isProd = process.env.NODE_ENV === 'production';
@@ -179,6 +180,18 @@ const buildConfig = (browser, path) => ({
       path: join(Source, 'manifest', `${browser}.js`),
       filename: 'manifest.json',
     }),
+    // new WebpackShellPluginNext({
+    //   // onBuildStart:{
+    //   //   scripts: ['echo "Webpack Start"'],
+    //   //   blocking: true,
+    //   //   parallel: false
+    //   // },
+    //   onAfterDone: {
+    //     scripts: ['yarn compress'],
+    //     blocking: false,
+    //     parallel: true,
+    //   },
+    // }),
   ],
 });
 
