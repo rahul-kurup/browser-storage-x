@@ -2,7 +2,7 @@ import { Button, Modal } from '@mantine/core';
 import { Cookie } from 'lib-models/browser';
 import Browser from 'lib-utils/browser';
 import { getAllItems, isCookieType } from 'lib-utils/storage';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { convertCookieToTreeNode, convertStorageToTreeNode } from './helper';
 import { NodeKey, NodeValue, StyledTreeView } from './style';
 import { SpecificProps, TreeDataState } from './type';
@@ -18,7 +18,7 @@ export default function ShareSpecific({
   const [storageContent, setStorageContent] = useState([]);
   const isCookie = isCookieType(srcStorage);
 
-  const handleModalClose = useCallback(async () => {
+  const handleModalClose = async () => {
     setTreeDataState('HIDDEN');
     /**
      * So we discard the tab again as it was discarded earlier and don't want to consume user's memory
@@ -31,7 +31,7 @@ export default function ShareSpecific({
     if (tabWasDiscarded) {
       await Browser.tab.discard(srcTab);
     }
-  }, []);
+  };
 
   useEffect(() => {
     if (treeDataState !== 'HIDDEN' && srcTab && srcStorage) {
@@ -44,12 +44,12 @@ export default function ShareSpecific({
         Browser.script
           .execute(srcTab, getAllItems, [srcStorage])
           .then(output => {
-            setStorageContent(convertStorageToTreeNode(output.result));
+            setStorageContent(convertStorageToTreeNode(output || {}));
             setTreeDataState('LOADED');
           });
       }
     }
-  }, [treeDataState, srcTab, srcStorage, handleModalClose]);
+  }, [treeDataState, srcTab, srcStorage]);
 
   return (
     <>
