@@ -9,15 +9,17 @@ import {
   setAllItems,
   StorageTypeList
 } from 'lib-utils/storage';
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { useBrowserTabs } from 'lib/context/browser-tab';
+import { FormEvent, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { CustomSelectOption, PresetAlerts } from './components';
 import { convertTreeNodeToCookie, convertTreeNodeToStorage } from './helper';
 import ShareSpecific from './share-specific';
 import Form, { Fieldset, Legend, SourceContainer } from './style';
 import { ShareState, State } from './type';
 
-export default function ShareUI() {
-  const [tabs, setTabs] = useState<Tab[]>([]);
+function ShareUI() {
+  const { tabs, replaced } = useBrowserTabs();
+
   const [state, setState] = useState({} as State);
   const refPrevState = useRef(state);
   const [shareState, setShareState] = useState<Omit<ShareState, 'onSelection'>>(
@@ -30,43 +32,24 @@ export default function ShareUI() {
     Progress | { title: string; color: string; message: string }
   >(Progress.idle);
 
-  const handleTabReplace = (addedTabId: number, removedTabId: number) => {
-    // update the tabs list for select dropdown
-    const allTabs = tabs;
-    const idxOfReplacedTab = allTabs.findIndex(t => t.id === removedTabId);
-    if (idxOfReplacedTab > -1) {
-      Browser.tab.get(addedTabId, tab => {
-        const newTabs = [...allTabs];
-        newTabs[idxOfReplacedTab] = tab;
-        setTabs(newTabs);
-
-        // update the srcTab/destTab to reflect current value
-        let { srcTab, destTab } = state;
-        if (srcTab?.id === removedTabId) {
-          srcTab = tab;
-        }
-        if (destTab?.id === removedTabId) {
-          destTab = tab;
-        }
-        setState({
-          ...state,
-          srcTab,
-          destTab,
-        });
-      });
-    }
-  };
-
   useEffect(() => {
-    Browser.tab.getAll(setTabs);
-  }, []);
-
-  useEffect(() => {
-    Browser.tab.onReplaced.addListener(handleTabReplace);
-    return () => {
-      Browser.tab.onReplaced.removeListener(handleTabReplace);
-    };
-  }, [state, tabs]);
+    setState(prev => {
+      let { srcTab, destTab } = prev;
+      const srcReplacedTab = replaced[srcTab?.id || ''];
+      const destReplacedTab = replaced[destTab?.id || ''];
+      if (srcReplacedTab) {
+        srcTab = srcReplacedTab;
+      }
+      if (destReplacedTab) {
+        destTab = destReplacedTab;
+      }
+      return {
+        ...prev,
+        srcTab,
+        destTab,
+      };
+    });
+  }, [replaced]);
 
   useEffect(() => {
     const prevState = refPrevState.current;
@@ -286,3 +269,5 @@ export default function ShareUI() {
     </>
   );
 }
+
+export default memo(ShareUI);

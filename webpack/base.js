@@ -152,9 +152,13 @@ const config = {
       popup: Popup,
       assets: Assets,
       option: Option,
-      'lib-models': join(Source, 'lib', 'models'),
-      'lib-utils': join(Source, 'lib', 'utils'),
-      'lib-components': join(Source, 'lib', 'components'),
+      ...['models', 'utils', 'components', 'context'].reduce(
+        (dirPrev, dirModule) => ({
+          ...dirPrev,
+          [`lib-${dirModule}`]: join(Source, 'lib', dirModule),
+        }),
+        {}
+      ),
     },
   },
   optimization: {
