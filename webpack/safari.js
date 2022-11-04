@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { buildConfig } = require('./base');
 
-module.exports = buildConfig('safari', 'safari-prebuild');
+module.exports = buildConfig('safari', process.env.DIST_SAFARI);

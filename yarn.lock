@@ -2031,10 +2031,10 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
-babel-loader@^9.0.1:
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/babel-loader/-/babel-loader-9.0.1.tgz#d473f30a6ffc2f2abca610c01775c40fc5c2a970"
-  integrity sha512-szYjslOXFlj/po5KfrVmiuBAcI6GVHFuAgC96Qd6mMPHdwl4lmAJkYtvjQ1RxxPjgdkKjd3LQgXDE4jxEutNuw==
+babel-loader@^9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/babel-loader/-/babel-loader-9.1.0.tgz#839e9ae88aea930864ef9ec0f356dfca96ecf238"
+  integrity sha512-Antt61KJPinUMwHwIIz9T5zfMgevnfZkEVWYDWlG888fgdvRRGD0JTuf/fFozQnfT+uq64sk1bmdHDy/mOEWnA==
   dependencies:
     find-cache-dir "^3.3.2"
     schema-utils "^4.0.0"
@@ -2832,11 +2832,6 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
 
-dexie@^3.2.2:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.2.2.tgz#fa6f2a3c0d6ed0766f8d97a03720056f88fe0e01"
-  integrity sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg==
-
 dir-glob@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/dir-glob/-/dir-glob-3.0.1.tgz#56dbf73d992a4a93ba1584f4534063fd2e41717f"
@@ -2939,6 +2934,11 @@ dot-prop@^6.0.1:
   integrity sha512-tE7ztYzXHIeyvc7N+hR3oi7FIbf/NIjVP9hmAt3yMXzrQ072/fpjGLx2GxNxGxUl5V73MEqYzioOMoVhGMJ5cA==
   dependencies:
     is-obj "^2.0.0"
+
+dotenv-expand@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-9.0.0.tgz#1fd37e2cd63ea0b5f7389fb87256efc38b035b26"
+  integrity sha512-uW8Hrhp5ammm9x7kBLR6jDfujgaDarNA02tprvZdyrJ7MpdzD1KyrIHG4l+YoC2fJ2UcdFdNWNWIjt+sexBHJw==
 
 dotenv@^16.0.3:
   version "16.0.3"
@@ -5352,11 +5352,6 @@ quick-lru@^5.1.1:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-5.1.1.tgz#366493e6b3e42a3a6885e2e99d18f80fb7a8c932"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
 
-rambda@^7.3.0:
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/rambda/-/rambda-7.3.0.tgz#90e440ead53030a216093865d8d97997a80868ca"
-  integrity sha512-RFVofZYaG2TaVcxjnM0ejdVWf/59rFq1f57OGnjP3GT/bthzFw0GVr5rkP9PKbVlEuF/Y7bOVPLfiiYfxq/EWQ==
-
 randombytes@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/randombytes/-/randombytes-2.1.0.tgz#df6f84372f0270dc65cdf6291349ab7a473d4f2a"
@@ -5670,7 +5665,7 @@ run-parallel@^1.1.9:
   dependencies:
     queue-microtask "^1.2.2"
 
-rxjs@^7.0.0, rxjs@^7.5.7:
+rxjs@^7.0.0:
   version "7.5.7"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.7.tgz#2ec0d57fdc89ece220d2e702730ae8f1e49def39"
   integrity sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==
@@ -6665,6 +6660,11 @@ webpack-merge@^5.7.3, webpack-merge@^5.8.0:
     clone-deep "^4.0.1"
     wildcard "^2.0.0"
 
+webpack-shell-plugin-next@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/webpack-shell-plugin-next/-/webpack-shell-plugin-next-2.3.1.tgz#a7bcf7aeeb4143ec8de261194e2b029459b3ae6d"
+  integrity sha512-+ozr/BcsuPh2R6j4oxmu9qJCInhhDCQ+Lb/sSUNHuXjoGj+myxxZyjucHze+K9dCoIo22gAoK1yuCP/gSnpUNg==
+
 webpack-sources@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.3.tgz#2d4daab8451fd4b240cc27055ff6a0c2ccea0cde"
@@ -6855,13 +6855,20 @@ yargs@17.6.0, yargs@^17.3.1:
     y18n "^5.0.5"
     yargs-parser "^21.0.0"
 
-yauzl@2.10.0:
+yauzl@2.10.0, yauzl@^2.10.0:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/yauzl/-/yauzl-2.10.0.tgz#c7eb17c93e112cb1086fa6d8e51fb0667b79a5f9"
   integrity sha512-p4a9I6X6nu6IhoGmBqAcbJy1mlC4j27vEPZX9F4L4/vZT3Lyq1VkFHw/V/PUcB9Buo+DG3iHkT0x3Qya58zc3g==
   dependencies:
     buffer-crc32 "~0.2.3"
     fd-slicer "~1.1.0"
+
+yazl@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/yazl/-/yazl-2.5.1.tgz#a3d65d3dd659a5b0937850e8609f22fffa2b5c35"
+  integrity sha512-phENi2PLiHnHb6QBVot+dJnaAZ0xosj7p3fWl+znIjBDlnMI2PsZCJZ306BPTFOaHf5qdDEI8x5qFrSOBN5vrw==
+  dependencies:
+    buffer-crc32 "~0.2.3"
 
 yocto-queue@^0.1.0:
   version "0.1.0"
@@ -6875,3 +6882,11 @@ zip-dir@2.0.0:
   dependencies:
     async "^3.2.0"
     jszip "^3.2.2"
+
+zip-lib@^0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/zip-lib/-/zip-lib-0.7.3.tgz#0f0c425569a79f7ef3641208bab53244ff23ff60"
+  integrity sha512-hp40KYzTJvoaCRr2t6hztlPnVmHYqDUDiIn0hlfAFwVBs3/jwkLy8aZ7NVGHECeWH2Tv8WPwWyR6QuWYarIjJQ==
+  dependencies:
+    yauzl "^2.10.0"
+    yazl "^2.5.1"

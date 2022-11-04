@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { buildConfig } = require('./base');
 
-module.exports = buildConfig('chrome');
+module.exports = buildConfig('chrome', process.env.DIST_CHROMIUM);

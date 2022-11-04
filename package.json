@@ -1,6 +1,6 @@
 {
   "name": "browser-ext-storage-x",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "displayName": "StorageX",
   "description": "StorageX extension is a toolset to manage any/all browser tab's Application Storage",
   "author": "Rahul Kurup <raulsrule@gmail.com>",
@@ -21,6 +21,7 @@
     "postinstall": "npm run init:profile",
     "init:profile": "mkdirp tmp/profile/chrome tmp/profile/brave tmp/profile/firefox",
     "prebuild": "npm run clean",
+    "compress": "node scripts/compress.mjs",
     "build": "cross-env NODE_ENV=production webpack",
     "build:local": "cross-env NODE_ENV=development webpack",
     "build:chrome": "cross-env NODE_ENV=development webpack --config ./webpack/chrome.js",
@@ -44,13 +45,10 @@
     "@emotion/styled": "^11.10.5",
     "@mantine/core": "^5.6.4",
     "@mantine/hooks": "^5.6.4",
-    "dexie": "^3.2.2",
     "emotion": "^11.0.0",
     "lodash": "^4.17.21",
-    "rambda": "^7.3.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "rxjs": "^7.5.7"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.19.3",
@@ -61,12 +59,13 @@
     "@types/react-dom": "^18.0.8",
     "@types/webextension-polyfill": "^0.9.1",
     "autoprefixer": "^10.4.13",
-    "babel-loader": "^9.0.1",
+    "babel-loader": "^9.1.0",
     "concurrently": "^7.5.0",
     "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.7.1",
     "dotenv": "^16.0.3",
+    "dotenv-expand": "^9.0.0",
     "generate-json-from-js-webpack-plugin": "^0.1.1",
     "html-webpack-plugin": "^5.5.0",
     "husky": "^8.0.1",
@@ -84,6 +83,8 @@
     "webpack-bundle-analyzer": "^4.7.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.11.1",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.8.0",
+    "webpack-shell-plugin-next": "^2.3.1",
+    "zip-lib": "^0.7.3"
   }
 }
