@@ -22,8 +22,8 @@ export default function ShareUI() {
   const refPrevState = useRef(state);
   const [shareState, setShareState] = useState<Omit<ShareState, 'onSelection'>>(
     {
-      selectedItems: [],
-      selectedValues: {},
+      selectedItems: undefined,
+      selectedValues: undefined,
     }
   );
   const [progress, setProgress] = useState<
@@ -76,7 +76,11 @@ export default function ShareUI() {
     ) {
       prevState.srcTab = state.srcTab;
       prevState.srcStorage = state.srcStorage;
-      setShareState(s => ({ ...s, selectedItems: [], selectedValues: {} }));
+      setShareState(s => ({
+        ...s,
+        selectedItems: undefined,
+        selectedValues: undefined,
+      }));
     }
   }, [state.srcStorage, state.srcTab]);
 
@@ -143,7 +147,7 @@ export default function ShareUI() {
         const isDestCookie = isCookieType(destStorage);
         if (isSrcCookie || isDestCookie) {
           if (isSrcCookie && isDestCookie) {
-            if (shareState.selectedValues.length) {
+            if (shareState.selectedValues?.length) {
               await shareCookieContent(
                 convertTreeNodeToCookie(shareState.selectedValues)
               );
@@ -160,7 +164,7 @@ export default function ShareUI() {
             });
           }
         } else {
-          if (shareState.selectedValues.length) {
+          if (shareState.selectedValues?.length) {
             await shareStorageContent(
               convertTreeNodeToStorage(shareState.selectedValues)
             );
@@ -201,6 +205,7 @@ export default function ShareUI() {
           <Legend>Source</Legend>
 
           <Select
+            searchable
             label='Tab'
             name='srcTab'
             options={tabs}
@@ -243,6 +248,7 @@ export default function ShareUI() {
           <Legend>Destination</Legend>
 
           <Select
+            searchable
             label='Tab'
             name='destTab'
             options={tabs}
