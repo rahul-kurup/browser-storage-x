@@ -7,7 +7,7 @@ import {
   getAllItems,
   isCookieType,
   setAllItems,
-  StorageTypeList
+  StorageTypeList,
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { FormEvent, memo, useEffect, useMemo, useRef, useState } from 'react';

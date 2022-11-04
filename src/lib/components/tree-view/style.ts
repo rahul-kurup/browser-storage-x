@@ -8,6 +8,11 @@ export const LabelCheckBox = styled.label`
 `;
 
 export const NodeText = styled.div<{ expanded: boolean; hasItems: boolean }>`
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  position: relative;
+  align-items: center;
   cursor: ${p =>
     p.hasItems ? (p.expanded ? 'n-resize' : 's-resize') : 'default'};
 `;

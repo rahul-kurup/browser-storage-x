@@ -10,8 +10,12 @@ export type DataProps = {
   dataType?:
     | 'string'
     | 'boolean'
-    | 'number / bigint'
-    | 'undefined / null'
+    | 'number'
+    | 'bigint'
+    | 'undefined'
+    | 'null'
+    | 'symbol'
+    | 'function'
     | 'array'
     | 'object';
 };
@@ -67,5 +71,8 @@ export type ExternalProps = {
   /**
    * custom node renderer
    */
-  nodeRenderer?: (args: NodeWithIdProps) => JSX.Element;
+  nodeRenderer?: (
+    args: NodeWithIdProps,
+    opts: { isExpanded: boolean; hasItems: boolean }
+  ) => JSX.Element;
 };

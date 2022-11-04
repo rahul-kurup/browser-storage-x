@@ -40,13 +40,18 @@ export default function TreeNode({
           itemPath: subItemPath,
           ...subProps
         } = node;
+
+        const hasItems = Boolean(subNodes?.length);
+        const isExpanded = expanded.includes(subItemPath);
+
         return (
           <LiNode
             {...subProps}
             key={subItemPath}
             data-item-id={subItemPath}
-            enableSelection={enableSelection}
+            aria-expanded={isExpanded}
             showGuidelines={showGuidelines}
+            enableSelection={enableSelection}
           >
             <TextContainer>
               {enableSelection && (
@@ -62,21 +67,23 @@ export default function TreeNode({
               )}
 
               <NodeText
-                hasItems={!!subNodes?.length}
-                expanded={expanded.includes(subItemPath)}
+                hasItems={hasItems}
+                expanded={isExpanded}
                 onClick={() => handleExpansion(subItemPath)}
               >
-                {nodeRenderer ? nodeRenderer(node) : subName}
+                {hasItems && <span>{isExpanded ? '▼' : '▶'}</span>}
+                {nodeRenderer?.(node, { isExpanded, hasItems }) || subName}
               </NodeText>
             </TextContainer>
 
-            {subNodes?.length && expanded.includes(subItemPath) && (
+            {hasItems && isExpanded && (
               <TreeNode
-                uniqName={subName}
                 items={subNodes}
+                uniqName={subName}
                 itemPath={subItemPath}
-                enableSelection={enableSelection}
+                nodeRenderer={nodeRenderer}
                 showGuidelines={showGuidelines}
+                enableSelection={enableSelection}
               />
             )}
           </LiNode>

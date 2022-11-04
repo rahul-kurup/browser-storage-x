@@ -3,7 +3,7 @@ import type {
   BrowserVendor,
   Cookie,
   CookieSetInfo,
-  Tab
+  Tab,
 } from 'lib-models/browser';
 
 type TabReplaceEvent = (addedTabId: number, removedTabId: number) => void;

@@ -55,6 +55,7 @@
     "@babel/core": "^7.19.6",
     "@babel/plugin-transform-react-jsx": "^7.19.0",
     "@babel/preset-env": "^7.19.4",
+    "@emotion/babel-plugin": "^11.10.5",
     "@types/chrome": "^0.0.200",
     "@types/react-dom": "^18.0.8",
     "@types/webextension-polyfill": "^0.9.1",

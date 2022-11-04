@@ -40,11 +40,13 @@ export default function Select<T>({
   }, [value, getContent]);
 
   const dataItems = useMemo(() => {
-    return options?.map(m => {
-      const label = getContent(m, 'label');
-      const value = String(getContent(m, 'value'));
-      return { label, value, data: m };
-    }) || [];
+    return (
+      options?.map(m => {
+        const label = getContent(m, 'label');
+        const value = String(getContent(m, 'value'));
+        return { label, value, data: m };
+      }) || []
+    );
   }, [fieldKey, options, getContent]);
 
   function handleChange(value: string) {
