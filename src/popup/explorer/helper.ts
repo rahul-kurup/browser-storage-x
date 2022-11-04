@@ -3,8 +3,8 @@ import { Cookie } from 'lib-models/browser';
 
 type TreeViewNodeItems = TreeViewProps['items'];
 
-export function isValueType(node: NodeWithIdProps) {
-  return node.dataType !== 'array' && node.dataType !== 'object';
+export function isValueType(node?: NodeWithIdProps) {
+  return node?.dataType !== 'array' && node?.dataType !== 'object';
 }
 
 export function valueNodeHint(node: NodeWithIdProps, value = null) {

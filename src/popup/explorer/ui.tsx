@@ -26,6 +26,8 @@ import Form, {
   Placeholder,
   StyledTreeView,
 } from './style';
+import { UpsertModalProps } from './type';
+import Upsert from './upsert';
 
 const actionProps: ButtonProps = {
   radius: 'xl',
@@ -40,6 +42,8 @@ function ExplorerUI() {
   const [state, setState] = useState(
     {} as { tab: Tab; storage: StorageType; content: TreeViewProps['items'] }
   );
+
+  const [modal, setModal] = useState({} as UpsertModalProps);
 
   function handleChange({ name, value }: ChangeHandlerArgs<Tab>) {
     setState(s => ({ ...s, [name]: value }));
@@ -151,6 +155,15 @@ function ExplorerUI() {
                               title='Add'
                               onClick={e => {
                                 stopActionDefEvent(e);
+                                setModal({
+                                  open: true,
+                                  action: 'add',
+                                  title: (
+                                    <>
+                                      Add to <b>{name}</b>
+                                    </>
+                                  ),
+                                });
                               }}
                             >
                               &#10133;
@@ -162,6 +175,16 @@ function ExplorerUI() {
                             title='Modify'
                             onClick={e => {
                               stopActionDefEvent(e);
+                              setModal({
+                                open: true,
+                                node,
+                                action: 'update',
+                                title: (
+                                  <>
+                                    Modify: <b>{name}</b>
+                                  </>
+                                ),
+                              });
                             }}
                           >
                             &#128394;&#65039;
@@ -185,7 +208,9 @@ function ExplorerUI() {
                       </NodeKey>
 
                       {isValueType(node) && (
-                        <NodeValue title={value}>{String(value)}</NodeValue>
+                        <NodeValue title={String(value)}>
+                          {String(value)}
+                        </NodeValue>
                       )}
                     </NodeItemContainer>
                   );
@@ -201,6 +226,13 @@ function ExplorerUI() {
           </Placeholder>
         )}
       </Form>
+
+      {modal.open && (
+        <Upsert
+          {...modal}
+          onChange={node => setModal(s => ({ ...s, node, open: false }))}
+        />
+      )}
     </>
   );
 }
