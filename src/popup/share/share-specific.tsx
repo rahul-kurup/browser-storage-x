@@ -2,7 +2,7 @@ import { Button, Modal } from '@mantine/core';
 import { Cookie } from 'lib-models/browser';
 import Browser from 'lib-utils/browser';
 import { getAllItems, isCookieType } from 'lib-utils/storage';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { convertCookieToTreeNode, convertStorageToTreeNode } from './helper';
 import { NodeKey, NodeValue, StyledTreeView } from './style';
 import { SpecificProps, TreeDataState } from './type';
@@ -17,6 +17,21 @@ export default function ShareSpecific({
   const [treeDataState, setTreeDataState] = useState<TreeDataState>('HIDDEN');
   const [storageContent, setStorageContent] = useState([]);
   const isCookie = isCookieType(srcStorage);
+
+  const handleModalClose = useCallback(async () => {
+    setTreeDataState('HIDDEN');
+    /**
+     * So we discard the tab again as it was discarded earlier and don't want to consume user's memory
+     * BUT BUT BUT due to discarding the tab, tab is replaced, and is not the same
+     * so we use browser.tabs.onReplaced, search for onReplaced we add a listener there
+     * the discard fn here also returns the new tab, but onReplace handles more cases like tab getting discarded automatically
+     * so we use that
+     */
+    const tabWasDiscarded = Browser.tab.isDiscarded(srcTab);
+    if (tabWasDiscarded) {
+      await Browser.tab.discard(srcTab);
+    }
+  }, []);
 
   useEffect(() => {
     if (treeDataState !== 'HIDDEN' && srcTab && srcStorage) {
@@ -34,22 +49,7 @@ export default function ShareSpecific({
           });
       }
     }
-  }, [treeDataState, srcTab, srcStorage]);
-
-  async function handleModalClose() {
-    setTreeDataState('HIDDEN');
-    /**
-     * So we discard the tab again as it was discarded earlier and don't want to consume user's memory
-     * BUT BUT BUT due to discarding the tab, tab is replaced, and is not the same
-     * so we use browser.tabs.onReplaced, search for onReplaced we add a listener there
-     * the discard fn here also returns the new tab, but onReplace handles more cases like tab getting discarded automatically
-     * so we use that
-     */
-    const tabWasDiscarded = Browser.tab.isDiscarded(srcTab);
-    if (tabWasDiscarded) {
-      await Browser.tab.discard(srcTab);
-    }
-  }
+  }, [treeDataState, srcTab, srcStorage, handleModalClose]);
 
   return (
     <>
@@ -71,7 +71,7 @@ export default function ShareSpecific({
       >
         <StyledTreeView
           enableSelection
-          selecteAllByDefault
+          selectAllByDefault
           items={storageContent}
           checkedItems={props.selectedItems}
           onChecked={itemValueMap => {
@@ -84,7 +84,7 @@ export default function ShareSpecific({
               value = '';
             if (isCookie) {
               const d = node.data as Cookie;
-              name = `${d.name} (${d.domain})`;
+              name = d.name;
               value = d.value;
             } else {
               [name, value] = node.data;

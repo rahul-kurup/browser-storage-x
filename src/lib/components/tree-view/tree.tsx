@@ -16,11 +16,11 @@ export default function Tree({
   items,
   onChecked,
   checkedItems,
-  selecteAllByDefault,
+  selectAllByDefault,
   ...props
 }: TreeViewProps & ExternalProps) {
   const refMount = useRef(false);
-  const [selections, setSelections] = useState(checkedItems);
+  const [selections, setSelections] = useState(checkedItems || []);
 
   const nodeProps = useMemo(
     () => genNodes({ uniqName, items }),
@@ -53,7 +53,12 @@ export default function Tree({
   }, []);
 
   useEffect(() => {
-    if (props.enableSelection && selecteAllByDefault && nodeProps) {
+    if (
+      props.enableSelection &&
+      selectAllByDefault &&
+      nodeProps &&
+      !checkedItems
+    ) {
       setSelections(
         getItemsParentToChild(
           CONSTANTS.rootItemPath,
@@ -61,7 +66,7 @@ export default function Tree({
         )
       );
     }
-  }, [selecteAllByDefault, props.enableSelection, nodeProps]);
+  }, [selectAllByDefault, props.enableSelection, nodeProps, checkedItems]);
 
   useEffect(() => {
     if (props.enableSelection && refMount.current) {

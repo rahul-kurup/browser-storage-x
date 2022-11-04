@@ -14,8 +14,8 @@ export type State = {
 };
 
 export type ShareState = {
-  selectedItems: string[];
-  selectedValues: any;
+  selectedItems: string[] | undefined;
+  selectedValues: any[] | undefined;
   onSelection: (content: Partial<Omit<ShareState, 'onSelection'>>) => void;
 };
 

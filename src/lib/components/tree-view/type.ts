@@ -51,7 +51,7 @@ export type ExternalProps = {
    *
    * @description Selects all tree elements by default. Works only when _enableSelection_ is `true`
    * */
-  selecteAllByDefault?: boolean;
+  selectAllByDefault?: boolean;
 
   checkedItems?: string[];
 
