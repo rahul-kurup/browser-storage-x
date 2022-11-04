@@ -7,7 +7,7 @@ import {
   getAllItems,
   isCookieType,
   setAllItems,
-  StorageTypeList,
+  StorageTypeList
 } from 'lib-utils/storage';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { CustomSelectOption, PresetAlerts } from './components';

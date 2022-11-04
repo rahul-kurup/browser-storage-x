@@ -6,4 +6,6 @@ export type Cookie = chrome.cookies.Cookie;
 
 export type CookieSetInfo = chrome.cookies.SetDetails;
 
-export type Browser = typeof chrome;
+export type BrowserChrome = typeof chrome;
+
+export type BrowserVendor = 'firefox' | 'chromium' | 'safari';
