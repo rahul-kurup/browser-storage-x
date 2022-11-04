@@ -2,6 +2,11 @@ import styled from '@emotion/styled';
 import { Button } from '@mantine/core';
 import TreeView from 'lib-components/tree-view';
 
+export const ImgIcon = styled.img`
+  height: 10px;
+  width: 10px;
+`;
+
 export const DataType = styled.span`
   font-size: 0.8rem;
 `;
@@ -62,7 +67,8 @@ export const StyledTreeView = styled(TreeView)`
 `;
 
 export default styled.form`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
   gap: 10px;
+  min-height: 280px;
 `;

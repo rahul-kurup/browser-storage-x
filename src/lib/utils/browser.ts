@@ -4,7 +4,9 @@ import type {
   Cookie,
   CookieSetInfo,
   Tab,
+  TabQueryInfo,
 } from 'lib-models/browser';
+import { noop } from './common';
 
 type TabReplaceEvent = (addedTabId: number, removedTabId: number) => void;
 export default class Browser {
@@ -62,13 +64,26 @@ export default class Browser {
       return isTabUnloaded;
     },
 
-    getAll: async (cbSuccess?: (tabs: Tab[]) => void) => {
+    getAll: async (
+      cbSuccess?: (tabs: Tab[]) => void,
+      query: TabQueryInfo = {}
+    ) => {
       const { instance } = await this.detect();
       const result: Tab[] = (await new Promise((resolve, _reject) =>
-        instance.tabs.query({}, resolve)
+        instance.tabs.query(query, resolve)
       )) as unknown as Tab[];
       cbSuccess?.(result);
       return result;
+    },
+
+    getActiveTab: async (cbSuccess?: (tabs: Tab) => void) => {
+      const result = await this.tab.getAll(noop, {
+        active: true,
+        currentWindow: true,
+      });
+      const tab = result?.[0];
+      cbSuccess(tab);
+      return tab;
     },
 
     get: async (tabId: number, cb: (tab: Tab) => void) => {

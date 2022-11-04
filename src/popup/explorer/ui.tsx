@@ -4,7 +4,7 @@ import { TreeViewProps } from 'lib-components/tree-view';
 import { Cookie, Tab } from 'lib-models/browser';
 import { StorageType } from 'lib-models/storage';
 import Browser from 'lib-utils/browser';
-import { NoOp } from 'lib-utils/common';
+import { noop, withImg } from 'lib-utils/common';
 import { getAllItems, isCookieType, StorageTypeList } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { SourceContainer } from 'popup/share/style';
@@ -20,6 +20,7 @@ import Form, {
   ActionButton,
   Actions,
   DataType,
+  ImgIcon,
   NodeItemContainer,
   NodeKey,
   NodeValue,
@@ -98,7 +99,7 @@ function ExplorerUI() {
 
   return (
     <>
-      <Form onSubmit={NoOp}>
+      <Form onSubmit={noop}>
         <SourceContainer sourceSelected>
           <Select
             searchable
@@ -142,7 +143,7 @@ function ExplorerUI() {
                     [name] = node.data;
                     value = (node.data[1] as Cookie).value;
                   } else {
-                    [name, value] = node.data;
+                    [name, value] = node.data || [];
                   }
                   return (
                     <NodeItemContainer>
@@ -166,7 +167,7 @@ function ExplorerUI() {
                                 });
                               }}
                             >
-                              &#10133;
+                              <ImgIcon src={withImg('plus.png')} alt='' />
                             </ActionButton>
                           )}
 
@@ -187,7 +188,7 @@ function ExplorerUI() {
                               });
                             }}
                           >
-                            &#128394;&#65039;
+                            <ImgIcon src={withImg('pen.png')} alt='' />
                           </ActionButton>
 
                           <ActionButton
@@ -198,7 +199,7 @@ function ExplorerUI() {
                               stopActionDefEvent(e);
                             }}
                           >
-                            &#10060;
+                            <ImgIcon src={withImg('trash.png')} alt='' />
                           </ActionButton>
                         </>
                       </Actions>

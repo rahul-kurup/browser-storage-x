@@ -1,6 +1,8 @@
+import { withImg } from 'lib-utils/common';
 import { useContext, useState } from 'react';
 import Ctx from './context';
 import UlView, {
+  ImgIcon,
   LabelCheckBox,
   LiNode,
   NodeText,
@@ -71,7 +73,14 @@ export default function TreeNode({
                 expanded={isExpanded}
                 onClick={() => handleExpansion(subItemPath)}
               >
-                {hasItems && <span>{isExpanded ? '▼' : '▶'}</span>}
+                {hasItems && (
+                  <ImgIcon
+                    alt=''
+                    src={withImg(
+                      `arrowhead-${isExpanded ? 'down' : 'right'}.png`
+                    )}
+                  />
+                )}
                 {nodeRenderer?.(node, { isExpanded, hasItems }) || subName}
               </NodeText>
             </TextContainer>

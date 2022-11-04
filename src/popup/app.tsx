@@ -1,13 +1,14 @@
 import { Tabs } from '@mantine/core';
 import BrowserTabProvider from 'lib/context/browser-tab';
+import { getExtName } from '../manifest/base/helper';
 import Explorer from './explorer';
 import Share from './share';
 import Wrapper, { Heading } from './style';
 
 function TabbedView() {
   return (
-    <Tabs defaultValue='share'>
-      <Tabs.List>
+    <Tabs defaultValue='explorer' loop>
+      <Tabs.List grow>
         <Tabs.Tab value='share'>Share</Tabs.Tab>
         <Tabs.Tab value='explorer'>Explorer</Tabs.Tab>
       </Tabs.List>
@@ -30,7 +31,7 @@ function TabbedView() {
 export default function App() {
   return (
     <Wrapper>
-      <Heading>StorageX</Heading>
+      <Heading>{getExtName('StorageX')}</Heading>
       <TabbedView />
     </Wrapper>
   );

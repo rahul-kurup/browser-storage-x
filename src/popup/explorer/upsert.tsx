@@ -1,4 +1,4 @@
-import { Modal, NumberInput, Radio, TextInput } from '@mantine/core';
+import { Button, Modal, NumberInput, Radio, TextInput } from '@mantine/core';
 import { NodeWithIdProps } from 'lib-components/tree-view';
 import { useCallback, useMemo, useState } from 'react';
 import { isValueType } from './helper';
@@ -43,7 +43,7 @@ export default function Upsert(
   const valueProps = useMemo(
     () => ({
       label: 'Value',
-      placeholder: 'value',
+      placeholder: 'Value',
       value: kvValue,
       onChange: (e: any) =>
         setKv(s => [s[0], typeof e === 'object' && e ? e.target.value : e]),
@@ -51,12 +51,23 @@ export default function Upsert(
     [kvValue]
   );
 
+  function onSubmit() {
+    // const toSave = { ...state };
+    // toSave.uniqName = kvName;
+    // if (isStateNodeValueType) {
+    //   toSave.data = [kvName, kvValue];
+    // } else {
+    //   toSave.data = [toSave.data[0], { ...toSave.data[1], [kvName]: kvValue }];
+    // }
+    // props.onChange(toSave);
+  }
+
   return (
     <>
       <Modal
         title={props.title}
         opened={props.open}
-        onClose={() => props.onChange(state)}
+        onClose={() => props.onChange(props.node)}
       >
         <TextInput
           label='Key'
@@ -97,7 +108,10 @@ export default function Upsert(
 
         {isStateNodeValueType &&
           (state.dataType === 'boolean' ? (
-            <Radio.Group {...valueProps}>
+            <Radio.Group
+              {...valueProps}
+              value={String(Boolean(valueProps.value))}
+            >
               <Radio value='true' label='true' />
               <Radio value='false' label='false' />
             </Radio.Group>
@@ -106,6 +120,10 @@ export default function Upsert(
           ) : (
             <TextInput {...valueProps} />
           ))}
+
+        <Button type='button' onClick={onSubmit}>
+          Save
+        </Button>
       </Modal>
     </>
   );
