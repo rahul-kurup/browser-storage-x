@@ -102,35 +102,56 @@ export function convertStorageToTreeNode(storageData = {}) {
     parentDataType: 'object',
     path: [],
   });
-  return { converted, parsed };
+  return { converted, parsed, originalData: storageData };
 }
 
-export function convertTreeNodeToStorage(nodeData: [string, any][]): {} {
-  return nodeData.reduce((a, c) => {
-    if (c) {
-      const [k, v] = c;
-      return { ...a, [k]: v };
-    }
-    return a;
-  }, {});
-}
-
-export function convertCookieToTreeNode(cookies: Cookie[]) {
-  const parsed = {};
-  for (const cookie of cookies) {
-    parsed[cookie.name] = cookie.value;
-    try {
-      parsed[cookie.name] = JSON.parse(decodeURIComponent(cookie.value));
-    } catch (error) {
-      console.error(error);
+export function convertCookieToTreeNode(cookies: Cookie[] | Object) {
+  let parsed = cookies;
+  if (Array.isArray(cookies)) {
+    parsed = {};
+    for (const cookie of cookies) {
+      parsed[cookie.name] = cookie.value;
+      try {
+        parsed[cookie.name] = JSON.parse(decodeURIComponent(cookie.value));
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
   const converted = converter(parsed, { parentDataType: 'object', path: [] });
-  return { converted, parsed };
+  return { converted, parsed, originalData: cookies };
 }
 
-export function convertTreeNodeToCookie(nodeData: Cookie[]): Cookie[] {
-  return nodeData.reduce((a, c) => (c ? [...a, c] : a), []);
+export function convertContentToStorage(content: any) {
+  const keys = Object.keys(content);
+  const changed = {};
+  keys.forEach(key => {
+    changed[key] = content[key];
+    try {
+      changed[key] = JSON.stringify(content[key]);
+    } catch (error) {
+      console.error(error);
+    }
+  });
+  return changed;
+}
+
+export function convertContentToCookie(
+  content: any,
+  originalCookies: Cookie[]
+) {
+  const changed: Cookie[] = [];
+  const keys = Object.keys(content);
+  keys.forEach(cookieName => {
+    const cookieValue = encodeURIComponent(JSON.stringify(content[cookieName]));
+    // TODO: Find a way to track cookie, whose name gets changed
+    const found = originalCookies.find(f => f.name === cookieName);
+    changed.push({
+      ...found,
+      value: cookieValue,
+    });
+  });
+  return changed;
 }
 
 export function stopActionDefEvent(e: any) {

@@ -4,8 +4,13 @@ import { TreeViewProps } from 'lib-components/tree-view';
 import { Tab } from 'lib-models/browser';
 import { StorageType } from 'lib-models/storage';
 import Browser from 'lib-utils/browser';
-import { noop, withImg } from 'lib-utils/common';
-import { getAllItems, isCookieType, StorageTypeList } from 'lib-utils/storage';
+import { withImg } from 'lib-utils/common';
+import {
+  getAllItems,
+  isCookieType,
+  setAllItems,
+  StorageTypeList,
+} from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, unset } from 'lodash';
 import { filterFn } from 'popup/share/helper';
@@ -13,6 +18,8 @@ import { SourceContainer } from 'popup/share/style';
 import { memo, useEffect, useState } from 'react';
 import { CustomSelectOption } from '../share/components';
 import {
+  convertContentToCookie,
+  convertContentToStorage,
   convertCookieToTreeNode,
   convertStorageToTreeNode,
   isValueType,
@@ -47,9 +54,12 @@ function ExplorerUI() {
   const [loading, setLoading] = useState(false);
   const [state, setState] = useState(
     {} as {
+      isSaving?: boolean;
       tab: Tab;
       storage: StorageType;
+      original: any;
       content: any;
+      isChanged?: boolean;
       treeContent: TreeViewProps['items'];
     }
   );
@@ -88,10 +98,11 @@ function ExplorerUI() {
             .execute(tab, getAllItems, [storage])
             .then(convertStorageToTreeNode)
       )
-        .then(({ converted, parsed }) =>
+        .then(({ converted, parsed, originalData }) =>
           setState(s => ({
             ...s,
             content: parsed,
+            original: originalData,
             treeContent: converted,
           }))
         )
@@ -118,6 +129,7 @@ function ExplorerUI() {
           : convertStorageToTreeNode(changedContent);
         return {
           ...newState,
+          isChanged: true,
           content: parsed,
           treeContent: converted,
         };
@@ -125,9 +137,43 @@ function ExplorerUI() {
     }
   }
 
+  async function onSubmit(e) {
+    stopActionDefEvent(e);
+    setState(s => ({ ...s, isSaving: true }));
+    try {
+      if (isCookie) {
+        const cookies = convertContentToCookie(state.content, state.original);
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i];
+          await Browser.cookies.set({
+            domain: cookie.domain,
+            url: state.tab.url,
+            path: cookie.path,
+            name: cookie.name,
+            value: String(cookie.value ?? ''),
+            secure: cookie.secure,
+            httpOnly: cookie.httpOnly,
+            sameSite: cookie.sameSite,
+            expirationDate: cookie.expirationDate,
+          });
+        }
+      } else {
+        const content = convertContentToStorage(state.content);
+        await Browser.script.execute(state.tab, setAllItems, [
+          state.storage,
+          content,
+        ]);
+      }
+    } catch (error) {
+      console.error(error);
+      return setState(s => ({ ...s, isSaving: false }));
+    }
+    setState(s => ({ ...s, isSaving: false, isChanged: false }));
+  }
+
   return (
     <>
-      <Form onSubmit={noop}>
+      <Form onSubmit={onSubmit}>
         <SourceContainer sourceSelected>
           <Select
             label='Tab'
@@ -241,7 +287,15 @@ function ExplorerUI() {
                 }}
               />
 
-              {enableUpsert && <Button type='submit'>Update Storage</Button>}
+              {enableUpsert && (
+                <Button
+                  type='submit'
+                  loading={state.isSaving}
+                  disabled={!state.isChanged}
+                >
+                  Update Storage
+                </Button>
+              )}
             </>
           )
         ) : (
@@ -256,7 +310,11 @@ function ExplorerUI() {
         (modal.action === 'delete' ? (
           <DeleteModal {...modal} onDelete={handleContentChange} />
         ) : (
-          <UpsertModal {...modal} onUpdate={handleContentChange} />
+          <UpsertModal
+            {...modal}
+            isCookie={isCookie}
+            onUpdate={handleContentChange}
+          />
         ))}
     </>
   );

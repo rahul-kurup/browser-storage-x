@@ -94,7 +94,7 @@ function ShareUI() {
           url: destTab.url,
           path: cookie.path,
           name: cookie.name,
-          value: String(cookie.value || ''),
+          value: String(cookie.value ?? ''),
           secure: cookie.secure,
           httpOnly: cookie.httpOnly,
           sameSite: cookie.sameSite,

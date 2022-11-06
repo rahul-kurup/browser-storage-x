@@ -160,11 +160,11 @@ export default function UpsertModal(
           )
         }
       >
+        <Radio value='object' label='Object' />
+        <Radio value='array' label='Array' />
         <Radio value='string' label='String' />
         <Radio value='number' label='Number' />
         <Radio value='boolean' label='Boolean' />
-        <Radio value='object' label='Object' />
-        <Radio value='array' label='Array' />
       </Radio.Group>
     ) : (
       <></>
