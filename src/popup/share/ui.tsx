@@ -12,7 +12,11 @@ import {
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { FormEvent, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { CustomSelectOption, PresetAlerts } from './components';
-import { convertTreeNodeToCookie, convertTreeNodeToStorage } from './helper';
+import {
+  convertTreeNodeToCookie,
+  convertTreeNodeToStorage,
+  filterFn,
+} from './helper';
 import ShareSpecific from './share-specific';
 import Form, { Fieldset, Legend, SourceContainer } from './style';
 import { ShareState, State } from './type';
@@ -188,7 +192,6 @@ function ShareUI() {
           <Legend>Source</Legend>
 
           <Select
-            searchable
             label='Tab'
             name='srcTab'
             options={tabs}
@@ -201,6 +204,8 @@ function ShareUI() {
               value: 'id',
               label: 'title',
             }}
+            searchable
+            filter={filterFn}
           />
 
           <SourceContainer sourceSelected={isSrcSelected}>
@@ -231,7 +236,6 @@ function ShareUI() {
           <Legend>Destination</Legend>
 
           <Select
-            searchable
             label='Tab'
             name='destTab'
             options={tabs}
@@ -244,6 +248,8 @@ function ShareUI() {
               value: 'id',
               label: 'title',
             }}
+            searchable
+            filter={filterFn}
           />
 
           <Select
