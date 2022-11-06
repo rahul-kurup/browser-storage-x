@@ -43,8 +43,8 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@mantine/core": "^5.6.4",
-    "@mantine/hooks": "^5.6.4",
+    "@mantine/core": "^5.7.0",
+    "@mantine/hooks": "^5.7.0",
     "emotion": "^11.0.0",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
@@ -52,9 +52,9 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.19.3",
-    "@babel/core": "^7.19.6",
+    "@babel/core": "^7.20.2",
     "@babel/plugin-transform-react-jsx": "^7.19.0",
-    "@babel/preset-env": "^7.19.4",
+    "@babel/preset-env": "^7.20.2",
     "@emotion/babel-plugin": "^11.10.5",
     "@types/chrome": "^0.0.200",
     "@types/react-dom": "^18.0.8",

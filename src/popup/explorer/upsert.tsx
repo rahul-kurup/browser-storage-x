@@ -2,6 +2,7 @@ import { Button, Modal, NumberInput, Radio, TextInput } from '@mantine/core';
 import { NodeWithIdProps } from 'lib-components/tree-view';
 import { useCallback, useMemo, useState } from 'react';
 import { isValueType } from './helper';
+import { ModalContainer } from './style';
 import { UpsertModalProps } from './type';
 
 export default function Upsert(
@@ -9,6 +10,8 @@ export default function Upsert(
     onChange: (arg: NodeWithIdProps) => void;
   }
 ) {
+  const isParentDataTypeArray = props.node?.data?.[2] === 'array';
+
   const isPropNodeValueType = isValueType(props.node);
 
   const isUpdateAction = props.action === 'update';
@@ -55,9 +58,9 @@ export default function Upsert(
     // const toSave = { ...state };
     // toSave.uniqName = kvName;
     // if (isStateNodeValueType) {
-    //   toSave.data = [kvName, kvValue];
+    //   toSave.data = [kvName, kvValue, toSave.data[2]];
     // } else {
-    //   toSave.data = [toSave.data[0], { ...toSave.data[1], [kvName]: kvValue }];
+    //   toSave.data = [toSave.data[0], { ...toSave.data[1], [kvName]: kvValue }, toSave.data[2]];
     // }
     // props.onChange(toSave);
   }
@@ -69,61 +72,67 @@ export default function Upsert(
         opened={props.open}
         onClose={() => props.onChange(props.node)}
       >
-        <TextInput
-          label='Key'
-          placeholder='Key'
-          value={kvName}
-          onChange={e => {
-            setKv(s => [e.target.value, s[1]]);
-          }}
-        />
-
-        {isUpdateAction ? (
-          <></>
-        ) : (
-          <>
-            <Radio.Group
-              label='Value Type'
-              name='dataType'
-              value={state.dataType}
-              onChange={(dataType: NodeWithIdProps['dataType']) =>
-                setState(s => ({ ...s, dataType }))
-              }
-            >
-              {isPropNodeValueType ? (
-                <>
-                  <Radio value='string' label='String' />
-                  <Radio value='number' label='Number' />
-                  <Radio value='boolean' label='Boolean' />
-                </>
-              ) : (
-                <>
-                  <Radio value='object' label='Object' />
-                  <Radio value='array' label='Array' />
-                </>
-              )}
-            </Radio.Group>
-          </>
-        )}
-
-        {isStateNodeValueType &&
-          (state.dataType === 'boolean' ? (
-            <Radio.Group
-              {...valueProps}
-              value={String(Boolean(valueProps.value))}
-            >
-              <Radio value='true' label='true' />
-              <Radio value='false' label='false' />
-            </Radio.Group>
-          ) : state.dataType === 'number' ? (
-            <NumberInput {...valueProps} />
+        <ModalContainer>
+          {isParentDataTypeArray ? (
+            <></>
           ) : (
-            <TextInput {...valueProps} />
-          ))}
+            <TextInput
+              label='Key'
+              placeholder='Key'
+              value={kvName}
+              onChange={e => {
+                setKv(s => [e.target.value, s[1]]);
+              }}
+            />
+          )}
 
-        <Button type='button' onClick={onSubmit}>
-          Save
-        </Button>
+          {isUpdateAction ? (
+            <></>
+          ) : (
+            <>
+              <Radio.Group
+                label='Value Type'
+                name='dataType'
+                value={state.dataType}
+                onChange={(dataType: NodeWithIdProps['dataType']) =>
+                  setState(s => ({ ...s, dataType }))
+                }
+              >
+                {isPropNodeValueType ? (
+                  <>
+                    <Radio value='string' label='String' />
+                    <Radio value='number' label='Number' />
+                    <Radio value='boolean' label='Boolean' />
+                  </>
+                ) : (
+                  <>
+                    <Radio value='object' label='Object' />
+                    <Radio value='array' label='Array' />
+                  </>
+                )}
+              </Radio.Group>
+            </>
+          )}
+
+          {isStateNodeValueType &&
+            (state.dataType === 'boolean' ? (
+              <Radio.Group
+                {...valueProps}
+                value={String(Boolean(valueProps.value))}
+              >
+                <Radio value='true' label='true' />
+                <Radio value='false' label='false' />
+              </Radio.Group>
+            ) : state.dataType === 'number' ? (
+              <NumberInput {...valueProps} />
+            ) : (
+              <TextInput {...valueProps} />
+            ))}
+
+          <Button type='button' onClick={onSubmit}>
+            Save
+          </Button>
+        </ModalContainer>
       </Modal>
     </>
   );

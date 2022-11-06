@@ -11,6 +11,7 @@ const defaultManifest = {
   version,
   description,
   short_name: name,
+  permissions,
   icons: {
     128: 'assets/images/logo.png',
   },

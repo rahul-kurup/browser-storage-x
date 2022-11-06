@@ -1,4 +1,8 @@
-import { NodeWithIdProps, TreeViewProps } from 'lib-components/tree-view';
+import {
+  AcceptedDataType,
+  NodeWithIdProps,
+  TreeViewProps,
+} from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
 
 type TreeViewNodeItems = TreeViewProps['items'];
@@ -7,29 +11,44 @@ export function isValueType(node?: NodeWithIdProps) {
   return node?.dataType !== 'array' && node?.dataType !== 'object';
 }
 
-export function valueNodeHint(node: NodeWithIdProps, value = null) {
-  return node.dataType === 'array'
-    ? `Array (${node.items.length})`
-    : node.dataType === 'object'
-    ? 'Object'
-    : value;
+export function isBasicDataType(arg: any) {
+  const ty = typeof arg;
+  return (
+    ty === 'string' || ty === 'number' || ty === 'boolean' || ty === 'bigint'
+  );
 }
 
-function converter(obj: Record<string, any>) {
+function converter(
+  obj: Record<string, any>,
+  parentDataType?: AcceptedDataType
+) {
   if (obj) {
     if (Array.isArray(obj) && obj.length) {
-      return obj.map(converter);
+      return obj.map(m =>
+        isBasicDataType(m)
+          ? {
+              uniqName: m,
+              data: [m, m, parentDataType],
+              dataType: typeof m,
+            }
+          : converter(m)
+      );
     } else {
       if (typeof obj === 'object') {
         const items: TreeViewNodeItems = [];
         for (const key in obj) {
           if (Object.prototype.hasOwnProperty.call(obj, key)) {
             const el = obj[key];
-            const val = converter(el);
+            const dataType = (
+              Array.isArray(el) ? 'array' : typeof el
+            ) as AcceptedDataType;
+            const val = converter(el, dataType);
             items.push({
               uniqName: key,
               data: [key, el],
-              dataType: Array.isArray(el) ? 'array' : typeof el,
+              dataType: (Array.isArray(el)
+                ? 'array'
+                : typeof el) as AcceptedDataType,
               items: typeof val === 'object' ? val : undefined,
             });
           }

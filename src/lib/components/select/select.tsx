@@ -15,7 +15,7 @@ export default function Select<T>({
   const getContent = useCallback(
     (m: T, keyFor: 'label' | 'value') => {
       if (isNully(m)) {
-        return m;
+        return '';
       } else if (fieldKey?.[keyFor]) {
         return typeof fieldKey[keyFor] === 'string'
           ? m[fieldKey[keyFor] as string]
@@ -42,7 +42,7 @@ export default function Select<T>({
   const dataItems = useMemo(() => {
     return (
       options?.map(m => {
-        const label = getContent(m, 'label');
+        const label = getContent(m, 'label') ?? '';
         const value = String(getContent(m, 'value'));
         return { label, value, data: m };
       }) || []

@@ -1,5 +1,25 @@
 import { ComponentProps } from 'react';
 
+export type AllDataType =
+  | 'string'
+  | 'boolean'
+  | 'number'
+  | 'bigint'
+  | 'undefined'
+  | 'null'
+  | 'symbol'
+  | 'function'
+  | 'array'
+  | 'object';
+
+export type AcceptedDataType =
+  | 'string'
+  | 'boolean'
+  | 'number'
+  | 'bigint'
+  | 'array'
+  | 'object';
+
 export type NodeProps = {
   uniqName: string;
   items?: NodeProps[];
@@ -7,17 +27,7 @@ export type NodeProps = {
 
 export type DataProps = {
   data?: any;
-  dataType?:
-    | 'string'
-    | 'boolean'
-    | 'number'
-    | 'bigint'
-    | 'undefined'
-    | 'null'
-    | 'symbol'
-    | 'function'
-    | 'array'
-    | 'object';
+  dataType?: AcceptedDataType;
 };
 
 export type NodeWithIdProps = DataProps & {

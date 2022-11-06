@@ -1,6 +1,6 @@
 import { Button, ButtonProps, Loader } from '@mantine/core';
 import Select, { ChangeHandlerArgs } from 'lib-components/select';
-import { TreeViewProps } from 'lib-components/tree-view';
+import { AcceptedDataType, TreeViewProps } from 'lib-components/tree-view';
 import { Cookie, Tab } from 'lib-models/browser';
 import { StorageType } from 'lib-models/storage';
 import Browser from 'lib-utils/browser';
@@ -36,6 +36,8 @@ const actionProps: ButtonProps = {
   compact: true,
   variant: 'light',
 };
+
+const enableUpsert = false;
 
 function ExplorerUI() {
   const { tabs, replaced } = useBrowserTabs();
@@ -138,87 +140,94 @@ function ExplorerUI() {
                 items={state.content || []}
                 nodeRenderer={node => {
                   let name = '',
-                    value = '';
+                    value = '',
+                    parentType: AcceptedDataType;
                   if (isCookie) {
                     [name] = node.data;
                     value = (node.data[1] as Cookie).value;
+                    parentType = node.data[2];
                   } else {
-                    [name, value] = node.data || [];
+                    [name, value, parentType] = node.data || [];
                   }
                   return (
                     <NodeItemContainer>
-                      <Actions className='actions'>
-                        <>
-                          {!isValueType(node) && (
+                      {enableUpsert && (
+                        <Actions className='actions'>
+                          <>
+                            {!isValueType(node) && (
+                              <ActionButton
+                                {...actionProps}
+                                color='green'
+                                title='Add'
+                                onClick={e => {
+                                  stopActionDefEvent(e);
+                                  setModal({
+                                    open: true,
+                                    action: 'add',
+                                    title: (
+                                      <>
+                                        Add to <b>{name}</b>
+                                      </>
+                                    ),
+                                  });
+                                }}
+                              >
+                                <ImgIcon src={withImg('plus.png')} alt='' />
+                              </ActionButton>
+                            )}
+
                             <ActionButton
                               {...actionProps}
-                              color='green'
-                              title='Add'
+                              title='Modify'
                               onClick={e => {
                                 stopActionDefEvent(e);
                                 setModal({
                                   open: true,
-                                  action: 'add',
+                                  node,
+                                  action: 'update',
                                   title: (
                                     <>
-                                      Add to <b>{name}</b>
+                                      Modify: <b>{name}</b>
                                     </>
                                   ),
                                 });
                               }}
                             >
-                              <ImgIcon src={withImg('plus.png')} alt='' />
+                              <ImgIcon src={withImg('pen.png')} alt='' />
                             </ActionButton>
-                          )}
 
-                          <ActionButton
-                            {...actionProps}
-                            title='Modify'
-                            onClick={e => {
-                              stopActionDefEvent(e);
-                              setModal({
-                                open: true,
-                                node,
-                                action: 'update',
-                                title: (
-                                  <>
-                                    Modify: <b>{name}</b>
-                                  </>
-                                ),
-                              });
-                            }}
-                          >
-                            <ImgIcon src={withImg('pen.png')} alt='' />
-                          </ActionButton>
+                            <ActionButton
+                              {...actionProps}
+                              color='red'
+                              title='Remove'
+                              onClick={e => {
+                                stopActionDefEvent(e);
+                              }}
+                            >
+                              <ImgIcon src={withImg('trash.png')} alt='' />
+                            </ActionButton>
+                          </>
+                        </Actions>
+                      )}
 
-                          <ActionButton
-                            {...actionProps}
-                            color='red'
-                            title='Remove'
-                            onClick={e => {
-                              stopActionDefEvent(e);
-                            }}
-                          >
-                            <ImgIcon src={withImg('trash.png')} alt='' />
-                          </ActionButton>
-                        </>
-                      </Actions>
-
-                      <NodeKey title={`${name} ⇒ ${value}`}>
-                        {name} <DataType>[{node.dataType}]</DataType>
+                      <NodeKey title={String(name)}>
+                        {String(name)} <DataType>[{node.dataType}]</DataType>
                       </NodeKey>
 
-                      {isValueType(node) && (
-                        <NodeValue title={String(value)}>
-                          {String(value)}
-                        </NodeValue>
-                      )}
+                      {isValueType(node) &&
+                        (parentType === 'array' ? (
+                          <></>
+                        ) : (
+                          <NodeValue title={String(value)}>
+                            {String(value)}
+                          </NodeValue>
+                        ))}
                     </NodeItemContainer>
                   );
                 }}
               />
 
-              <Button type='submit'>Update Storage</Button>
+              {enableUpsert && <Button type='submit'>Update Storage</Button>}
             </>
           )
         ) : (
