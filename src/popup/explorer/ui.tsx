@@ -80,29 +80,21 @@ function ExplorerUI() {
   useEffect(() => {
     if (tab && storage) {
       setLoading(true);
-      if (isCookie) {
-        Browser.cookies
-          .getAll(tab)
-          .then(content => {
-            setState(s => ({
-              ...s,
-              content,
-              treeContent: convertCookieToTreeNode(content),
-            }));
-          })
-          .finally(() => setLoading(false));
-      } else {
-        Browser.script
-          .execute(tab, getAllItems, [storage])
-          .then(content => {
-            setState(s => ({
-              ...s,
-              content,
-              treeContent: convertStorageToTreeNode(content),
-            }));
-          })
-          .finally(() => setLoading(false));
-      }
+
+      (isCookie
+        ? Browser.cookies.getAll(tab).then(convertCookieToTreeNode)
+        : Browser.script
+            .execute(tab, getAllItems, [storage])
+            .then(convertStorageToTreeNode)
+      )
+        .then(({ converted, parsed }) =>
+          setState(s => ({
+            ...s,
+            content: parsed,
+            treeContent: converted,
+          }))
+        )
+        .finally(() => setLoading(false));
     }
   }, [tab, storage]);
 
@@ -238,13 +230,18 @@ function ExplorerUI() {
               setState(prev => {
                 debugger;
                 const newState = { ...prev };
-                set(newState.content, newPath, newPathValue);
+                const changedContent = { ...newState.content };
+                set(changedContent, newPath, newPathValue);
                 if (prevPath?.length) {
-                  unset(newState.content, prevPath);
+                  unset(changedContent, prevPath);
                 }
+                const { converted, parsed } = isCookie
+                  ? convertCookieToTreeNode(changedContent)
+                  : convertStorageToTreeNode(changedContent);
                 return {
                   ...newState,
-                  treeContent: convertStorageToTreeNode(newState.content),
+                  content: parsed,
+                  treeContent: converted,
                 };
               });
             }

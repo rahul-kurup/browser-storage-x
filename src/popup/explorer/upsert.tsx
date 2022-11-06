@@ -8,7 +8,11 @@ import {
 } from '@mantine/core';
 import { AcceptedDataType, AllDataType } from 'lib-components/tree-view';
 import { useCallback, useMemo, useState } from 'react';
-import { getValueByType, stopActionDefEvent } from './helper';
+import {
+  getValueByType,
+  isPrevNewPathSame,
+  stopActionDefEvent,
+} from './helper';
 import { ModalForm } from './style';
 import { UpsertModalProps } from './type';
 
@@ -50,23 +54,16 @@ export default function Upsert(
 
   const [state, setState] = useState(prepareNode());
 
-  // useEffect(() => {
-  //   setState(prepareNode());
-  // }, [prepareNode]);
-
-  // useEffect(() => {
-  //   setKv(state.data || []);
-  // }, [state]);
-
   function onSubmit(e) {
     stopActionDefEvent(e);
     const { isParentArray, isParentObject, isSelfObject, isSelfArray } = checks;
     const toSave = { ...props.node };
-    const dataName = toSave.data.name;
     const dataPath = toSave.data.path;
     let dataValue = toSave.data.value;
+    const stateValue = getValueByType[state.valueType](state.value);
+
+    // ADD
     if (isActionAdd) {
-      const stateValue = getValueByType[state.valueType](state.value);
       if (isSelfArray) {
         dataValue ??= [];
         dataValue.push(stateValue);
@@ -79,20 +76,42 @@ export default function Upsert(
       const newPathValue = dataValue;
       return props.onUpdate({ close: false, newPath, newPathValue });
     }
+
+    // UPDATE
     if (isActionUpdate) {
+      const prevPath = dataPath;
+      const newPaths = [...dataPath];
+      // rename key
       if (isSelfArray || isSelfObject) {
-        const newPaths = [...dataPath];
         newPaths.pop();
         newPaths.push(state.name);
-        const prevPath = dataPath;
         const newPath = newPaths;
         const newPathValue = dataValue;
-        props.onUpdate({ close: false, prevPath, newPath, newPathValue });
+        return props.onUpdate({
+          close: false,
+          newPath,
+          newPathValue,
+          prevPath: isPrevNewPathSame(prevPath, newPath) ? undefined : prevPath,
+        });
       } else {
+        const newPathValue = stateValue;
+        // rename value if array
         if (isParentArray) {
-          debugger;
+          const newPath = newPaths;
+          return props.onUpdate({ close: false, newPath, newPathValue });
         } else if (isParentObject) {
-          debugger;
+          // rename key and value if object
+          newPaths.pop();
+          newPaths.push(state.name);
+          const newPath = newPaths;
+          return props.onUpdate({
+            close: false,
+            newPath,
+            newPathValue,
+            prevPath: isPrevNewPathSame(prevPath, newPath)
+              ? undefined
+              : prevPath,
+          });
         }
       }
     }
@@ -161,7 +180,12 @@ export default function Upsert(
       onChange: (e: any) =>
         setState(s => ({
           ...s,
-          value: typeof e === 'object' && e ? e.target.value : e,
+          value:
+            typeof e === 'object' && e
+              ? e.target.value
+              : state.valueType === 'boolean'
+              ? e === 'true'
+              : e,
         })),
     };
 
@@ -176,7 +200,7 @@ export default function Upsert(
             <Radio value='false' label='false' />
           </Radio.Group>
         ) : state.valueType === 'number' ? (
-          <NumberInput {...valueProps} />
+          <NumberInput {...valueProps} precision={2} step={0.1} />
         ) : state.valueType === 'string' ? (
           <Textarea {...valueProps} autosize minRows={1} />
         ) : (

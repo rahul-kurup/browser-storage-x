@@ -1,7 +1,7 @@
 import {
   AcceptedDataType,
   NodeWithIdProps,
-  TreeViewProps,
+  TreeViewProps
 } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
 
@@ -14,6 +14,15 @@ export const getValueByType = {
   number: (arg: any) => Number(arg),
   boolean: (arg: any) =>
     typeof arg === 'string' ? arg === 'true' : Boolean(arg),
+};
+
+export const isPrevNewPathSame = (prevPath?: string[], newPath?: string[]) => {
+  if (newPath?.length === prevPath?.length) {
+    return newPath.length && (
+      newPath.every(e => prevPath.includes(e)) &&
+      prevPath.every(e => newPath.includes(e))
+    );
+  }
 };
 
 export function isValueType(node?: NodeWithIdProps) {
@@ -37,7 +46,7 @@ function converter(
   if (obj) {
     if (Array.isArray(obj) && obj.length) {
       return obj.map((m, i) => {
-        const newPath = [...path, `[${i}]`];
+        const newPath = [...path, String(i)];
         return isBasicDataType(m)
           ? {
               uniqName: m,
@@ -49,27 +58,26 @@ function converter(
     } else {
       if (typeof obj === 'object') {
         const items: TreeViewNodeItems = [];
-        for (const key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            const el = obj[key];
-            const dataType = (
-              Array.isArray(el) ? 'array' : typeof el
-            ) as AcceptedDataType;
-            const newPath = [...path, key];
-            const val = converter(el, {
-              path: newPath,
-              parentDataType: dataType,
-            });
-            items.push({
-              uniqName: key,
-              data: { name: key, value: el, parentDataType, path: newPath },
-              dataType: (Array.isArray(el)
-                ? 'array'
-                : typeof el) as AcceptedDataType,
-              items: typeof val === 'object' ? val : undefined,
-            });
-          }
-        }
+        const keys = Object.keys(obj).sort();
+        keys.forEach(key => {
+          const el = obj[key];
+          const dataType = (
+            Array.isArray(el) ? 'array' : typeof el
+          ) as AcceptedDataType;
+          const newPath = [...path, key];
+          const val = converter(el, {
+            path: newPath,
+            parentDataType: dataType,
+          });
+          items.push({
+            uniqName: key,
+            data: { name: key, value: el, parentDataType, path: newPath },
+            dataType: (Array.isArray(el)
+              ? 'array'
+              : typeof el) as AcceptedDataType,
+            items: typeof val === 'object' ? val : undefined,
+          });
+        });
         return items;
       }
       return obj;
@@ -79,22 +87,21 @@ function converter(
 }
 
 export function convertStorageToTreeNode(storageData = {}) {
-  const parsedData = {};
-  for (const key in storageData) {
-    if (Object.prototype.hasOwnProperty.call(storageData, key)) {
-      parsedData[key] = storageData[key];
-      try {
-        parsedData[key] = JSON.parse(storageData[key]);
-      } catch (error) {
-        console.error(error);
-      }
+  const parsed = {};
+  const keys = Object.keys(storageData).sort();
+  keys.forEach(key => {
+    parsed[key] = storageData[key];
+    try {
+      parsed[key] = JSON.parse(storageData[key]);
+    } catch (error) {
+      console.error(error);
     }
-  }
-  const converted = converter(parsedData, {
+  });
+  const converted = converter(parsed, {
     parentDataType: 'object',
     path: [],
   });
-  return converted;
+  return { converted, parsed };
 }
 
 export function convertTreeNodeToStorage(nodeData: [string, any][]): {} {
@@ -108,16 +115,17 @@ export function convertTreeNodeToStorage(nodeData: [string, any][]): {} {
 }
 
 export function convertCookieToTreeNode(cookies: Cookie[]) {
-  const parsedData = {};
+  const parsed = {};
   for (const cookie of cookies) {
-    parsedData[cookie.name] = cookie.value;
+    parsed[cookie.name] = cookie.value;
     try {
-      parsedData[cookie.name] = JSON.parse(decodeURIComponent(cookie.value));
+      parsed[cookie.name] = JSON.parse(decodeURIComponent(cookie.value));
     } catch (error) {
       console.error(error);
     }
   }
-  return converter(parsedData, { parentDataType: 'object', path: [] });
+  const converted = converter(parsed, { parentDataType: 'object', path: [] });
+  return { converted, parsed };
 }
 
 export function convertTreeNodeToCookie(nodeData: Cookie[]): Cookie[] {
