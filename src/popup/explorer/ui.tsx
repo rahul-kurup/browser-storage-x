@@ -18,6 +18,8 @@ import {
   isValueType,
   stopActionDefEvent,
 } from './helper';
+import DeleteModal from './modal-delete';
+import UpsertModal from './modal-upsert';
 import Form, {
   ActionButton,
   Actions,
@@ -29,8 +31,7 @@ import Form, {
   Placeholder,
   StyledTreeView,
 } from './style';
-import { UpsertModalProps } from './type';
-import Upsert from './upsert';
+import { CommonModalArgs, UpsertModalProps } from './type';
 
 const actionProps: ButtonProps = {
   radius: 'xl',
@@ -99,6 +100,30 @@ function ExplorerUI() {
   }, [tab, storage]);
 
   const isSrcSelected = Boolean(tab && storage);
+
+  function handleContentChange(args: CommonModalArgs) {
+    setModal(s => ({ ...s, node: undefined, open: false }));
+    if (!args.close) {
+      setState(prev => {
+        const newState = { ...prev };
+        const changedContent = { ...newState.content };
+        if (args.newPath) {
+          set(changedContent, args.newPath, args.newPathValue);
+        }
+        if (args.prevPath?.length) {
+          unset(changedContent, args.prevPath);
+        }
+        const { converted, parsed } = isCookie
+          ? convertCookieToTreeNode(changedContent)
+          : convertStorageToTreeNode(changedContent);
+        return {
+          ...newState,
+          content: parsed,
+          treeContent: converted,
+        };
+      });
+    }
+  }
 
   return (
     <>
@@ -186,6 +211,11 @@ function ExplorerUI() {
                               title='Remove'
                               onClick={e => {
                                 stopActionDefEvent(e);
+                                setModal({
+                                  open: true,
+                                  node,
+                                  action: 'delete',
+                                });
                               }}
                             >
                               <ImgIcon src={withImg('trash.png')} alt='' />
@@ -221,33 +251,13 @@ function ExplorerUI() {
         )}
       </Form>
 
-      {modal.open && modal.node && (
-        <Upsert
-          {...modal}
-          onUpdate={({ close, newPath, newPathValue, prevPath }) => {
-            setModal(s => ({ ...s, node: undefined, open: false }));
-            if (!close) {
-              setState(prev => {
-                debugger;
-                const newState = { ...prev };
-                const changedContent = { ...newState.content };
-                set(changedContent, newPath, newPathValue);
-                if (prevPath?.length) {
-                  unset(changedContent, prevPath);
-                }
-                const { converted, parsed } = isCookie
-                  ? convertCookieToTreeNode(changedContent)
-                  : convertStorageToTreeNode(changedContent);
-                return {
-                  ...newState,
-                  content: parsed,
-                  treeContent: converted,
-                };
-              });
-            }
-          }}
-        />
-      )}
+      {modal.open &&
+        modal.node &&
+        (modal.action === 'delete' ? (
+          <DeleteModal {...modal} onDelete={handleContentChange} />
+        ) : (
+          <UpsertModal {...modal} onUpdate={handleContentChange} />
+        ))}
     </>
   );
 }

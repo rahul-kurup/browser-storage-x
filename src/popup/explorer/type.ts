@@ -5,3 +5,10 @@ export type UpsertModalProps = {
   open: boolean;
   action: 'add' | 'update' | 'delete';
 };
+
+export type CommonModalArgs = {
+  close: boolean;
+  prevPath?: string[];
+  newPath: string[];
+  newPathValue: any;
+};

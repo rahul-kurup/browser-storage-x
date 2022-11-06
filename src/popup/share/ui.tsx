@@ -17,7 +17,7 @@ import {
   convertTreeNodeToStorage,
   filterFn,
 } from './helper';
-import ShareSpecific from './share-specific';
+import ShareSpecificModal from './modal-share';
 import Form, { Fieldset, Legend, SourceContainer } from './style';
 import { ShareState, State } from './type';
 
@@ -219,7 +219,7 @@ function ShareUI() {
             />
 
             {isSrcSelected && (
-              <ShareSpecific
+              <ShareSpecificModal
                 disabled={disabledField}
                 srcTab={state.srcTab}
                 srcStorage={state.srcStorage}

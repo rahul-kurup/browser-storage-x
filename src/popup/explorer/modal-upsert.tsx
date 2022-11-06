@@ -14,19 +14,14 @@ import {
   stopActionDefEvent,
 } from './helper';
 import { ModalForm } from './style';
-import { UpsertModalProps } from './type';
+import { CommonModalArgs, UpsertModalProps } from './type';
 
 const basicDt: AllDataType[] = ['string', 'number', 'bigint', 'boolean'];
 const containerDt: AllDataType[] = ['object', 'array'];
 
-export default function Upsert(
+export default function UpsertModal(
   props: UpsertModalProps & {
-    onUpdate: (args: {
-      close: boolean;
-      prevPath?: string[];
-      newPath: string[];
-      newPathValue: any;
-    }) => void;
+    onUpdate: (args: CommonModalArgs) => void;
   }
 ) {
   const isActionAdd = props.action === 'add';
@@ -225,7 +220,7 @@ export default function Upsert(
       <Modal
         title={<b>{isActionAdd ? 'Add' : 'Modify'}</b>}
         opened={props.open}
-        onClose={() => props.onUpdate({ close: true } as any)}
+        onClose={() => props.onUpdate({ close: true } as CommonModalArgs)}
       >
         <ModalForm onSubmit={onSubmit}>
           <>

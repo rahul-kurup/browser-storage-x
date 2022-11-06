@@ -1,7 +1,7 @@
 import {
   AcceptedDataType,
   NodeWithIdProps,
-  TreeViewProps
+  TreeViewProps,
 } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
 
@@ -18,7 +18,8 @@ export const getValueByType = {
 
 export const isPrevNewPathSame = (prevPath?: string[], newPath?: string[]) => {
   if (newPath?.length === prevPath?.length) {
-    return newPath.length && (
+    return (
+      newPath.length &&
       newPath.every(e => prevPath.includes(e)) &&
       prevPath.every(e => newPath.includes(e))
     );

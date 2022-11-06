@@ -9,19 +9,19 @@ function TabbedView() {
   return (
     <Tabs defaultValue='explorer' loop>
       <Tabs.List grow>
-        <Tabs.Tab value='share'>Share</Tabs.Tab>
         <Tabs.Tab value='explorer'>Explorer</Tabs.Tab>
+        <Tabs.Tab value='share'>Share</Tabs.Tab>
       </Tabs.List>
-
-      <Tabs.Panel value='share' pt='xs'>
-        <BrowserTabProvider>
-          <Share />
-        </BrowserTabProvider>
-      </Tabs.Panel>
 
       <Tabs.Panel value='explorer' pt='xs'>
         <BrowserTabProvider>
           <Explorer />
+        </BrowserTabProvider>
+      </Tabs.Panel>
+
+      <Tabs.Panel value='share' pt='xs'>
+        <BrowserTabProvider>
+          <Share />
         </BrowserTabProvider>
       </Tabs.Panel>
     </Tabs>

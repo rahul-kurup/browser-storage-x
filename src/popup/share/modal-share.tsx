@@ -7,7 +7,7 @@ import { convertCookieToTreeNode, convertStorageToTreeNode } from './helper';
 import { NodeKey, NodeValue, StyledTreeView } from './style';
 import { SpecificProps, TreeDataState } from './type';
 
-export default function ShareSpecific({
+export default function ShareSpecificModal({
   onSelection,
   srcStorage,
   srcTab,
