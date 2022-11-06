@@ -17,7 +17,6 @@ import { ModalForm } from './style';
 import { CommonModalArgs, UpsertModalProps } from './type';
 
 const basicDt: AllDataType[] = ['string', 'number', 'bigint', 'boolean'];
-const containerDt: AllDataType[] = ['object', 'array'];
 
 export default function UpsertModal(
   props: UpsertModalProps & {
@@ -37,6 +36,7 @@ export default function UpsertModal(
   const prepareNode = useCallback(() => {
     const isUpdate = props.action === 'update';
     return {
+      isChanged: false,
       name: isUpdate ? props.node.uniqName : '',
       value: isUpdate ? props.node.data?.value : '',
       valueType: isUpdate
@@ -116,13 +116,16 @@ export default function UpsertModal(
     const { isParentArray, isParentObject, isSelfObject, isSelfArray } = checks;
     const KeyInput = (
       <Textarea
+        required
         label='Key'
         placeholder='New key name'
         value={state.name}
         autosize
         minRows={1}
         onChange={e => {
-          setState(s => ({ ...s, name: e.target.value } as any));
+          let value = e.target.value;
+          value = value.trim().length < 1 ? '' : value;
+          setState(s => ({ ...s, name: value, isChanged: true } as any));
         }}
       />
     );
@@ -146,12 +149,15 @@ export default function UpsertModal(
   const CompValueType = useMemo(() => {
     return isActionAdd ? (
       <Radio.Group
+        required
         spacing='xs'
         name='dataType'
         label='Value Type'
         value={state.valueType}
         onChange={(valueType: AcceptedDataType) =>
-          setState(s => ({ ...s, value: '', valueType } as any))
+          setState(
+            s => ({ ...s, value: '', valueType, isChanged: true } as any)
+          )
         }
       >
         <Radio value='string' label='String' />
@@ -172,16 +178,25 @@ export default function UpsertModal(
       label: 'Value',
       placeholder: 'Value',
       value: state.value,
-      onChange: (e: any) =>
+      required: true,
+      onChange: (e: any) => {
+        const value =
+          typeof e === 'object' && e
+            ? e.target.value
+            : state.valueType === 'boolean'
+            ? e === 'true'
+            : e;
         setState(s => ({
           ...s,
+          isChanged: true,
           value:
-            typeof e === 'object' && e
-              ? e.target.value
-              : state.valueType === 'boolean'
-              ? e === 'true'
-              : e,
-        })),
+            typeof value === 'string'
+              ? value.trim().length < 1
+                ? ''
+                : value
+              : value,
+        }));
+      },
     };
 
     return showValue ? (
@@ -230,7 +245,9 @@ export default function UpsertModal(
 
             {CompValue}
 
-            <Button type='submit'>Save</Button>
+            <Button type='submit' disabled={!state.isChanged}>
+              Save
+            </Button>
           </>
         </ModalForm>
       </Modal>
