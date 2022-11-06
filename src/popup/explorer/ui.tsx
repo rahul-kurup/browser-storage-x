@@ -7,6 +7,7 @@ import Browser from 'lib-utils/browser';
 import { noop, withImg } from 'lib-utils/common';
 import { getAllItems, isCookieType, StorageTypeList } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
+import { set, unset } from 'lodash';
 import { SourceContainer } from 'popup/share/style';
 import { memo, useEffect, useState } from 'react';
 import { CustomSelectOption } from '../share/components';
@@ -43,7 +44,12 @@ function ExplorerUI() {
   const { tabs, replaced } = useBrowserTabs();
   const [loading, setLoading] = useState(false);
   const [state, setState] = useState(
-    {} as { tab: Tab; storage: StorageType; content: TreeViewProps['items'] }
+    {} as {
+      tab: Tab;
+      storage: StorageType;
+      content: any;
+      treeContent: TreeViewProps['items'];
+    }
   );
 
   const [modal, setModal] = useState({} as UpsertModalProps);
@@ -79,7 +85,8 @@ function ExplorerUI() {
           .then(content => {
             setState(s => ({
               ...s,
-              content: convertCookieToTreeNode(content),
+              content,
+              treeContent: convertCookieToTreeNode(content),
             }));
           })
           .finally(() => setLoading(false));
@@ -89,7 +96,8 @@ function ExplorerUI() {
           .then(content => {
             setState(s => ({
               ...s,
-              content: convertStorageToTreeNode(content),
+              content,
+              treeContent: convertStorageToTreeNode(content),
             }));
           })
           .finally(() => setLoading(false));
@@ -137,10 +145,9 @@ function ExplorerUI() {
           ) : (
             <>
               <StyledTreeView
-                items={state.content || []}
+                items={state.treeContent || []}
                 nodeRenderer={node => {
                   const { name, value, parentDataType } = node.data || {};
-
                   return (
                     <NodeItemContainer>
                       {enableUpsert && (
@@ -156,11 +163,7 @@ function ExplorerUI() {
                                   setModal({
                                     open: true,
                                     action: 'add',
-                                    title: (
-                                      <>
-                                        Add to <b>{name}</b>
-                                      </>
-                                    ),
+                                    node,
                                   });
                                 }}
                               >
@@ -177,11 +180,6 @@ function ExplorerUI() {
                                   open: true,
                                   node,
                                   action: 'update',
-                                  title: (
-                                    <>
-                                      Modify: <b>{name}</b>
-                                    </>
-                                  ),
                                 });
                               }}
                             >
@@ -229,10 +227,26 @@ function ExplorerUI() {
         )}
       </Form>
 
-      {modal.open && (
+      {modal.open && modal.node && (
         <Upsert
           {...modal}
-          onChange={node => setModal(s => ({ ...s, node, open: false }))}
+          onUpdate={({ close, newPath, newPathValue, prevPath }) => {
+            setModal(s => ({ ...s, node: undefined, open: false }));
+            if (!close) {
+              setState(prev => {
+                debugger;
+                const newState = { ...prev };
+                set(newState.content, newPath, newPathValue);
+                if (prevPath?.length) {
+                  unset(newState.content, prevPath);
+                }
+                return {
+                  ...newState,
+                  treeContent: convertStorageToTreeNode(newState.content),
+                };
+              });
+            }
+          }}
         />
       )}
     </>
