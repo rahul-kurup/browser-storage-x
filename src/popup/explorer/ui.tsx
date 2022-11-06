@@ -8,6 +8,7 @@ import { noop, withImg } from 'lib-utils/common';
 import { getAllItems, isCookieType, StorageTypeList } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, unset } from 'lodash';
+import { filterFn } from 'popup/share/helper';
 import { SourceContainer } from 'popup/share/style';
 import { memo, useEffect, useState } from 'react';
 import { CustomSelectOption } from '../share/components';
@@ -112,7 +113,6 @@ function ExplorerUI() {
       <Form onSubmit={noop}>
         <SourceContainer sourceSelected>
           <Select
-            searchable
             label='Tab'
             name='tab'
             options={tabs}
@@ -125,6 +125,8 @@ function ExplorerUI() {
               value: 'id',
               label: 'title',
             }}
+            searchable
+            filter={filterFn}
           />
 
           <Select
