@@ -25,8 +25,10 @@ export const NodeText = styled.div<{ expanded: boolean; hasItems: boolean }>`
 export const TextContainer = styled.div`
   display: flex;
   gap: 5px;
+  border: 1px dashed transparent;
   &:hover {
     background: whitesmoke;
+    border: 1px dashed #d1d1d1;
   }
 `;
 

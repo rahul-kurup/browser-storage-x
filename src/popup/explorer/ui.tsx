@@ -1,7 +1,7 @@
 import { Button, ButtonProps, Loader } from '@mantine/core';
 import Select, { ChangeHandlerArgs } from 'lib-components/select';
-import { AcceptedDataType, TreeViewProps } from 'lib-components/tree-view';
-import { Cookie, Tab } from 'lib-models/browser';
+import { TreeViewProps } from 'lib-components/tree-view';
+import { Tab } from 'lib-models/browser';
 import { StorageType } from 'lib-models/storage';
 import Browser from 'lib-utils/browser';
 import { noop, withImg } from 'lib-utils/common';
@@ -37,7 +37,7 @@ const actionProps: ButtonProps = {
   variant: 'light',
 };
 
-const enableUpsert = false;
+const enableUpsert = true;
 
 function ExplorerUI() {
   const { tabs, replaced } = useBrowserTabs();
@@ -139,16 +139,8 @@ function ExplorerUI() {
               <StyledTreeView
                 items={state.content || []}
                 nodeRenderer={node => {
-                  let name = '',
-                    value = '',
-                    parentType: AcceptedDataType;
-                  if (isCookie) {
-                    [name] = node.data;
-                    value = (node.data[1] as Cookie).value;
-                    parentType = node.data[2];
-                  } else {
-                    [name, value, parentType] = node.data || [];
-                  }
+                  const { name, value, parentDataType } = node.data || {};
+
                   return (
                     <NodeItemContainer>
                       {enableUpsert && (
@@ -215,7 +207,7 @@ function ExplorerUI() {
                       </NodeKey>
 
                       {isValueType(node) &&
-                        (parentType === 'array' ? (
+                        (parentDataType === 'array' ? (
                           <></>
                         ) : (
                           <NodeValue title={String(value)}>

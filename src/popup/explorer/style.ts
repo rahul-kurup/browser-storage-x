@@ -2,11 +2,11 @@ import styled from '@emotion/styled';
 import { Button } from '@mantine/core';
 import TreeView from 'lib-components/tree-view';
 
-export const ModalContainer = styled.div`
+export const ModalForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: 5px;
-`
+`;
 
 export const ImgIcon = styled.img`
   height: 10px;

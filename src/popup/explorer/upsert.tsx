@@ -1,8 +1,8 @@
 import { Button, Modal, NumberInput, Radio, TextInput } from '@mantine/core';
 import { NodeWithIdProps } from 'lib-components/tree-view';
 import { useCallback, useMemo, useState } from 'react';
-import { isValueType } from './helper';
-import { ModalContainer } from './style';
+import { isValueType, stopActionDefEvent } from './helper';
+import { ModalForm } from './style';
 import { UpsertModalProps } from './type';
 
 export default function Upsert(
@@ -10,7 +10,7 @@ export default function Upsert(
     onChange: (arg: NodeWithIdProps) => void;
   }
 ) {
-  const isParentDataTypeArray = props.node?.data?.[2] === 'array';
+  const isParentDataTypeArray = props.node?.data?.parentDataType === 'array';
 
   const isPropNodeValueType = isValueType(props.node);
 
@@ -29,7 +29,9 @@ export default function Upsert(
 
   const [state, setState] = useState(prepareNode());
 
-  const [kv, setKv] = useState((state.data || []) as [string, any]);
+  const [kv, setKv] = useState(
+    (state.data ? [state.data.name, state.data.value] : []) as [string, any]
+  );
 
   // useEffect(() => {
   //   setState(prepareNode());
@@ -54,15 +56,18 @@ export default function Upsert(
     [kvValue]
   );
 
-  function onSubmit() {
-    // const toSave = { ...state };
-    // toSave.uniqName = kvName;
+  function onSubmit(e) {
+    stopActionDefEvent(e);
+    const toSave = { ...state };
+    toSave.uniqName = kvName;
+    if (isParentDataTypeArray) {
+    }
     // if (isStateNodeValueType) {
     //   toSave.data = [kvName, kvValue, toSave.data[2]];
     // } else {
     //   toSave.data = [toSave.data[0], { ...toSave.data[1], [kvName]: kvValue }, toSave.data[2]];
     // }
-    // props.onChange(toSave);
+    props.onChange(toSave);
   }
 
   return (
@@ -72,7 +77,7 @@ export default function Upsert(
         opened={props.open}
         onClose={() => props.onChange(props.node)}
       >
-        <ModalContainer>
+        <ModalForm onSubmit={onSubmit}>
           {isParentDataTypeArray ? (
             <></>
           ) : (
@@ -129,10 +134,8 @@ export default function Upsert(
               <TextInput {...valueProps} />
             ))}
 
-          <Button type='button' onClick={onSubmit}>
-            Save
-          </Button>
-        </ModalContainer>
+          <Button type='submit'>Save</Button>
+        </ModalForm>
       </Modal>
     </>
   );
