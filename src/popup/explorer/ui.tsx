@@ -9,7 +9,7 @@ import {
   getAllItems,
   isCookieType,
   setAllItems,
-  StorageTypeList,
+  StorageTypeList
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
@@ -24,7 +24,7 @@ import {
   convertContentToStorage,
   convertCookieToTreeNode,
   convertStorageToTreeNode,
-  stopActionDefEvent,
+  stopActionDefEvent
 } from './helper';
 import DeleteModal from './modal-delete';
 import UpsertModal from './modal-upsert';
@@ -37,7 +37,7 @@ import Form, {
   NodeKey,
   NodeValue,
   Placeholder,
-  StyledTreeView,
+  StyledTreeView
 } from './style';
 import { CommonModalArgs, UpsertModalProps } from './type';
 
@@ -214,6 +214,11 @@ function ExplorerUI() {
                       ? basicDt.includes(node.dataType)
                       : true;
 
+                  const capDataType = startCase(node.dataType) || '';
+
+                  const Empty = containerDt.includes(node.dataType) &&
+                    !node.items?.length && <i>{'<empty>'}</i>;
+
                   return (
                     <NodeItemContainer>
                       <Actions className='actions'>
@@ -273,13 +278,15 @@ function ExplorerUI() {
                         {node.dataSubType === 'index' ? (
                           <>
                             <DataType title={`index ${name}`}>
-                              [{name}] (Array)
+                              [{name}] ({capDataType}) {Empty}
                             </DataType>
                           </>
                         ) : (
                           <>
                             {String(name)}{' '}
-                            <DataType>({startCase(node.dataType)})</DataType>
+                            <DataType>
+                              ({capDataType}) {Empty}
+                            </DataType>
                           </>
                         )}
                       </NodeKey>
