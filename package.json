@@ -1,6 +1,6 @@
 {
   "name": "browser-ext-storage-x",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "displayName": "StorageX",
   "description": "StorageX extension is a toolset to manage any/all browser tab's Application Storage",
   "author": "Rahul Kurup <raulsrule@gmail.com>",
@@ -40,11 +40,14 @@
     "start": "concurrently npm:watch:chrome npm:reload:brave npm:watch:firefox npm:reload:firefox",
     "pretty": "prettier --loglevel=error --write ."
   },
+  "lint-staged": {
+    "*": "prettier --loglevel=error --write"
+  },
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@mantine/core": "^5.7.0",
-    "@mantine/hooks": "^5.7.0",
+    "@mantine/core": "^5.7.1",
+    "@mantine/hooks": "^5.7.1",
     "emotion": "^11.0.0",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
@@ -70,6 +73,7 @@
     "generate-json-from-js-webpack-plugin": "^0.1.1",
     "html-webpack-plugin": "^5.5.0",
     "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
     "mkdirp": "^1.0.4",
     "postcss-loader": "^7.0.1",
     "prettier": "^2.7.1",
