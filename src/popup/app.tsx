@@ -7,10 +7,10 @@ import Wrapper, { Heading } from './style';
 
 function TabbedView() {
   return (
-    <Tabs defaultValue='explorer' loop>
+    <Tabs defaultValue='share' loop>
       <Tabs.List grow>
-        <Tabs.Tab value='explorer'>Explorer</Tabs.Tab>
         <Tabs.Tab value='share'>Share</Tabs.Tab>
+        <Tabs.Tab value='explorer'>Explorer</Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel value='explorer' pt='xs'>
