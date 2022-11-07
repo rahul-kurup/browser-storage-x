@@ -31,9 +31,10 @@ export default class Browser {
       );
 
       if (tab) {
+        const tabUrlParts = tab.url.split('/').filter(Boolean);
         const filtered = result.filter(f => {
           const srcDomain = f.domain.split('.').filter(Boolean).join('.');
-          return tab.url.split('/').filter(Boolean).includes(srcDomain);
+          return tabUrlParts.includes(srcDomain);
         });
         cbSuccess?.(filtered);
         return filtered;

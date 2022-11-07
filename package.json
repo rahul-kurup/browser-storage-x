@@ -60,6 +60,7 @@
     "@babel/preset-env": "^7.20.2",
     "@emotion/babel-plugin": "^11.10.5",
     "@types/chrome": "^0.0.200",
+    "@types/lodash": "^4.14.188",
     "@types/react-dom": "^18.0.8",
     "@types/webextension-polyfill": "^0.9.1",
     "autoprefixer": "^10.4.13",

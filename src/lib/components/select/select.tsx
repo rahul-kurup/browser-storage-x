@@ -1,5 +1,5 @@
 import { Select as MantineSelect } from '@mantine/core';
-import { isNully } from 'lib-utils/common';
+import { checkItem } from 'lib-utils/common';
 import { useCallback, useMemo } from 'react';
 import { SelectProps } from './type';
 
@@ -14,7 +14,7 @@ export default function Select<T>({
 }: SelectProps<T>) {
   const getContent = useCallback(
     (m: T, keyFor: 'label' | 'value') => {
-      if (isNully(m)) {
+      if (checkItem.isNullOrUndefined(m)) {
         return '';
       } else if (fieldKey?.[keyFor]) {
         return typeof fieldKey[keyFor] === 'string'
