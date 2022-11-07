@@ -4,7 +4,7 @@ import {
   TreeViewProps,
 } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
-import { isNully } from 'lib-utils/common';
+import { checkItem } from 'lib-utils/common';
 
 type TreeViewNodeItems = TreeViewProps['items'];
 
@@ -37,7 +37,9 @@ export function isBasicDataType(arg: any) {
   );
 }
 function getDataType(m: any) {
-  return (Array.isArray(m) ? 'array' : typeof m) as AcceptedDataType;
+  return (
+    Array.isArray(m) ? 'array' : m === null ? 'null' : typeof m
+  ) as AcceptedDataType;
 }
 
 function converter(
@@ -47,32 +49,40 @@ function converter(
     path,
   }: { parentDataType?: AcceptedDataType; path: string[] }
 ) {
-  if (isNully(obj)) {
+  if (checkItem.isNullOrUndefined(obj)) {
     return obj;
   } else if (Array.isArray(obj) && obj.length) {
-    return obj.map((m, i) => {
-      const newPath = [...path, String(i)];
-      const items = isBasicDataType(m)
-        ? {
-            nodeName: m,
-            data: { name: m, value: m, parentDataType: 'array', path: newPath },
-            dataType: typeof m,
-          }
-        : converter(m, { parentDataType: getDataType(m), path: newPath });
-      const item = {
-        nodeName: i,
-        data: {
-          name: i,
-          value: m,
-          parentDataType: 'array',
-          path: newPath,
-        },
-        dataType: getDataType(m),
-        dataSubType: 'index',
-        items,
-      };
-      return item;
-    });
+    return obj
+      .filter(f => !checkItem.isUndefined(f))
+      .map((m, i) => {
+        const typeofObjItem = getDataType(m);
+        const newPath = [...path, String(i)];
+        const items = isBasicDataType(m)
+          ? {
+              nodeName: m,
+              data: {
+                name: m,
+                value: m,
+                parentDataType: 'array',
+                path: newPath,
+              },
+              dataType: typeofObjItem,
+            }
+          : converter(m, { parentDataType: typeofObjItem, path: newPath });
+        const item = {
+          nodeName: i,
+          data: {
+            name: i,
+            value: m,
+            parentDataType: 'array',
+            path: newPath,
+          },
+          dataType: typeofObjItem,
+          dataSubType: 'index',
+          items,
+        };
+        return item;
+      });
   } else if (typeof obj === 'object') {
     const items: TreeViewNodeItems = [];
     const keys = Object.keys(obj).sort();

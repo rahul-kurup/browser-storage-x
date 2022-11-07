@@ -22,6 +22,7 @@ export type AcceptedDataType =
   | 'bigint'
   | 'array'
   | 'object'
+  | 'null'
   | SubDataType;
 
 export type NodeProps = {
