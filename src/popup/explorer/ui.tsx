@@ -9,7 +9,7 @@ import {
   getAllItems,
   isCookieType,
   setAllItems,
-  StorageTypeList
+  StorageTypeList,
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
@@ -24,7 +24,7 @@ import {
   convertContentToStorage,
   convertCookieToTreeNode,
   convertStorageToTreeNode,
-  stopActionDefEvent
+  stopActionDefEvent,
 } from './helper';
 import DeleteModal from './modal-delete';
 import UpsertModal from './modal-upsert';
@@ -37,7 +37,7 @@ import Form, {
   NodeKey,
   NodeValue,
   Placeholder,
-  StyledTreeView
+  StyledTreeView,
 } from './style';
 import { CommonModalArgs, UpsertModalProps } from './type';
 
