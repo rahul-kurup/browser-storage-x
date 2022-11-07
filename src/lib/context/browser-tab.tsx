@@ -5,7 +5,7 @@ import {
   PropsWithChildren,
   useContext,
   useEffect,
-  useState
+  useState,
 } from 'react';
 
 type CtxState = {

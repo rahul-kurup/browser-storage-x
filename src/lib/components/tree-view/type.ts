@@ -1,43 +1,63 @@
 import { ComponentProps } from 'react';
 
+export type SubDataType = 'index';
+
+export type AllDataType =
+  | 'string'
+  | 'boolean'
+  | 'number'
+  | 'bigint'
+  | 'undefined'
+  | 'null'
+  | 'symbol'
+  | 'function'
+  | 'array'
+  | 'object'
+  | SubDataType;
+
+export type AcceptedDataType =
+  | 'string'
+  | 'boolean'
+  | 'number'
+  | 'bigint'
+  | 'array'
+  | 'object'
+  | 'null'
+  | SubDataType;
+
 export type NodeProps = {
-  uniqName: string;
+  nodeName: string;
   items?: NodeProps[];
 };
 
 export type DataProps = {
   data?: any;
-  dataType?:
-    | 'string'
-    | 'boolean'
-    | 'number / bigint'
-    | 'undefined / null'
-    | 'array'
-    | 'object';
+  dataType?: AcceptedDataType;
+  dataSubType?: SubDataType;
 };
 
 export type NodeWithIdProps = DataProps & {
   itemPath: string;
-  uniqName: string;
+  nodeName: string;
   parentItemPath?: string;
   items?: NodeWithIdProps[];
 };
 
 export type TreeViewProps = ComponentProps<'ul'> &
   DataProps & {
-    uniqName?: string;
+    nodeName?: string;
     items?: TreeViewProps[];
   };
 
 export type NodeViewProps = ComponentProps<'ul'> & {
-  uniqName?: string;
+  nodeName?: string;
   itemPath: string;
   parentItemPath?: string;
   items: (ComponentProps<'li'> & NodeWithIdProps)[];
 };
 
 export type GenNodeArgs = {
-  uniqName?: string;
+  nodeName?: string;
   parentItemPath?: string;
   items?: GenNodeArgs[];
 };
@@ -67,5 +87,8 @@ export type ExternalProps = {
   /**
    * custom node renderer
    */
-  nodeRenderer?: (args: NodeWithIdProps) => JSX.Element;
+  nodeRenderer?: (
+    args: NodeWithIdProps,
+    opts: { isExpanded: boolean; hasItems: boolean }
+  ) => JSX.Element;
 };

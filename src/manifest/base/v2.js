@@ -1,30 +1,12 @@
-const {
-  version,
-  displayName: name,
-  description,
-} = require('../../../package.json');
-const permissions = require('../permissions');
+const { name, permissions, defaultManifest } = require('./helper');
 
 module.exports = {
-  version,
+  ...defaultManifest,
   manifest_version: 2,
-  name,
-  short_name: name,
-  description,
   permissions: [...permissions, 'https://*/*'],
   browser_action: {
     default_title: name,
     default_popup: 'assets/html/popup.html',
-  },
-  content_scripts: [
-    {
-      matches: ['<all_urls>'],
-      // "css": ["myStyles.css"],
-      js: ['content.js'],
-    },
-  ],
-  icons: {
-    128: 'assets/images/logo.png',
   },
   background: {
     scripts: ['background.js'],

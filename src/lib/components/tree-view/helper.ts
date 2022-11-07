@@ -6,7 +6,7 @@ export const CONSTANTS = {
 };
 
 export function genNodes({
-  uniqName: name,
+  nodeName: name,
   items,
   parentItemPath,
   ...rest
@@ -26,7 +26,7 @@ export function genNodes({
 
   return {
     ...rest,
-    uniqName: name,
+    nodeName: name,
     itemPath,
     parentItemPath,
     items: mappedItems,

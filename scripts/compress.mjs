@@ -4,7 +4,7 @@ import zl from 'zip-lib';
 
 dotenvExpand.expand(dotenv.config());
 
-if (process.env.COMPRESS_PROG){
+if (process.env.COMPRESS_PROG) {
   console.log('compress_running');
 } else {
   process.env.COMPRESS_PROG = 'start';

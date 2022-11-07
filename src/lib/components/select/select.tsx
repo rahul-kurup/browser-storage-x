@@ -1,5 +1,5 @@
 import { Select as MantineSelect } from '@mantine/core';
-import { isNully } from 'lib-utils/common';
+import { checkItem } from 'lib-utils/common';
 import { useCallback, useMemo } from 'react';
 import { SelectProps } from './type';
 
@@ -14,8 +14,8 @@ export default function Select<T>({
 }: SelectProps<T>) {
   const getContent = useCallback(
     (m: T, keyFor: 'label' | 'value') => {
-      if (isNully(m)) {
-        return m;
+      if (checkItem.isNullOrUndefined(m)) {
+        return '';
       } else if (fieldKey?.[keyFor]) {
         return typeof fieldKey[keyFor] === 'string'
           ? m[fieldKey[keyFor] as string]
@@ -40,11 +40,13 @@ export default function Select<T>({
   }, [value, getContent]);
 
   const dataItems = useMemo(() => {
-    return options?.map(m => {
-      const label = getContent(m, 'label');
-      const value = String(getContent(m, 'value'));
-      return { label, value, data: m };
-    }) || [];
+    return (
+      options?.map(m => {
+        const label = getContent(m, 'label') ?? '';
+        const value = String(getContent(m, 'value'));
+        return { label, value, data: m };
+      }) || []
+    );
   }, [fieldKey, options, getContent]);
 
   function handleChange(value: string) {

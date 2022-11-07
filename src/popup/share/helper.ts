@@ -1,3 +1,4 @@
+import { SelectProps } from '@mantine/core';
 import { TreeViewProps } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
 
@@ -7,7 +8,7 @@ export function convertStorageToTreeNode(data = {}) {
   const keys = Object.keys(data);
   const nodeItems: TreeViewNodeItems = [];
   keys.forEach(key =>
-    nodeItems.push({ uniqName: key, data: [key, data[key]] })
+    nodeItems.push({ nodeName: key, data: [key, data[key]] })
   );
   return nodeItems;
 }
@@ -26,7 +27,7 @@ export function convertCookieToTreeNode(cookies: Cookie[]) {
   const nodeItems: TreeViewNodeItems = [];
   cookies.forEach(cookie =>
     nodeItems.push({
-      uniqName: `${cookie.name}@${cookie.domain}`,
+      nodeName: `${cookie.name}@${cookie.domain}`,
       data: cookie,
     })
   );
@@ -36,3 +37,19 @@ export function convertCookieToTreeNode(cookies: Cookie[]) {
 export function convertTreeNodeToCookie(nodeData: Cookie[]): Cookie[] {
   return nodeData.reduce((a, c) => (c ? [...a, c] : a), []);
 }
+
+export const filterFn: SelectProps['filter'] = (value, item) => {
+  let inUrl = false,
+    inTitle = false;
+  inUrl = item?.data?.url
+    ?.toLowerCase()
+    .trim()
+    .includes(value.toLowerCase().trim());
+  if (!inUrl) {
+    inTitle = item.label
+      .toLowerCase()
+      .trim()
+      .includes(value.toLowerCase().trim());
+  }
+  return inUrl || inTitle;
+};

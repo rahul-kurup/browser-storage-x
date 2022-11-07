@@ -1,6 +1,8 @@
+import { withImg } from 'lib-utils/common';
 import { useContext, useState } from 'react';
 import Ctx from './context';
 import UlView, {
+  ImgIcon,
   LabelCheckBox,
   LiNode,
   NodeText,
@@ -9,7 +11,7 @@ import UlView, {
 import { ExternalProps, NodeViewProps } from './type';
 
 export default function TreeNode({
-  uniqName: mainName,
+  nodeName: mainName,
   items: mainNodes,
   itemPath: mainItemPath,
   enableSelection = false,
@@ -35,18 +37,23 @@ export default function TreeNode({
     <UlView {...mainProps} data-item-id={mainItemPath}>
       {mainNodes.map(node => {
         const {
-          uniqName: subName,
+          nodeName: subName,
           items: subNodes,
           itemPath: subItemPath,
           ...subProps
         } = node;
+
+        const hasItems = Boolean(subNodes?.length);
+        const isExpanded = expanded.includes(subItemPath);
+
         return (
           <LiNode
             {...subProps}
             key={subItemPath}
             data-item-id={subItemPath}
-            enableSelection={enableSelection}
+            aria-expanded={isExpanded}
             showGuidelines={showGuidelines}
+            enableSelection={enableSelection}
           >
             <TextContainer>
               {enableSelection && (
@@ -62,21 +69,30 @@ export default function TreeNode({
               )}
 
               <NodeText
-                hasItems={!!subNodes?.length}
-                expanded={expanded.includes(subItemPath)}
+                hasItems={hasItems}
+                expanded={isExpanded}
                 onClick={() => handleExpansion(subItemPath)}
               >
-                {nodeRenderer ? nodeRenderer(node) : subName}
+                {hasItems && (
+                  <ImgIcon
+                    alt=''
+                    src={withImg(
+                      `arrowhead-${isExpanded ? 'down' : 'right'}.png`
+                    )}
+                  />
+                )}
+                {nodeRenderer?.(node, { isExpanded, hasItems }) || subName}
               </NodeText>
             </TextContainer>
 
-            {subNodes?.length && expanded.includes(subItemPath) && (
+            {hasItems && isExpanded && (
               <TreeNode
-                uniqName={subName}
                 items={subNodes}
+                nodeName={subName}
                 itemPath={subItemPath}
-                enableSelection={enableSelection}
+                nodeRenderer={nodeRenderer}
                 showGuidelines={showGuidelines}
+                enableSelection={enableSelection}
               />
             )}
           </LiNode>
