@@ -1,11 +1,4 @@
-import {
-  Button,
-  Modal,
-  NumberInput,
-  Radio,
-  Textarea,
-  TextInput,
-} from '@mantine/core';
+import { Button, Modal, Radio, Textarea, TextInput } from '@mantine/core';
 import { AcceptedDataType, AllDataType } from 'lib-components/tree-view';
 import { useCallback, useMemo, useState } from 'react';
 import {
@@ -210,7 +203,7 @@ export default function UpsertModal(
             <Radio value='false' label='false' />
           </Radio.Group>
         ) : state.valueType === 'number' ? (
-          <NumberInput {...valueProps} precision={2} step={0.1} />
+          <TextInput {...valueProps} pattern='^\d*\.?\d*$' />
         ) : state.valueType === 'string' ? (
           <Textarea {...valueProps} autosize minRows={1} />
         ) : (

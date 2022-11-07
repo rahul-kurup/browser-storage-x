@@ -140,33 +140,29 @@ function ExplorerUI() {
   async function onSubmit(e) {
     stopActionDefEvent(e);
     setState(s => ({ ...s, isSaving: true }));
-    try {
-      if (isCookie) {
-        const cookies = convertContentToCookie(state.content, state.original);
-        for (let i = 0; i < cookies.length; i++) {
+    if (isCookie) {
+      const cookies = convertContentToCookie(state.content, state.original);
+      for (let i = 0; i < cookies.length; i++) {
+        try {
           const cookie = cookies[i];
           await Browser.cookies.set({
-            domain: cookie.domain,
+            ...cookie,
             url: state.tab.url,
-            path: cookie.path,
-            name: cookie.name,
-            value: String(cookie.value ?? ''),
-            secure: cookie.secure,
-            httpOnly: cookie.httpOnly,
-            sameSite: cookie.sameSite,
-            expirationDate: cookie.expirationDate,
           });
+        } catch (error) {
+          console.error(error);
         }
-      } else {
-        const content = convertContentToStorage(state.content);
+      }
+    } else {
+      const content = convertContentToStorage(state.content);
+      try {
         await Browser.script.execute(state.tab, setAllItems, [
           state.storage,
           content,
         ]);
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
-      return setState(s => ({ ...s, isSaving: false }));
     }
     setState(s => ({ ...s, isSaving: false, isChanged: false }));
   }

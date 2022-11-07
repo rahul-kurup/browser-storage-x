@@ -90,15 +90,9 @@ function ShareUI() {
       }
       try {
         await Browser.cookies.set({
+          ...cookie,
           domain,
           url: destTab.url,
-          path: cookie.path,
-          name: cookie.name,
-          value: String(cookie.value ?? ''),
-          secure: cookie.secure,
-          httpOnly: cookie.httpOnly,
-          sameSite: cookie.sameSite,
-          expirationDate: cookie.expirationDate,
         });
       } catch (error) {
         console.error(error);

@@ -31,9 +31,10 @@ export default class Browser {
       );
 
       if (tab) {
-        const filtered = result.filter(f =>
-          tab.url.includes(f.domain.split('.').filter(Boolean).join('.'))
-        );
+        const filtered = result.filter(f => {
+          const srcDomain = f.domain.split('.').filter(Boolean).join('.');
+          return tab.url.split('/').filter(Boolean).includes(srcDomain);
+        });
         cbSuccess?.(filtered);
         return filtered;
       }
@@ -43,7 +44,17 @@ export default class Browser {
 
     set: async (info: CookieSetInfo) => {
       const { instance } = await this.detect();
-      await instance.cookies.set(info);
+      return await instance.cookies.set({
+        domain: info.domain,
+        url: info.url,
+        path: info.path,
+        name: info.name,
+        value: String(info.value ?? ''),
+        secure: info.secure,
+        httpOnly: info.httpOnly,
+        sameSite: info.sameSite,
+        expirationDate: info.expirationDate,
+      });
     },
   };
 

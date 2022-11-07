@@ -146,10 +146,12 @@ export function convertContentToCookie(
     const cookieValue = encodeURIComponent(JSON.stringify(content[cookieName]));
     // TODO: Find a way to track cookie, whose name gets changed
     const found = originalCookies.find(f => f.name === cookieName);
-    changed.push({
-      ...found,
-      value: cookieValue,
-    });
+    if (found) {
+      changed.push({
+        ...found,
+        value: cookieValue,
+      });
+    }
   });
   return changed;
 }
