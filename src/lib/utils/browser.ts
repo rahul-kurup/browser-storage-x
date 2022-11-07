@@ -3,8 +3,10 @@ import type {
   BrowserVendor,
   Cookie,
   CookieSetInfo,
-  Tab
+  Tab,
+  TabQueryInfo,
 } from 'lib-models/browser';
+import { noop } from './common';
 
 type TabReplaceEvent = (addedTabId: number, removedTabId: number) => void;
 export default class Browser {
@@ -29,9 +31,11 @@ export default class Browser {
       );
 
       if (tab) {
-        const filtered = result.filter(f =>
-          tab.url.includes(f.domain.split('.').filter(Boolean).join('.'))
-        );
+        const tabUrlParts = tab.url.split('/').filter(Boolean);
+        const filtered = result.filter(f => {
+          const srcDomain = f.domain.split('.').filter(Boolean).join('.');
+          return tabUrlParts.includes(srcDomain);
+        });
         cbSuccess?.(filtered);
         return filtered;
       }
@@ -41,7 +45,17 @@ export default class Browser {
 
     set: async (info: CookieSetInfo) => {
       const { instance } = await this.detect();
-      await instance.cookies.set(info);
+      return await instance.cookies.set({
+        domain: info.domain,
+        url: info.url,
+        path: info.path,
+        name: info.name,
+        value: String(info.value ?? ''),
+        secure: info.secure,
+        httpOnly: info.httpOnly,
+        sameSite: info.sameSite,
+        expirationDate: info.expirationDate,
+      });
     },
   };
 
@@ -62,13 +76,26 @@ export default class Browser {
       return isTabUnloaded;
     },
 
-    getAll: async (cbSuccess?: (tabs: Tab[]) => void) => {
+    getAll: async (
+      cbSuccess?: (tabs: Tab[]) => void,
+      query: TabQueryInfo = {}
+    ) => {
       const { instance } = await this.detect();
       const result: Tab[] = (await new Promise((resolve, _reject) =>
-        instance.tabs.query({}, resolve)
+        instance.tabs.query(query, resolve)
       )) as unknown as Tab[];
       cbSuccess?.(result);
       return result;
+    },
+
+    getActiveTab: async (cbSuccess?: (tabs: Tab) => void) => {
+      const result = await this.tab.getAll(noop, {
+        active: true,
+        currentWindow: true,
+      });
+      const tab = result?.[0];
+      cbSuccess(tab);
+      return tab;
     },
 
     get: async (tabId: number, cb: (tab: Tab) => void) => {

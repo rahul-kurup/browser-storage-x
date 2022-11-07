@@ -1,6 +1,11 @@
 import styled from '@emotion/styled';
 import { ExternalProps } from './type';
 
+export const ImgIcon = styled.img`
+  height: 10px;
+  width: 10px;
+`;
+
 export const LabelCheckBox = styled.label`
   display: flex;
   gap: 5px;
@@ -8,6 +13,11 @@ export const LabelCheckBox = styled.label`
 `;
 
 export const NodeText = styled.div<{ expanded: boolean; hasItems: boolean }>`
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  position: relative;
+  align-items: center;
   cursor: ${p =>
     p.hasItems ? (p.expanded ? 'n-resize' : 's-resize') : 'default'};
 `;
@@ -15,8 +25,10 @@ export const NodeText = styled.div<{ expanded: boolean; hasItems: boolean }>`
 export const TextContainer = styled.div`
   display: flex;
   gap: 5px;
+  border: 1px dashed transparent;
   &:hover {
     background: whitesmoke;
+    border: 1px dashed #d1d1d1;
   }
 `;
 

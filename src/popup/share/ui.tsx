@@ -7,13 +7,17 @@ import {
   getAllItems,
   isCookieType,
   setAllItems,
-  StorageTypeList
+  StorageTypeList,
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { FormEvent, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { CustomSelectOption, PresetAlerts } from './components';
-import { convertTreeNodeToCookie, convertTreeNodeToStorage } from './helper';
-import ShareSpecific from './share-specific';
+import {
+  convertTreeNodeToCookie,
+  convertTreeNodeToStorage,
+  filterFn,
+} from './helper';
+import ShareSpecificModal from './modal-share';
 import Form, { Fieldset, Legend, SourceContainer } from './style';
 import { ShareState, State } from './type';
 
@@ -86,15 +90,9 @@ function ShareUI() {
       }
       try {
         await Browser.cookies.set({
+          ...cookie,
           domain,
           url: destTab.url,
-          path: cookie.path,
-          name: cookie.name,
-          value: String(cookie.value || ''),
-          secure: cookie.secure,
-          httpOnly: cookie.httpOnly,
-          sameSite: cookie.sameSite,
-          expirationDate: cookie.expirationDate,
         });
       } catch (error) {
         console.error(error);
@@ -155,7 +153,7 @@ function ShareUI() {
             const output = await Browser.script.execute(srcTab, getAllItems, [
               srcStorage,
             ]);
-            await shareStorageContent(output?.result);
+            await shareStorageContent(output);
           }
         }
       }
@@ -188,7 +186,6 @@ function ShareUI() {
           <Legend>Source</Legend>
 
           <Select
-            searchable
             label='Tab'
             name='srcTab'
             options={tabs}
@@ -201,6 +198,8 @@ function ShareUI() {
               value: 'id',
               label: 'title',
             }}
+            searchable
+            filter={filterFn}
           />
 
           <SourceContainer sourceSelected={isSrcSelected}>
@@ -214,7 +213,7 @@ function ShareUI() {
             />
 
             {isSrcSelected && (
-              <ShareSpecific
+              <ShareSpecificModal
                 disabled={disabledField}
                 srcTab={state.srcTab}
                 srcStorage={state.srcStorage}
@@ -231,7 +230,6 @@ function ShareUI() {
           <Legend>Destination</Legend>
 
           <Select
-            searchable
             label='Tab'
             name='destTab'
             options={tabs}
@@ -244,6 +242,8 @@ function ShareUI() {
               value: 'id',
               label: 'title',
             }}
+            searchable
+            filter={filterFn}
           />
 
           <Select

@@ -12,7 +12,7 @@ import TreeNode from './tree-node';
 import { ExternalProps, NodeWithIdProps, TreeViewProps } from './type';
 
 export default function Tree({
-  uniqName = CONSTANTS.rootItemPath,
+  nodeName = CONSTANTS.rootItemPath,
   items,
   onChecked,
   checkedItems,
@@ -23,8 +23,8 @@ export default function Tree({
   const [selections, setSelections] = useState(checkedItems || []);
 
   const nodeProps = useMemo(
-    () => genNodes({ uniqName, items }),
-    [uniqName, items]
+    () => genNodes({ nodeName, items }),
+    [nodeName, items]
   );
 
   function handleSelection(itemPath: string) {
@@ -82,8 +82,8 @@ export default function Tree({
         <LabelCheckBox>
           <input
             type='checkbox'
-            id={nodeProps.uniqName}
-            name={nodeProps.uniqName}
+            id={nodeProps.nodeName}
+            name={nodeProps.nodeName}
             checked={selections.includes(nodeProps.itemPath)}
             onChange={() => handleSelection(nodeProps.itemPath)}
           />

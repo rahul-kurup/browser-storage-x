@@ -1,24 +1,34 @@
-import { Alert, Avatar, Group, Text } from '@mantine/core';
+import { Alert, Group, Text } from '@mantine/core';
 import { Progress } from 'lib-models/progress';
+import { withImg } from 'lib-utils/common';
 import { forwardRef } from 'react';
+import {
+  ImgIcon,
+  SelectTextWrapper,
+  SelectWrapper,
+  StyledAvatar,
+} from './style';
 import { ItemProps } from './type';
 
 export const CustomSelectOption = forwardRef<HTMLDivElement, ItemProps>(
   ({ data, label, ...others }: ItemProps, ref) => (
-    <div ref={ref} {...others}>
-      <Group noWrap>
-        <Avatar src={data.favIconUrl} size='sm' />
+    <SelectWrapper ref={ref} {...others}>
+      {data.incognito && (
+        <ImgIcon src={withImg('anony.png')} alt='' title='Private/Incognito' />
+      )}
 
-        <div>
+      <Group noWrap>
+        <StyledAvatar src={data.favIconUrl} size='sm' />
+
+        <SelectTextWrapper>
           <Text size='sm'>
-            {data.incognito && '🕶'} {data.title}{' '}
-            {data.audible && (data.mutedInfo.muted ? '🔇' : '🔊')}
+            {data.title} {data.audible && (data.mutedInfo.muted ? '🔇' : '🔊')}
           </Text>
 
           <Text size='xs'>{data.url}</Text>
-        </div>
+        </SelectTextWrapper>
       </Group>
-    </div>
+    </SelectWrapper>
   )
 );
 
