@@ -1,15 +1,14 @@
 import { Button, Modal, Radio, Textarea, TextInput } from '@mantine/core';
-import { AcceptedDataType, AllDataType } from 'lib-components/tree-view';
+import { AcceptedDataType } from 'lib-components/tree-view';
 import { useCallback, useMemo, useState } from 'react';
 import {
+  basicDt,
   getValueByType,
   isPrevNewPathSame,
   stopActionDefEvent,
 } from './helper';
 import { ModalForm } from './style';
 import { CommonModalArgs, UpsertModalProps } from './type';
-
-const basicDt: AllDataType[] = ['string', 'number', 'bigint', 'boolean'];
 
 export default function UpsertModal(
   props: UpsertModalProps & {
@@ -30,7 +29,7 @@ export default function UpsertModal(
     const isUpdate = props.action === 'update';
     return {
       isChanged: false,
-      name: isUpdate ? props.node.uniqName : '',
+      name: isUpdate ? props.node.nodeName : '',
       value: isUpdate ? props.node.data?.value : '',
       valueType: isUpdate
         ? props.node.dataType

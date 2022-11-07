@@ -1,11 +1,15 @@
 import {
   AcceptedDataType,
-  NodeWithIdProps,
+  AllDataType,
   TreeViewProps,
 } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
+import { isNully } from 'lib-utils/common';
 
 type TreeViewNodeItems = TreeViewProps['items'];
+
+export const basicDt: AllDataType[] = ['string', 'number', 'bigint', 'boolean'];
+export const containerDt: AllDataType[] = ['array', 'object'];
 
 export const getValueByType = {
   array: () => [],
@@ -26,15 +30,14 @@ export const isPrevNewPathSame = (prevPath?: string[], newPath?: string[]) => {
   }
 };
 
-export function isValueType(node?: NodeWithIdProps) {
-  return node?.dataType !== 'array' && node?.dataType !== 'object';
-}
-
 export function isBasicDataType(arg: any) {
   const ty = typeof arg;
   return (
     ty === 'string' || ty === 'number' || ty === 'boolean' || ty === 'bigint'
   );
+}
+function getDataType(m: any) {
+  return (Array.isArray(m) ? 'array' : typeof m) as AcceptedDataType;
 }
 
 function converter(
@@ -44,47 +47,55 @@ function converter(
     path,
   }: { parentDataType?: AcceptedDataType; path: string[] }
 ) {
-  if (obj) {
-    if (Array.isArray(obj) && obj.length) {
-      return obj.map((m, i) => {
-        const newPath = [...path, String(i)];
-        return isBasicDataType(m)
-          ? {
-              uniqName: m,
-              data: { name: m, value: m, parentDataType, path: newPath },
-              dataType: typeof m,
-            }
-          : converter(m, { parentDataType, path: newPath });
+  if (isNully(obj)) {
+    return obj;
+  } else if (Array.isArray(obj) && obj.length) {
+    return obj.map((m, i) => {
+      const newPath = [...path, String(i)];
+      const items = isBasicDataType(m)
+        ? {
+            nodeName: m,
+            data: { name: m, value: m, parentDataType: 'array', path: newPath },
+            dataType: typeof m,
+          }
+        : converter(m, { parentDataType: getDataType(m), path: newPath });
+      const item = {
+        nodeName: i,
+        data: {
+          name: i,
+          value: m,
+          parentDataType: 'array',
+          path: newPath,
+        },
+        dataType: getDataType(m),
+        dataSubType: 'index',
+        items,
+      };
+      return item;
+    });
+  } else if (typeof obj === 'object') {
+    const items: TreeViewNodeItems = [];
+    const keys = Object.keys(obj).sort();
+    keys.forEach(key => {
+      const el = obj[key];
+      const dataType = getDataType(el);
+      const newPath = [...path, key];
+      const val = converter(el, {
+        path: newPath,
+        parentDataType: dataType,
       });
-    } else {
-      if (typeof obj === 'object') {
-        const items: TreeViewNodeItems = [];
-        const keys = Object.keys(obj).sort();
-        keys.forEach(key => {
-          const el = obj[key];
-          const dataType = (
-            Array.isArray(el) ? 'array' : typeof el
-          ) as AcceptedDataType;
-          const newPath = [...path, key];
-          const val = converter(el, {
-            path: newPath,
-            parentDataType: dataType,
-          });
-          items.push({
-            uniqName: key,
-            data: { name: key, value: el, parentDataType, path: newPath },
-            dataType: (Array.isArray(el)
-              ? 'array'
-              : typeof el) as AcceptedDataType,
-            items: typeof val === 'object' ? val : undefined,
-          });
-        });
-        return items;
-      }
-      return obj;
-    }
+
+      items.push({
+        nodeName: key,
+        data: { name: key, value: el, parentDataType, path: newPath },
+        dataType,
+        items: typeof val === 'object' ? val : undefined,
+      });
+    });
+    return items;
+  } else {
+    return obj;
   }
-  return obj;
 }
 
 export function convertStorageToTreeNode(storageData = {}) {

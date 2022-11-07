@@ -12,17 +12,18 @@ import {
   StorageTypeList,
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
-import { set, unset } from 'lodash';
+import { set, startCase, unset } from 'lodash';
 import { filterFn } from 'popup/share/helper';
 import { SourceContainer } from 'popup/share/style';
 import { memo, useEffect, useState } from 'react';
 import { CustomSelectOption } from '../share/components';
 import {
+  basicDt,
+  containerDt,
   convertContentToCookie,
   convertContentToStorage,
   convertCookieToTreeNode,
   convertStorageToTreeNode,
-  isValueType,
   stopActionDefEvent,
 } from './helper';
 import DeleteModal from './modal-delete';
@@ -46,8 +47,6 @@ const actionProps: ButtonProps = {
   compact: true,
   variant: 'light',
 };
-
-const enableUpsert = true;
 
 function ExplorerUI() {
   const { tabs, replaced } = useBrowserTabs();
@@ -208,90 +207,101 @@ function ExplorerUI() {
               <StyledTreeView
                 items={state.treeContent || []}
                 nodeRenderer={node => {
-                  const { name, value, parentDataType } = node.data || {};
+                  const { name, value } = node.data || {};
+
+                  const showModify =
+                    node.dataSubType === 'index'
+                      ? basicDt.includes(node.dataType)
+                      : true;
+
                   return (
                     <NodeItemContainer>
-                      {enableUpsert && (
-                        <Actions className='actions'>
-                          <>
-                            {!isValueType(node) && (
-                              <ActionButton
-                                {...actionProps}
-                                color='green'
-                                title='Add'
-                                onClick={e => {
-                                  stopActionDefEvent(e);
-                                  setModal({
-                                    open: true,
-                                    action: 'add',
-                                    node,
-                                  });
-                                }}
-                              >
-                                <ImgIcon src={withImg('plus.png')} alt='' />
-                              </ActionButton>
-                            )}
+                      <Actions className='actions'>
+                        {containerDt.includes(node.dataType) && (
+                          <ActionButton
+                            {...actionProps}
+                            color='green'
+                            title='Add'
+                            onClick={e => {
+                              stopActionDefEvent(e);
+                              setModal({
+                                open: true,
+                                action: 'add',
+                                node,
+                              });
+                            }}
+                          >
+                            <ImgIcon src={withImg('plus.png')} alt='' />
+                          </ActionButton>
+                        )}
 
-                            <ActionButton
-                              {...actionProps}
-                              title='Modify'
-                              onClick={e => {
-                                stopActionDefEvent(e);
-                                setModal({
-                                  open: true,
-                                  node,
-                                  action: 'update',
-                                });
-                              }}
-                            >
-                              <ImgIcon src={withImg('pen.png')} alt='' />
-                            </ActionButton>
+                        {showModify && (
+                          <ActionButton
+                            {...actionProps}
+                            title='Modify'
+                            onClick={e => {
+                              stopActionDefEvent(e);
+                              setModal({
+                                open: true,
+                                node,
+                                action: 'update',
+                              });
+                            }}
+                          >
+                            <ImgIcon src={withImg('pen.png')} alt='' />
+                          </ActionButton>
+                        )}
 
-                            <ActionButton
-                              {...actionProps}
-                              color='red'
-                              title='Remove'
-                              onClick={e => {
-                                stopActionDefEvent(e);
-                                setModal({
-                                  open: true,
-                                  node,
-                                  action: 'delete',
-                                });
-                              }}
-                            >
-                              <ImgIcon src={withImg('trash.png')} alt='' />
-                            </ActionButton>
-                          </>
-                        </Actions>
-                      )}
+                        <ActionButton
+                          {...actionProps}
+                          color='red'
+                          title='Remove'
+                          onClick={e => {
+                            stopActionDefEvent(e);
+                            setModal({
+                              open: true,
+                              node,
+                              action: 'delete',
+                            });
+                          }}
+                        >
+                          <ImgIcon src={withImg('trash.png')} alt='' />
+                        </ActionButton>
+                      </Actions>
 
                       <NodeKey title={String(name)}>
-                        {String(name)} <DataType>[{node.dataType}]</DataType>
+                        {node.dataSubType === 'index' ? (
+                          <>
+                            <DataType title={`index ${name}`}>
+                              [{name}] (Array)
+                            </DataType>
+                          </>
+                        ) : (
+                          <>
+                            {String(name)}{' '}
+                            <DataType>({startCase(node.dataType)})</DataType>
+                          </>
+                        )}
                       </NodeKey>
 
-                      {isValueType(node) &&
-                        (parentDataType === 'array' ? (
-                          <></>
-                        ) : (
+                      {basicDt.includes(node.dataType) &&
+                        !Boolean(node.items?.length) && (
                           <NodeValue title={String(value)}>
                             {String(value)}
                           </NodeValue>
-                        ))}
+                        )}
                     </NodeItemContainer>
                   );
                 }}
               />
 
-              {enableUpsert && (
-                <Button
-                  type='submit'
-                  loading={state.isSaving}
-                  disabled={!state.isChanged}
-                >
-                  Update Storage
-                </Button>
-              )}
+              <Button
+                type='submit'
+                loading={state.isSaving}
+                disabled={!state.isChanged}
+              >
+                Update Storage
+              </Button>
             </>
           )
         ) : (

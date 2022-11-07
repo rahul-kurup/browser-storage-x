@@ -13,7 +13,7 @@ export default function DeleteModal(
         opened={props.open}
         onClose={() => props.onDelete({ close: true } as any)}
       >
-        Delete this item <b>{props.node.uniqName}</b>?
+        Delete this item <b>{props.node.nodeName}</b>?
         <br />
         <Group>
           <Button

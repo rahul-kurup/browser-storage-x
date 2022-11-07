@@ -11,7 +11,7 @@ import UlView, {
 import { ExternalProps, NodeViewProps } from './type';
 
 export default function TreeNode({
-  uniqName: mainName,
+  nodeName: mainName,
   items: mainNodes,
   itemPath: mainItemPath,
   enableSelection = false,
@@ -37,7 +37,7 @@ export default function TreeNode({
     <UlView {...mainProps} data-item-id={mainItemPath}>
       {mainNodes.map(node => {
         const {
-          uniqName: subName,
+          nodeName: subName,
           items: subNodes,
           itemPath: subItemPath,
           ...subProps
@@ -88,7 +88,7 @@ export default function TreeNode({
             {hasItems && isExpanded && (
               <TreeNode
                 items={subNodes}
-                uniqName={subName}
+                nodeName={subName}
                 itemPath={subItemPath}
                 nodeRenderer={nodeRenderer}
                 showGuidelines={showGuidelines}

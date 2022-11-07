@@ -7,7 +7,7 @@ import {
   getAllItems,
   isCookieType,
   setAllItems,
-  StorageTypeList,
+  StorageTypeList
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { FormEvent, memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -15,7 +15,7 @@ import { CustomSelectOption, PresetAlerts } from './components';
 import {
   convertTreeNodeToCookie,
   convertTreeNodeToStorage,
-  filterFn,
+  filterFn
 } from './helper';
 import ShareSpecificModal from './modal-share';
 import Form, { Fieldset, Legend, SourceContainer } from './style';
@@ -153,7 +153,7 @@ function ShareUI() {
             const output = await Browser.script.execute(srcTab, getAllItems, [
               srcStorage,
             ]);
-            await shareStorageContent(output?.result);
+            await shareStorageContent(output);
           }
         }
       }

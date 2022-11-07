@@ -1,6 +1,6 @@
+import { SelectProps } from '@mantine/core';
 import { TreeViewProps } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
-import { SelectProps } from '@mantine/core';
 
 type TreeViewNodeItems = TreeViewProps['items'];
 
@@ -8,7 +8,7 @@ export function convertStorageToTreeNode(data = {}) {
   const keys = Object.keys(data);
   const nodeItems: TreeViewNodeItems = [];
   keys.forEach(key =>
-    nodeItems.push({ uniqName: key, data: [key, data[key]] })
+    nodeItems.push({ nodeName: key, data: [key, data[key]] })
   );
   return nodeItems;
 }
@@ -27,7 +27,7 @@ export function convertCookieToTreeNode(cookies: Cookie[]) {
   const nodeItems: TreeViewNodeItems = [];
   cookies.forEach(cookie =>
     nodeItems.push({
-      uniqName: `${cookie.name}@${cookie.domain}`,
+      nodeName: `${cookie.name}@${cookie.domain}`,
       data: cookie,
     })
   );
