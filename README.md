@@ -1,22 +1,26 @@
 # StorageX
+
 ![StorageX logo](/src/assets/images/logo/128.png)
 
 An all in one localstorage/sessionstorage/cookie manager browser extension for chrome based/firefox browsers.
 
 ## Features
 
-### Share section
+### Share
+
 - lets you copy localstorage/sessionstorage/cookies across different domains
 - only pick items that you want to share
 - search tabs by url or title of a tab
 
-### Explorer section
+### Explorer
+
 - tree view to explore JSON for localstorage/sessionstorage/cookies
 - add/edit/delete values in the tree view itself
 - custom editors for different data types
 - search tabs by url or title of a tab
 
 ## Extension links
+
 - Chrome - https://chrome.google.com/webstore/detail/storagex/pafddkhaocklakonboekmgodcmgmfcbp
 - Firefox - https://addons.mozilla.org/en-US/firefox/addon/storagex/
 - Edge - https://microsoftedge.microsoft.com/addons/detail/storagex/gamhkdfigfofibfjhkcamegmckfmnode

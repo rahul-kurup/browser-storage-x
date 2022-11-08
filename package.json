@@ -2,8 +2,15 @@
   "name": "browser-ext-storage-x",
   "version": "0.0.8",
   "displayName": "StorageX",
-  "description": "StorageX extension is a toolset to manage any/all browser tab's Application Storage",
-  "author": "Rahul Kurup <raulsrule@gmail.com>",
+  "description": "StorageX extension is a toolset to manage browser's Application Storage",
+  "author": {
+    "name": "Rahul Kurup",
+    "email": "me@rahulkurup.com"
+  },
+  "maintainers": [
+    "Piyush Gupta (https://github.com/piyu-sh/)",
+    "Rahul Kurup <me@rahulkurup.com> (https://rahulkurup.com/)"
+  ],
   "private": true,
   "bugs": {
     "email": "me@rahulkurup.com"
@@ -41,7 +48,7 @@
     "pretty": "prettier --loglevel=error --write ."
   },
   "lint-staged": {
-    "*": "prettier --loglevel=error --write"
+    "*.{js,jsx,ts,tsx,html,css,json,md}": "prettier --loglevel=error --write"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -73,7 +80,7 @@
     "dotenv-expand": "^9.0.0",
     "generate-json-from-js-webpack-plugin": "^0.1.1",
     "html-webpack-plugin": "^5.5.0",
-    "husky": "^8.0.1",
+    "husky": "^8.0.2",
     "lint-staged": "^13.0.3",
     "mkdirp": "^1.0.4",
     "postcss-loader": "^7.0.1",
