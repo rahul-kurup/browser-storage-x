@@ -27,7 +27,8 @@ export default function UpsertModal({
   const checks = {
     isSelfArray: node.dataType === 'array',
     isSelfObject: node.dataType === 'object',
-    isParentArray: node.data?.parentDataType === 'array',
+    isParentArray:
+      node.data?.parentDataType === 'array' || node.dataSubType === 'index',
     isParentObject: node.data?.parentDataType === 'object',
   };
 
@@ -47,9 +48,28 @@ export default function UpsertModal({
 
   const [state, setState] = useState(prepareNode());
 
+  const showKeyInput = useMemo(() => {
+    const { isParentArray, isParentObject, isSelfObject, isSelfArray } = checks;
+
+    if (isActionAdd) {
+      if (isSelfArray) {
+        return null;
+      }
+      if (isSelfObject || isParentObject) {
+        return true;
+      }
+    }
+
+    if (isActionUpdate && isParentArray && basicDt.includes(state.valueType)) {
+      return null;
+    }
+
+    return true;
+  }, [state.name, node, isActionAdd, isActionUpdate, checks]);
+
   const pushChange = useCallback(
     (args: Omit<CommonModalArgs, 'changes'>) => {
-      if (args.newPath && node.nodeName !== state.name) {
+      if (showKeyInput && args.newPath && node.nodeName !== state.name) {
         const exists = has(explorerState.content, args.newPath);
         if (exists) {
           return alert(
@@ -64,7 +84,7 @@ export default function UpsertModal({
         changes: [state.name, node.nodeName],
       });
     },
-    [state.name, node]
+    [state.name, node, showKeyInput]
   );
 
   function onSubmit(e: FormEvent) {
@@ -73,6 +93,8 @@ export default function UpsertModal({
     const toSave = { ...node };
     const dataPath = toSave.data.path;
     let dataValue = toSave.data.value;
+    const newPaths = [...dataPath];
+    const stateName = state.name;
     const stateValue = getValueByType[state.valueType](state.value);
 
     // ADD
@@ -84,46 +106,48 @@ export default function UpsertModal({
       }
       // add key with value if object
       if (isSelfObject) {
-        dataValue ??= {};
-        dataValue[state.name] = stateValue;
+        newPaths.push(stateName);
+        dataValue = stateValue;
       }
-      const newPath = dataPath;
-      const newPathValue = dataValue;
-      return pushChange({ close: false, newPath, newPathValue });
+      return pushChange({
+        close: false,
+        newPath: newPaths,
+        newPathValue: dataValue,
+      });
     }
 
     // UPDATE
     if (isActionUpdate) {
       const prevPath = dataPath;
-      const newPaths = [...dataPath];
       // rename key
       if (isSelfArray || isSelfObject) {
         newPaths.pop();
-        newPaths.push(state.name);
-        const newPath = newPaths;
-        const newPathValue = dataValue;
+        newPaths.push(stateName);
         return pushChange({
           close: false,
-          newPath,
-          newPathValue,
-          prevPath: isPrevNewPathSame(prevPath, newPath) ? undefined : prevPath,
+          newPath: newPaths,
+          newPathValue: dataValue,
+          prevPath: isPrevNewPathSame(prevPath, newPaths)
+            ? undefined
+            : prevPath,
         });
       } else {
-        const newPathValue = stateValue;
         // rename value if array
         if (isParentArray) {
-          const newPath = newPaths;
-          return pushChange({ close: false, newPath, newPathValue });
+          return pushChange({
+            close: false,
+            newPath: newPaths,
+            newPathValue: stateValue,
+          });
         } else if (isParentObject) {
           // rename key and value if object
           newPaths.pop();
-          newPaths.push(state.name);
-          const newPath = newPaths;
+          newPaths.push(stateName);
           return pushChange({
             close: false,
-            newPath,
-            newPathValue,
-            prevPath: isPrevNewPathSame(prevPath, newPath)
+            newPath: newPaths,
+            newPathValue: stateValue,
+            prevPath: isPrevNewPathSame(prevPath, newPaths)
               ? undefined
               : prevPath,
           });
@@ -131,64 +155,6 @@ export default function UpsertModal({
       }
     }
   }
-
-  const CompKey = useMemo(() => {
-    const { isParentArray, isParentObject, isSelfObject, isSelfArray } = checks;
-    const KeyInput = (
-      <Textarea
-        required
-        autosize
-        label='Key'
-        minRows={1}
-        value={state.name}
-        placeholder='New key name'
-        onChange={e => {
-          const value = e.target.value?.trim() || '';
-          setState(s => ({ ...s, name: value, isChanged: true } as any));
-        }}
-      />
-    );
-
-    if (isActionAdd) {
-      if (isSelfArray) {
-        return null;
-      }
-      if (isSelfObject || isParentObject) {
-        return KeyInput;
-      }
-    }
-
-    if (isActionUpdate && isParentArray && basicDt.includes(state.valueType)) {
-      return null;
-    }
-
-    return KeyInput;
-  }, [state.name, node, isActionAdd, isActionUpdate, checks]);
-
-  const CompValueType = useMemo(() => {
-    return isActionAdd ? (
-      <Radio.Group
-        required
-        spacing='xs'
-        name='dataType'
-        label='Value Type'
-        value={state.valueType}
-        onChange={(valueType: AcceptedDataType) =>
-          setState(
-            s => ({ ...s, value: '', valueType, isChanged: true } as any)
-          )
-        }
-      >
-        <Radio value='object' label='Object' />
-        <Radio value='array' label='Array' />
-        <Radio value='string' label='String' />
-        <Radio value='number' label='Number' />
-        <Radio value='boolean' label='Boolean' />
-      </Radio.Group>
-    ) : (
-      <></>
-    );
-  }, [state.valueType, isActionAdd]);
 
   const CompValue = useMemo(() => {
     const showValue =
@@ -265,9 +231,44 @@ export default function UpsertModal({
       >
         <ModalForm onSubmit={onSubmit}>
           <>
-            {CompKey}
+            {showKeyInput && (
+              <Textarea
+                required
+                autosize
+                label='Key'
+                minRows={1}
+                value={state.name}
+                placeholder='New key name'
+                onChange={e => {
+                  const value = e.target.value?.trim() || '';
+                  setState(
+                    s => ({ ...s, name: value, isChanged: true } as any)
+                  );
+                }}
+              />
+            )}
 
-            {CompValueType}
+            {isActionAdd && (
+              <Radio.Group
+                required
+                spacing='xs'
+                name='dataType'
+                label='Value Type'
+                value={state.valueType}
+                onChange={(valueType: AcceptedDataType) =>
+                  setState(
+                    s =>
+                      ({ ...s, value: '', valueType, isChanged: true } as any)
+                  )
+                }
+              >
+                <Radio value='object' label='Object' />
+                <Radio value='array' label='Array' />
+                <Radio value='string' label='String' />
+                <Radio value='number' label='Number' />
+                <Radio value='boolean' label='Boolean' />
+              </Radio.Group>
+            )}
 
             {CompValue}
 
