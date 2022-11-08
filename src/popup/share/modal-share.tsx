@@ -36,7 +36,7 @@ export default function ShareSpecificModal({
   useEffect(() => {
     if (treeDataState !== 'HIDDEN' && srcTab && srcStorage) {
       if (isCookie) {
-        Browser.cookies.getAll(srcTab).then(output => {
+        Browser.cookie.getAll(srcTab).then(output => {
           setStorageContent(convertCookieToTreeNode(output));
           setTreeDataState('LOADED');
         });

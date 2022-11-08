@@ -2,7 +2,9 @@ import type {
   BrowserChrome,
   BrowserVendor,
   Cookie,
+  CookieRemoveInfo,
   CookieSetInfo,
+  CookieStore,
   Tab,
   TabQueryInfo,
 } from 'lib-models/browser';
@@ -22,19 +24,66 @@ export default class Browser {
     });
   }
 
-  static cookies = {
+  static cookie = {
+    genUrlInfoUsingTab: (cookie: Cookie, tab: Tab) => {
+      let { domain, protocol } = this.tab.getUrlInfo(tab);
+      const originalDomain = domain;
+      const d = '.';
+      const w3 = 'www.';
+      const dw3d = '.www.';
+
+      if (
+        (!cookie.domain.startsWith(w3) || !cookie.domain.startsWith(dw3d)) &&
+        domain.startsWith(w3)
+      ) {
+        domain = domain.replace(w3, '');
+      }
+
+      [w3, dw3d, d].forEach(prefix => {
+        if (cookie.domain.startsWith(prefix) && !domain.startsWith(prefix)) {
+          domain = `${prefix}${domain}`;
+        }
+      });
+
+      return { domain, url: `${protocol}//${originalDomain}` };
+    },
+
+    genCookieDomains: (tab: Tab) => {
+      const { domain } = this.tab.getUrlInfo(tab);
+      const domains = [domain];
+      if (domain.includes('www')) {
+        domains.push(
+          `.www.${domain}`,
+          domain.replace('www', ''),
+          domain.replace('www.', '')
+        );
+      } else {
+        domains.push(`.${domain}`, `www.${domain}`, `.www.${domain}`);
+      }
+      return domains;
+    },
+
+    storeIds: async (tab: Tab) => {
+      const { instance } = await this.detect();
+      const stores = await instance.cookies.getAllCookieStores();
+      return stores.filter(f => f.tabIds.includes(tab.id));
+    },
+
     getAll: async (tab?: Tab, cbSuccess?: (cookies: Cookie[]) => void) => {
       const { instance } = await this.detect();
 
+      const store = ((await this.cookie.storeIds(tab)?.[0]) ||
+        {}) as CookieStore;
+
       const result: Cookie[] = await new Promise((resolve, _reject) =>
-        instance.cookies.getAll({}, resolve)
+        instance.cookies.getAll({ storeId: store.id }, resolve)
       );
 
       if (tab) {
-        const tabUrlParts = tab.url.split('/').filter(Boolean);
+        const tabCookieDomains = this.cookie.genCookieDomains(tab);
         const filtered = result.filter(f => {
-          const srcDomain = f.domain.split('.').filter(Boolean).join('.');
-          return tabUrlParts.includes(srcDomain);
+          const isTabCookie = tabCookieDomains.includes(f.domain);
+          return isTabCookie;
         });
         cbSuccess?.(filtered);
         return filtered;
@@ -57,9 +106,19 @@ export default class Browser {
         expirationDate: info.expirationDate,
       });
     },
+
+    remove: async ({ name, url }: CookieRemoveInfo) => {
+      const { instance } = await this.detect();
+      return await instance.cookies.remove({ name, url });
+    },
   };
 
   static tab = {
+    getUrlInfo: (tab: Tab) => {
+      const { origin: url, protocol, hostname: domain } = new URL(tab.url);
+      return { url, domain, protocol };
+    },
+
     isDiscarded: (tab: Tab) => tab.discarded || tab.status === 'unloaded',
 
     discard: async (tab: Tab) => {

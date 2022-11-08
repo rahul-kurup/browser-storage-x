@@ -2,7 +2,7 @@ import { AcceptedDataType, TreeViewProps } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
 import { checkItem } from 'lib-utils/common';
 import { FormEvent } from 'react';
-import { ParentIdArgs } from './type';
+import { ExplorerState, ParentIdArgs } from './type';
 
 type TreeViewNodeItems = TreeViewProps['items'];
 
@@ -167,19 +167,36 @@ export function convertContentToStorage(content: any) {
 
 export function convertContentToCookie(
   content: any,
-  originalCookies: Cookie[]
+  originalCookies: Cookie[],
+  changes: ExplorerState['changes']
 ) {
   const changed: Cookie[] = [];
   const keys = Object.keys(content);
+  const findOrigCookie = (name: string) =>
+    originalCookies.find(f => f.name === name);
+
   keys.forEach(cookieName => {
     const cookieValue = encodeURIComponent(JSON.stringify(content[cookieName]));
-    // TODO: Find a way to track cookie, whose name gets changed
-    const found = originalCookies.find(f => f.name === cookieName);
+    // TODO: Find a better way to track cookie, whose name gets changed
+    let found = findOrigCookie(cookieName);
+
+    if (!found) {
+      const foundOldCookieName = changes[cookieName];
+      if (foundOldCookieName) {
+        found = findOrigCookie(foundOldCookieName);
+      }
+    }
+
     if (found) {
       changed.push({
         ...found,
+        name: cookieName,
         value: cookieValue,
       });
+    } else {
+      console.error(
+        `COOKIE_NOT_FOUND: Didn't find '${cookieName}' to match with in the original cookie data`
+      );
     }
   });
   return changed;
