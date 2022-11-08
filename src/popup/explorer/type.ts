@@ -1,4 +1,8 @@
-import { NodeWithIdProps, TreeViewProps } from 'lib-components/tree-view';
+import {
+  AcceptedDataType,
+  NodeWithIdProps,
+  TreeViewProps,
+} from 'lib-components/tree-view';
 import { Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
 import { StorageType } from 'lib-models/storage';
@@ -14,6 +18,10 @@ export type CommonModalArgs = {
   prevPath?: string[];
   newPath: string[];
   newPathValue: any;
+  /**
+   * NOTE: this is only to track root level cookie name changes
+   */
+  changes: [newName: string, oldName: string];
 };
 
 export type ExplorerState = {
@@ -22,6 +30,14 @@ export type ExplorerState = {
   storage: StorageType;
   original: any;
   content: any;
-  isChanged?: boolean;
+  /**
+   * NOTE: this is only to track root level cookie name changes
+   */
+  changes?: Record<string, string>;
   treeContent: TreeViewProps['items'];
+};
+
+export type ParentIdArgs = {
+  dataType?: AcceptedDataType;
+  path: string[];
 };

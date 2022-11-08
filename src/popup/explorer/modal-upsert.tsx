@@ -3,6 +3,7 @@ import { AcceptedDataType } from 'lib-components/tree-view';
 import { FormEvent, useCallback, useMemo, useState } from 'react';
 import {
   basicDt,
+  emptyDt,
   getValueByType,
   isPrevNewPathSame,
   stopDefaultEvent,
@@ -41,6 +42,18 @@ export default function UpsertModal(
 
   const [state, setState] = useState(prepareNode());
 
+  const pushChange = useCallback(
+    (args: Omit<CommonModalArgs, 'changes'>) => {
+      return props.onUpdate({
+        ...args,
+        // this is just to track name changes of root cookie.
+        // TODO: find a better way instead of this BS
+        changes: [state.name, props.node.nodeName],
+      });
+    },
+    [state.name, props.node]
+  );
+
   function onSubmit(e: FormEvent) {
     stopDefaultEvent(e);
     const { isParentArray, isParentObject, isSelfObject, isSelfArray } = checks;
@@ -63,7 +76,7 @@ export default function UpsertModal(
       }
       const newPath = dataPath;
       const newPathValue = dataValue;
-      return props.onUpdate({ close: false, newPath, newPathValue });
+      return pushChange({ close: false, newPath, newPathValue });
     }
 
     // UPDATE
@@ -76,7 +89,7 @@ export default function UpsertModal(
         newPaths.push(state.name);
         const newPath = newPaths;
         const newPathValue = dataValue;
-        return props.onUpdate({
+        return pushChange({
           close: false,
           newPath,
           newPathValue,
@@ -87,13 +100,13 @@ export default function UpsertModal(
         // rename value if array
         if (isParentArray) {
           const newPath = newPaths;
-          return props.onUpdate({ close: false, newPath, newPathValue });
+          return pushChange({ close: false, newPath, newPathValue });
         } else if (isParentObject) {
           // rename key and value if object
           newPaths.pop();
           newPaths.push(state.name);
           const newPath = newPaths;
-          return props.onUpdate({
+          return pushChange({
             close: false,
             newPath,
             newPathValue,
@@ -166,12 +179,13 @@ export default function UpsertModal(
   }, [state.valueType, isActionAdd]);
 
   const CompValue = useMemo(() => {
-    const showValue = basicDt.includes(state.valueType);
+    const showValue =
+      basicDt.includes(state.valueType) || emptyDt.includes(state.valueType);
 
     const valueProps = {
       label: 'Value',
       placeholder: 'Value',
-      value: state.value,
+      value: state.value ?? '',
       required: true,
       onChange: (e: any) => {
         const value =
@@ -204,8 +218,12 @@ export default function UpsertModal(
             <Radio value='false' label='false' />
           </Radio.Group>
         ) : state.valueType === 'number' ? (
-          <TextInput {...valueProps} pattern='^\d*\.?\d*$' />
-        ) : state.valueType === 'string' ? (
+          <TextInput
+            {...valueProps}
+            pattern='^\d*\.?\d*$'
+            title='Enter number only'
+          />
+        ) : state.valueType === 'string' || state.valueType === 'null' ? (
           <Textarea {...valueProps} autosize minRows={1} />
         ) : (
           <></>
@@ -231,7 +249,7 @@ export default function UpsertModal(
         trapFocus
         opened={props.open}
         title={<b>{isActionAdd ? 'Add' : 'Modify'}</b>}
-        onClose={() => props.onUpdate({ close: true } as CommonModalArgs)}
+        onClose={() => pushChange({ close: true } as CommonModalArgs)}
       >
         <ModalForm onSubmit={onSubmit}>
           <>

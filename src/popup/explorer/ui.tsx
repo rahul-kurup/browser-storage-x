@@ -5,7 +5,7 @@ import Select, {
   fnFilter,
   SelectOptionBrowserTab,
 } from 'lib-components/select';
-import { Tab } from 'lib-models/browser';
+import { Cookie, Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
 import Browser from 'lib-utils/browser';
 import {
@@ -16,7 +16,7 @@ import {
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
-import { memo, useEffect, useState } from 'react';
+import { FormEvent, memo, useEffect, useState } from 'react';
 import {
   basicDt,
   containerDt,
@@ -84,19 +84,19 @@ function ExplorerUI() {
       setLoading(true);
 
       (isCookie
-        ? Browser.cookies.getAll(tab).then(convertCookieToTreeNode)
+        ? Browser.cookie.getAll(tab).then(convertCookieToTreeNode)
         : Browser.script
             .execute(tab, getAllItems, [storage])
             .then(convertStorageToTreeNode)
       )
-        .then(({ converted, parsed, originalData }) =>
+        .then(async ({ converted, parsed, originalData }) => {
           setState(s => ({
             ...s,
             content: parsed,
             original: originalData,
             treeContent: converted,
-          }))
-        )
+          }));
+        })
         .finally(() => setLoading(false));
     }
   }, [tab, storage]);
@@ -109,53 +109,70 @@ function ExplorerUI() {
       setState(prev => {
         const newState = { ...prev };
         const changedContent = { ...newState.content };
+
         if (args.newPath) {
           set(changedContent, args.newPath, args.newPathValue);
         }
-        if (args.prevPath?.length) {
+
+        const prevLen = args.prevPath?.length;
+        let changes = newState.changes || {};
+
+        if (prevLen) {
           unset(changedContent, args.prevPath);
+
+          // check root node
+          // this if condition exists solely to track root cookie name changes
+          if (prevLen === 1 && args.changes) {
+            const [newName, oldName] = args.changes;
+            changes[newName] = oldName;
+          }
         }
+
         const { converted, parsed } = isCookie
           ? convertCookieToTreeNode(changedContent)
           : convertStorageToTreeNode(changedContent);
         return {
           ...newState,
-          isChanged: true,
           content: parsed,
           treeContent: converted,
+          changes,
         };
       });
     }
   }
 
-  async function onSubmit(e) {
-    stopDefaultEvent(e);
-    setState(s => ({ ...s, progress: Progress.started }));
-    if (isCookie) {
-      const cookies = convertContentToCookie(state.content, state.original);
-      for (let i = 0; i < cookies.length; i++) {
-        try {
-          const cookie = cookies[i];
-          await Browser.cookies.set({
-            ...cookie,
-            url: state.tab.url,
-          });
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    } else {
-      const content = convertContentToStorage(state.content);
+  async function modifyCookies(_cookies: Cookie[], op: 'set' | 'remove') {
+    for (const cookie of _cookies) {
       try {
-        await Browser.script.execute(state.tab, setAllItems, [
-          state.storage,
-          content,
-        ]);
+        const { url, domain } = Browser.cookie.genUrlInfoUsingTab(cookie, tab);
+        await Browser.cookie[op]({
+          ...cookie,
+          url,
+          domain: op === 'remove' ? cookie.domain : domain,
+        });
       } catch (error) {
         console.error(error);
       }
     }
-    setState(s => ({ ...s, progress: Progress.pass, isChanged: false }));
+  }
+
+  async function onSubmit(e: FormEvent) {
+    stopDefaultEvent(e);
+    setState(s => ({ ...s, progress: Progress.started }));
+    const { tab, content, original, changes } = state;
+    if (isCookie) {
+      const newCookies = convertContentToCookie(content, original, changes);
+      await modifyCookies(original, 'remove');
+      await modifyCookies(newCookies, 'set');
+    } else {
+      const newContent = convertContentToStorage(content);
+      try {
+        await Browser.script.execute(tab, setAllItems, [storage, newContent]);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    setState(s => ({ ...s, progress: Progress.pass, changes: undefined }));
     setTimeout(() => {
       setState(s => ({ ...s, progress: Progress.idle }));
     }, 1000);
@@ -176,12 +193,12 @@ function ExplorerUI() {
             onChange={handleChange}
             itemComponent={SelectOptionBrowserTab}
             disabled={disabledField}
+            searchable
+            filter={fnFilter}
             fieldKey={{
               value: 'id',
               label: 'title',
             }}
-            searchable
-            filter={fnFilter}
           />
 
           <Select
@@ -307,7 +324,7 @@ function ExplorerUI() {
                 <Button
                   type='submit'
                   loading={disabledField}
-                  disabled={!state.isChanged || disabledField}
+                  disabled={!state.changes || disabledField}
                 >
                   Update Storage
                 </Button>

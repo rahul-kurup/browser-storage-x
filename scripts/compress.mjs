@@ -1,25 +1,22 @@
 import dotenv from 'dotenv';
 import dotenvExpand from 'dotenv-expand';
 import zl from 'zip-lib';
+import pkg from '../package.json' assert { type: 'json' };
 
 dotenvExpand.expand(dotenv.config());
 
-if (process.env.COMPRESS_PROG) {
-  console.log('compress_running');
-} else {
-  process.env.COMPRESS_PROG = 'start';
-}
-
+const { version } = pkg;
 const dirDist = 'dist';
 const distDirs = process.env.DIST_DIRS.split(',').map(m => m.trim());
 
 async function compress() {
   for (let i = 0; i < distDirs.length; i++) {
     const dir = distDirs[i];
-    await zl.archiveFolder(`${dirDist}/${dir}`, `${dirDist}/ext_${dir}.zip`);
+    await zl.archiveFolder(
+      `${dirDist}/${dir}/`,
+      `${dirDist}/ext_${dir}_v${version}.zip`
+    );
   }
-
-  // await compressSource();
 }
 
 async function compressSource() {
@@ -30,7 +27,6 @@ async function compressSource() {
     '.prettierignore',
     '.prettierrc.json',
     'package.json',
-    'postcss.config.js',
     'README.md',
     'tsconfig.json',
     'webpack.config.js',
@@ -38,7 +34,7 @@ async function compressSource() {
   ];
   files.forEach(f => zip.addFile(f));
   dirs.forEach(f => zip.addFolder(f, f));
-  await zip.archive(`${dirDist}/_source.zip`);
+  await zip.archive(`${dirDist}/_source_v${version}.zip`);
 }
 
 await compress();

@@ -84,15 +84,11 @@ function ShareUI() {
   async function shareCookieContent(cookies: Cookie[]) {
     const { destTab } = state;
     for (const cookie of cookies) {
-      let domain = new URL(destTab.url).hostname;
-      if (cookie.domain.startsWith('.')) {
-        domain = `.${domain}`;
-      }
+      const urlInfo = Browser.cookie.genUrlInfoUsingTab(cookie, destTab);
       try {
-        await Browser.cookies.set({
+        await Browser.cookie.set({
           ...cookie,
-          domain,
-          url: destTab.url,
+          ...urlInfo,
         });
       } catch (error) {
         console.error(error);
@@ -133,7 +129,7 @@ function ShareUI() {
                 convertTreeNodeToCookie(shareState.selectedValues)
               );
             } else {
-              const cookies = await Browser.cookies.getAll(srcTab);
+              const cookies = await Browser.cookie.getAll(srcTab);
               await shareCookieContent(cookies);
             }
           } else {

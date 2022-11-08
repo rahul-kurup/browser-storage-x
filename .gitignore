@@ -1,7 +1,10 @@
 dist
 node_modules
+.tmp
 tmp
 .env.local
 
 .vscode
 .history
+yarn-error.logfirefox.env
+/yarn-error.log
