@@ -30,7 +30,6 @@ async function compressSource() {
     '.prettierignore',
     '.prettierrc.json',
     'package.json',
-    'postcss.config.js',
     'README.md',
     'tsconfig.json',
     'webpack.config.js',
