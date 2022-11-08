@@ -1,10 +1,13 @@
-import { Button, ButtonProps, Loader } from '@mantine/core';
-import Select, { ChangeHandlerArgs } from 'lib-components/select';
-import { TreeViewProps } from 'lib-components/tree-view';
+import { Alert, Button, ButtonProps, Loader } from '@mantine/core';
+import ImgIcon from 'lib-components/img-icon';
+import Select, {
+  ChangeHandlerArgs,
+  fnFilter,
+  SelectOptionBrowserTab,
+} from 'lib-components/select';
 import { Tab } from 'lib-models/browser';
-import { StorageType } from 'lib-models/storage';
+import { Progress } from 'lib-models/progress';
 import Browser from 'lib-utils/browser';
-import { withImg } from 'lib-utils/common';
 import {
   getAllItems,
   isCookieType,
@@ -13,10 +16,7 @@ import {
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
-import { filterFn } from 'popup/share/helper';
-import { SourceContainer } from 'popup/share/style';
 import { memo, useEffect, useState } from 'react';
-import { CustomSelectOption } from '../share/components';
 import {
   basicDt,
   containerDt,
@@ -24,7 +24,7 @@ import {
   convertContentToStorage,
   convertCookieToTreeNode,
   convertStorageToTreeNode,
-  stopActionDefEvent,
+  stopDefaultEvent,
 } from './helper';
 import DeleteModal from './modal-delete';
 import UpsertModal from './modal-upsert';
@@ -32,14 +32,14 @@ import Form, {
   ActionButton,
   Actions,
   DataType,
-  ImgIcon,
   NodeItemContainer,
   NodeKey,
   NodeValue,
   Placeholder,
+  SourceContainer,
   StyledTreeView,
 } from './style';
-import { CommonModalArgs, UpsertModalProps } from './type';
+import { CommonModalArgs, ExplorerState, UpsertModalProps } from './type';
 
 const actionProps: ButtonProps = {
   radius: 'xl',
@@ -51,17 +51,9 @@ const actionProps: ButtonProps = {
 function ExplorerUI() {
   const { tabs, replaced } = useBrowserTabs();
   const [loading, setLoading] = useState(false);
-  const [state, setState] = useState(
-    {} as {
-      isSaving?: boolean;
-      tab: Tab;
-      storage: StorageType;
-      original: any;
-      content: any;
-      isChanged?: boolean;
-      treeContent: TreeViewProps['items'];
-    }
-  );
+  const [state, setState] = useState({
+    progress: Progress.idle,
+  } as ExplorerState);
 
   const [modal, setModal] = useState({} as UpsertModalProps);
 
@@ -137,8 +129,8 @@ function ExplorerUI() {
   }
 
   async function onSubmit(e) {
-    stopActionDefEvent(e);
-    setState(s => ({ ...s, isSaving: true }));
+    stopDefaultEvent(e);
+    setState(s => ({ ...s, progress: Progress.started }));
     if (isCookie) {
       const cookies = convertContentToCookie(state.content, state.original);
       for (let i = 0; i < cookies.length; i++) {
@@ -163,13 +155,18 @@ function ExplorerUI() {
         console.error(error);
       }
     }
-    setState(s => ({ ...s, isSaving: false, isChanged: false }));
+    setState(s => ({ ...s, progress: Progress.pass, isChanged: false }));
+    setTimeout(() => {
+      setState(s => ({ ...s, progress: Progress.idle }));
+    }, 1000);
   }
+
+  const disabledField = state.progress === Progress.started;
 
   return (
     <>
       <Form onSubmit={onSubmit}>
-        <SourceContainer sourceSelected>
+        <SourceContainer>
           <Select
             label='Tab'
             name='tab'
@@ -177,14 +174,14 @@ function ExplorerUI() {
             valueAsObject
             value={state.tab}
             onChange={handleChange}
-            // disabled={disabledField}
-            itemComponent={CustomSelectOption}
+            itemComponent={SelectOptionBrowserTab}
+            disabled={disabledField}
             fieldKey={{
               value: 'id',
               label: 'title',
             }}
             searchable
-            filter={filterFn}
+            filter={fnFilter}
           />
 
           <Select
@@ -192,7 +189,7 @@ function ExplorerUI() {
             name='storage'
             options={StorageTypeList}
             value={state.storage}
-            // disabled={disabledField}
+            disabled={disabledField}
             onChange={handleChange}
           />
         </SourceContainer>
@@ -228,7 +225,7 @@ function ExplorerUI() {
                             color='green'
                             title='Add'
                             onClick={e => {
-                              stopActionDefEvent(e);
+                              stopDefaultEvent(e);
                               setModal({
                                 open: true,
                                 action: 'add',
@@ -236,7 +233,7 @@ function ExplorerUI() {
                               });
                             }}
                           >
-                            <ImgIcon src={withImg('plus.png')} alt='' />
+                            <ImgIcon src='plus' />
                           </ActionButton>
                         )}
 
@@ -245,7 +242,7 @@ function ExplorerUI() {
                             {...actionProps}
                             title='Modify'
                             onClick={e => {
-                              stopActionDefEvent(e);
+                              stopDefaultEvent(e);
                               setModal({
                                 open: true,
                                 node,
@@ -253,7 +250,7 @@ function ExplorerUI() {
                               });
                             }}
                           >
-                            <ImgIcon src={withImg('pen.png')} alt='' />
+                            <ImgIcon src='pen' />
                           </ActionButton>
                         )}
 
@@ -262,7 +259,7 @@ function ExplorerUI() {
                           color='red'
                           title='Remove'
                           onClick={e => {
-                            stopActionDefEvent(e);
+                            stopDefaultEvent(e);
                             setModal({
                               open: true,
                               node,
@@ -270,7 +267,7 @@ function ExplorerUI() {
                             });
                           }}
                         >
-                          <ImgIcon src={withImg('trash.png')} alt='' />
+                          <ImgIcon src='trash' />
                         </ActionButton>
                       </Actions>
 
@@ -302,13 +299,19 @@ function ExplorerUI() {
                 }}
               />
 
-              <Button
-                type='submit'
-                loading={state.isSaving}
-                disabled={!state.isChanged}
-              >
-                Update Storage
-              </Button>
+              {state.progress === Progress.pass ? (
+                <Alert color='green' title='✅ Done'>
+                  Storage content updated
+                </Alert>
+              ) : (
+                <Button
+                  type='submit'
+                  loading={disabledField}
+                  disabled={!state.isChanged || disabledField}
+                >
+                  Update Storage
+                </Button>
+              )}
             </>
           )
         ) : (
@@ -323,11 +326,7 @@ function ExplorerUI() {
         (modal.action === 'delete' ? (
           <DeleteModal {...modal} onDelete={handleContentChange} />
         ) : (
-          <UpsertModal
-            {...modal}
-            isCookie={isCookie}
-            onUpdate={handleContentChange}
-          />
+          <UpsertModal {...modal} onUpdate={handleContentChange} />
         ))}
     </>
   );

@@ -1,11 +1,11 @@
 import { Button, Modal, Radio, Textarea, TextInput } from '@mantine/core';
 import { AcceptedDataType } from 'lib-components/tree-view';
-import { useCallback, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useMemo, useState } from 'react';
 import {
   basicDt,
   getValueByType,
   isPrevNewPathSame,
-  stopActionDefEvent,
+  stopDefaultEvent,
 } from './helper';
 import { ModalForm } from './style';
 import { CommonModalArgs, UpsertModalProps } from './type';
@@ -37,12 +37,12 @@ export default function UpsertModal(
         ? 'string'
         : 'object',
     };
-  }, [props]);
+  }, [props.node, props.action]);
 
   const [state, setState] = useState(prepareNode());
 
-  function onSubmit(e) {
-    stopActionDefEvent(e);
+  function onSubmit(e: FormEvent) {
+    stopDefaultEvent(e);
     const { isParentArray, isParentObject, isSelfObject, isSelfArray } = checks;
     const toSave = { ...props.node };
     const dataPath = toSave.data.path;
@@ -51,10 +51,12 @@ export default function UpsertModal(
 
     // ADD
     if (isActionAdd) {
+      // add key with value if array
       if (isSelfArray) {
         dataValue ??= [];
         dataValue.push(stateValue);
       }
+      // add key with value if object
       if (isSelfObject) {
         dataValue ??= {};
         dataValue[state.name] = stateValue;
@@ -109,11 +111,11 @@ export default function UpsertModal(
     const KeyInput = (
       <Textarea
         required
-        label='Key'
-        placeholder='New key name'
-        value={state.name}
         autosize
+        label='Key'
         minRows={1}
+        value={state.name}
+        placeholder='New key name'
         onChange={e => {
           let value = e.target.value;
           value = value.trim().length < 1 ? '' : value;
@@ -225,8 +227,10 @@ export default function UpsertModal(
   return (
     <>
       <Modal
-        title={<b>{isActionAdd ? 'Add' : 'Modify'}</b>}
+        centered
+        trapFocus
         opened={props.open}
+        title={<b>{isActionAdd ? 'Add' : 'Modify'}</b>}
         onClose={() => props.onUpdate({ close: true } as CommonModalArgs)}
       >
         <ModalForm onSubmit={onSubmit}>

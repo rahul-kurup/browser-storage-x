@@ -2,15 +2,16 @@ import styled from '@emotion/styled';
 import { Button } from '@mantine/core';
 import TreeView from 'lib-components/tree-view';
 
-export const ModalForm = styled.form`
-  display: flex;
-  flex-direction: column;
+export const SourceContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: 5px;
 `;
 
-export const ImgIcon = styled.img`
-  height: 10px;
-  width: 10px;
+export const ModalForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `;
 
 export const DataType = styled.span`

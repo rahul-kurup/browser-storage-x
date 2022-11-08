@@ -1,11 +1,6 @@
 import styled from '@emotion/styled';
 import { ExternalProps } from './type';
 
-export const ImgIcon = styled.img`
-  height: 10px;
-  width: 10px;
-`;
-
 export const LabelCheckBox = styled.label`
   display: flex;
   gap: 5px;
