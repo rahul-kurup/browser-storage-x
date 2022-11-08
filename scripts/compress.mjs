@@ -13,7 +13,7 @@ async function compress() {
   for (let i = 0; i < distDirs.length; i++) {
     const dir = distDirs[i];
     await zl.archiveFolder(
-      `${dirDist}/${dir}`,
+      `${dirDist}/${dir}/`,
       `${dirDist}/ext_${dir}_v${version}.zip`
     );
   }

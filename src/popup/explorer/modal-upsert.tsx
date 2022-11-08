@@ -3,6 +3,7 @@ import { AcceptedDataType } from 'lib-components/tree-view';
 import { FormEvent, useCallback, useMemo, useState } from 'react';
 import {
   basicDt,
+  emptyDt,
   getValueByType,
   isPrevNewPathSame,
   stopDefaultEvent,
@@ -166,12 +167,13 @@ export default function UpsertModal(
   }, [state.valueType, isActionAdd]);
 
   const CompValue = useMemo(() => {
-    const showValue = basicDt.includes(state.valueType);
+    const showValue =
+      basicDt.includes(state.valueType) || emptyDt.includes(state.valueType);
 
     const valueProps = {
       label: 'Value',
       placeholder: 'Value',
-      value: state.value,
+      value: state.value ?? '',
       required: true,
       onChange: (e: any) => {
         const value =
@@ -204,8 +206,12 @@ export default function UpsertModal(
             <Radio value='false' label='false' />
           </Radio.Group>
         ) : state.valueType === 'number' ? (
-          <TextInput {...valueProps} pattern='^\d*\.?\d*$' />
-        ) : state.valueType === 'string' ? (
+          <TextInput
+            {...valueProps}
+            pattern='^\d*\.?\d*$'
+            title='Enter number only'
+          />
+        ) : state.valueType === 'string' || state.valueType === 'null' ? (
           <Textarea {...valueProps} autosize minRows={1} />
         ) : (
           <></>

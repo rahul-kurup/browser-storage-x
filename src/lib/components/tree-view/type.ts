@@ -2,19 +2,6 @@ import { ComponentProps } from 'react';
 
 export type SubDataType = 'index';
 
-export type AllDataType =
-  | 'string'
-  | 'boolean'
-  | 'number'
-  | 'bigint'
-  | 'undefined'
-  | 'null'
-  | 'symbol'
-  | 'function'
-  | 'array'
-  | 'object'
-  | SubDataType;
-
 export type AcceptedDataType =
   | 'string'
   | 'boolean'
