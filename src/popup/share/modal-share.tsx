@@ -65,6 +65,8 @@ export default function ShareSpecificModal({
       </Button>
 
       <Modal
+        centered
+        trapFocus
         title='Select items to share'
         opened={treeDataState === 'LOADED'}
         onClose={handleModalClose}

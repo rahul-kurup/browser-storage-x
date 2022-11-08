@@ -1,36 +1,5 @@
-import { Alert, Group, Text } from '@mantine/core';
+import { Alert } from '@mantine/core';
 import { Progress } from 'lib-models/progress';
-import { withImg } from 'lib-utils/common';
-import { forwardRef } from 'react';
-import {
-  ImgIcon,
-  SelectTextWrapper,
-  SelectWrapper,
-  StyledAvatar,
-} from './style';
-import { ItemProps } from './type';
-
-export const CustomSelectOption = forwardRef<HTMLDivElement, ItemProps>(
-  ({ data, label, ...others }: ItemProps, ref) => (
-    <SelectWrapper ref={ref} {...others}>
-      {data.incognito && (
-        <ImgIcon src={withImg('anony.png')} alt='' title='Private/Incognito' />
-      )}
-
-      <Group noWrap>
-        <StyledAvatar src={data.favIconUrl} size='sm' />
-
-        <SelectTextWrapper>
-          <Text size='sm'>
-            {data.title} {data.audible && (data.mutedInfo.muted ? '🔇' : '🔊')}
-          </Text>
-
-          <Text size='xs'>{data.url}</Text>
-        </SelectTextWrapper>
-      </Group>
-    </SelectWrapper>
-  )
-);
 
 export const PresetAlerts = {
   [Progress.started]: (

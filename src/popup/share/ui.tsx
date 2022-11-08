@@ -1,5 +1,9 @@
 import { Alert, Button } from '@mantine/core';
-import Select, { ChangeHandlerArgs } from 'lib-components/select';
+import Select, {
+  ChangeHandlerArgs,
+  fnFilter,
+  SelectOptionBrowserTab,
+} from 'lib-components/select';
 import { Cookie, Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
 import Browser from 'lib-utils/browser';
@@ -11,12 +15,8 @@ import {
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { FormEvent, memo, useEffect, useMemo, useRef, useState } from 'react';
-import { CustomSelectOption, PresetAlerts } from './components';
-import {
-  convertTreeNodeToCookie,
-  convertTreeNodeToStorage,
-  filterFn,
-} from './helper';
+import { PresetAlerts } from './components';
+import { convertTreeNodeToCookie, convertTreeNodeToStorage } from './helper';
 import ShareSpecificModal from './modal-share';
 import Form, { Fieldset, Legend, SourceContainer } from './style';
 import { ShareState, State } from './type';
@@ -193,13 +193,13 @@ function ShareUI() {
             value={state.srcTab}
             onChange={handleChange}
             disabled={disabledField}
-            itemComponent={CustomSelectOption}
+            itemComponent={SelectOptionBrowserTab}
             fieldKey={{
               value: 'id',
               label: 'title',
             }}
             searchable
-            filter={filterFn}
+            filter={fnFilter}
           />
 
           <SourceContainer sourceSelected={isSrcSelected}>
@@ -237,13 +237,13 @@ function ShareUI() {
             value={state.destTab}
             onChange={handleChange}
             disabled={disabledField}
-            itemComponent={CustomSelectOption}
+            itemComponent={SelectOptionBrowserTab}
             fieldKey={{
               value: 'id',
               label: 'title',
             }}
             searchable
-            filter={filterFn}
+            filter={fnFilter}
           />
 
           <Select

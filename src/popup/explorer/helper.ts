@@ -5,6 +5,7 @@ import {
 } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
 import { checkItem } from 'lib-utils/common';
+import { FormEvent } from 'react';
 
 type TreeViewNodeItems = TreeViewProps['items'];
 
@@ -177,7 +178,7 @@ export function convertContentToCookie(
   return changed;
 }
 
-export function stopActionDefEvent(e: any) {
-  e.preventDefault();
-  e.stopPropagation();
+export function stopDefaultEvent(e?: FormEvent) {
+  e?.preventDefault();
+  e?.stopPropagation();
 }

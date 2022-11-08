@@ -1,4 +1,3 @@
-import { SelectProps } from '@mantine/core';
 import { TreeViewProps } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
 
@@ -37,19 +36,3 @@ export function convertCookieToTreeNode(cookies: Cookie[]) {
 export function convertTreeNodeToCookie(nodeData: Cookie[]): Cookie[] {
   return nodeData.reduce((a, c) => (c ? [...a, c] : a), []);
 }
-
-export const filterFn: SelectProps['filter'] = (value, item) => {
-  let inUrl = false,
-    inTitle = false;
-  inUrl = item?.data?.url
-    ?.toLowerCase()
-    .trim()
-    .includes(value.toLowerCase().trim());
-  if (!inUrl) {
-    inTitle = item.label
-      .toLowerCase()
-      .trim()
-      .includes(value.toLowerCase().trim());
-  }
-  return inUrl || inTitle;
-};
