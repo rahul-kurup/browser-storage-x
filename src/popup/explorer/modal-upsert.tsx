@@ -52,7 +52,9 @@ export default function UpsertModal({
       if (args.newPath && node.nodeName !== state.name) {
         const exists = has(explorerState.content, args.newPath);
         if (exists) {
-          return alert('This Key already exists in this level / path');
+          return alert(
+            `The key name '${state.name}' already exists in this level / path`
+          );
         }
       }
       return onUpdate({
