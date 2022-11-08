@@ -5,4 +5,5 @@ tmp
 
 .vscode
 .history
-yarn-error.log
+yarn-error.logfirefox.env
+/yarn-error.log
