@@ -1,14 +1,31 @@
-**What is browser-storage-x ?**
+# StorageX
 
-It's a browser extension for chrome based/firefox/safari browsers which lets you copy localstorage/sessionstorage/cookies across different domains.
+![StorageX logo](/src/assets/images/logo/128.png)
 
-**Extension links**
+An all in one localstorage/sessionstorage/cookie manager browser extension for chrome based/firefox browsers.
+
+## Features
+
+### Share
+
+- lets you copy localstorage/sessionstorage/cookies across different domains
+- only pick items that you want to share
+- search tabs by url or title of a tab
+
+### Explorer
+
+- tree view to explore JSON for localstorage/sessionstorage/cookies
+- add/edit/delete values in the tree view itself
+- custom editors for different data types
+- search tabs by url or title of a tab
+
+## Extension links
 
 - Chrome - https://chrome.google.com/webstore/detail/storagex/pafddkhaocklakonboekmgodcmgmfcbp
 - Firefox - https://addons.mozilla.org/en-US/firefox/addon/storagex/
 - Edge - https://microsoftedge.microsoft.com/addons/detail/storagex/gamhkdfigfofibfjhkcamegmckfmnode
 
-**Setup**
+## Development Setup
 
 - This project uses `yarn`, so make sure to have that globally installed
 - Check package.json and use the correct "engines" version locally, which includes _node_ and _yarn_ versions
