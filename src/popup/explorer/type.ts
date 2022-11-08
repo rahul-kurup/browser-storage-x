@@ -7,12 +7,6 @@ import { Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
 import { StorageType } from 'lib-models/storage';
 
-export type UpsertModalProps = {
-  node: NodeWithIdProps;
-  open: boolean;
-  action: 'add' | 'update' | 'delete';
-};
-
 export type CommonModalArgs = {
   close: boolean;
   prevPath?: string[];
@@ -35,6 +29,13 @@ export type ExplorerState = {
    */
   changes?: Record<string, string>;
   treeContent: TreeViewProps['items'];
+};
+
+export type UpsertModalProps = {
+  node: NodeWithIdProps;
+  open: boolean;
+  action: 'add' | 'update' | 'delete';
+  explorerState: ExplorerState;
 };
 
 export type ParentIdArgs = {

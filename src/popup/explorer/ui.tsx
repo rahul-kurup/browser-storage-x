@@ -55,7 +55,9 @@ function ExplorerUI() {
     progress: Progress.idle,
   } as ExplorerState);
 
-  const [modal, setModal] = useState({} as UpsertModalProps);
+  const [modal, setModal] = useState(
+    {} as Omit<UpsertModalProps, 'explorerState'>
+  );
 
   function handleChange({ name, value }: ChangeHandlerArgs<Tab>) {
     setState(s => ({ ...s, [name]: value }));
@@ -77,13 +79,13 @@ function ExplorerUI() {
 
   const { tab, storage } = state;
 
-  const isCookie = isCookieType(storage);
+  const isStorageCookie = isCookieType(storage);
 
   useEffect(() => {
     if (tab && storage) {
       setLoading(true);
 
-      (isCookie
+      (isStorageCookie
         ? Browser.cookie.getAll(tab).then(convertCookieToTreeNode)
         : Browser.script
             .execute(tab, getAllItems, [storage])
@@ -120,15 +122,14 @@ function ExplorerUI() {
         if (prevLen) {
           unset(changedContent, args.prevPath);
 
-          // check root node
-          // this if condition exists solely to track root cookie name changes
-          if (prevLen === 1 && args.changes) {
+          // this condition solely exists to track root cookie name changes
+          if (isStorageCookie && prevLen === 1 && args.changes) {
             const [newName, oldName] = args.changes;
             changes[newName] = oldName;
           }
         }
 
-        const { converted, parsed } = isCookie
+        const { converted, parsed } = isStorageCookie
           ? convertCookieToTreeNode(changedContent)
           : convertStorageToTreeNode(changedContent);
         return {
@@ -160,7 +161,7 @@ function ExplorerUI() {
     stopDefaultEvent(e);
     setState(s => ({ ...s, progress: Progress.started }));
     const { tab, content, original, changes } = state;
-    if (isCookie) {
+    if (isStorageCookie) {
       const newCookies = convertContentToCookie(content, original, changes);
       await modifyCookies(original, 'remove');
       await modifyCookies(newCookies, 'set');
@@ -341,9 +342,17 @@ function ExplorerUI() {
       {modal.open &&
         modal.node &&
         (modal.action === 'delete' ? (
-          <DeleteModal {...modal} onDelete={handleContentChange} />
+          <DeleteModal
+            {...modal}
+            explorerState={state}
+            onDelete={handleContentChange}
+          />
         ) : (
-          <UpsertModal {...modal} onUpdate={handleContentChange} />
+          <UpsertModal
+            {...modal}
+            explorerState={state}
+            onUpdate={handleContentChange}
+          />
         ))}
     </>
   );
