@@ -5,6 +5,7 @@ const GenerateJsonFromJsPlugin = require('generate-json-from-js-webpack-plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { join } = require('path');
 const dotenv = require('dotenv');
+const fs = require('fs');
 const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 
 const prodPlugins = [];
@@ -24,6 +25,19 @@ const Content = join(Source, 'content');
 const Popup = join(Source, 'popup');
 const Lib = join(Source, 'lib');
 const Option = join(Source, 'option');
+
+const tsConfigPath = join(Root, 'tsconfig.json');
+const tsConfigJsonStr = fs.readFileSync(tsConfigPath);
+const tsConfigJson = JSON.parse(tsConfigJsonStr);
+
+const tsAliasPaths = Object.keys(tsConfigJson.compilerOptions.paths).reduce(
+  (a, c) => {
+    const _alias = c.split('/').shift();
+    const _dirModule = _alias.split('-').pop();
+    return { ...a, [_alias]: join(Source, 'lib', _dirModule) };
+  },
+  {}
+);
 
 const config = {
   mode: process.env.NODE_ENV,
@@ -73,11 +87,6 @@ const config = {
         ],
       },
       {
-        test: /\.(gql)$/,
-        exclude: /node_modules/,
-        loader: 'graphql-tag/loader',
-      },
-      {
         test: /\.css$/i,
         use: [
           'style-loader',
@@ -97,19 +106,6 @@ const config = {
       {
         test: /\.s[ac]ss$/i,
         use: ['style-loader', 'css-loader', 'sass-loader'],
-      },
-      {
-        test: /\.pcss$/i,
-        use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: {
-              importLoaders: 1,
-            },
-          },
-          'postcss-loader',
-        ],
       },
     ],
   },
@@ -144,7 +140,7 @@ const config = {
     ...prodPlugins,
   ],
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.png', '.svg', '.gql'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.png', '.svg'],
     alias: {
       lib: Lib,
       background: Background,
@@ -152,13 +148,7 @@ const config = {
       popup: Popup,
       assets: Assets,
       option: Option,
-      ...['models', 'utils', 'components', 'context'].reduce(
-        (dirPrev, dirModule) => ({
-          ...dirPrev,
-          [`lib-${dirModule}`]: join(Source, 'lib', dirModule),
-        }),
-        {}
-      ),
+      ...tsAliasPaths,
     },
   },
   optimization: {
