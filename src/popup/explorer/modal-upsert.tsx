@@ -1,5 +1,6 @@
 import { Button, Modal, Radio, Textarea, TextInput } from '@mantine/core';
 import { AcceptedDataType } from 'lib-components/tree-view';
+import { has } from 'lodash';
 import { FormEvent, useCallback, useMemo, useState } from 'react';
 import {
   basicDt,
@@ -11,53 +12,63 @@ import {
 import { ModalForm } from './style';
 import { CommonModalArgs, UpsertModalProps } from './type';
 
-export default function UpsertModal(
-  props: UpsertModalProps & {
-    onUpdate: (args: CommonModalArgs) => void;
-  }
-) {
-  const isActionAdd = props.action === 'add';
-  const isActionUpdate = props.action === 'update';
+export default function UpsertModal({
+  node,
+  open,
+  action,
+  explorerState,
+  onUpdate,
+}: UpsertModalProps & {
+  onUpdate: (args: CommonModalArgs) => void;
+}) {
+  const isActionAdd = action === 'add';
+  const isActionUpdate = action === 'update';
 
   const checks = {
-    isParentArray: props.node.data?.parentDataType === 'array',
-    isParentObject: props.node.data?.parentDataType === 'object',
-    isSelfObject: props.node.dataType === 'object',
-    isSelfArray: props.node.dataType === 'array',
+    isSelfArray: node.dataType === 'array',
+    isSelfObject: node.dataType === 'object',
+    isParentArray: node.data?.parentDataType === 'array',
+    isParentObject: node.data?.parentDataType === 'object',
   };
 
   const prepareNode = useCallback(() => {
-    const isUpdate = props.action === 'update';
+    const isUpdate = action === 'update';
     return {
       isChanged: false,
-      name: isUpdate ? props.node.nodeName : '',
-      value: isUpdate ? props.node.data?.value : '',
+      name: isUpdate ? node.nodeName : '',
+      value: isUpdate ? node.data?.value : '',
       valueType: isUpdate
-        ? props.node.dataType
-        : basicDt.includes(props.node.dataType)
+        ? node.dataType
+        : basicDt.includes(node.dataType)
         ? 'string'
         : 'object',
     };
-  }, [props.node, props.action]);
+  }, [node, action]);
 
   const [state, setState] = useState(prepareNode());
 
   const pushChange = useCallback(
     (args: Omit<CommonModalArgs, 'changes'>) => {
-      return props.onUpdate({
+      if (args.newPath && node.nodeName !== state.name) {
+        const exists = has(explorerState.content, args.newPath);
+        if (exists) {
+          return alert('This Key already exists in this level / path');
+        }
+      }
+      return onUpdate({
         ...args,
         // this is just to track name changes of root cookie.
         // TODO: find a better way instead of this BS
-        changes: [state.name, props.node.nodeName],
+        changes: [state.name, node.nodeName],
       });
     },
-    [state.name, props.node]
+    [state.name, node]
   );
 
   function onSubmit(e: FormEvent) {
     stopDefaultEvent(e);
     const { isParentArray, isParentObject, isSelfObject, isSelfArray } = checks;
-    const toSave = { ...props.node };
+    const toSave = { ...node };
     const dataPath = toSave.data.path;
     let dataValue = toSave.data.value;
     const stateValue = getValueByType[state.valueType](state.value);
@@ -130,8 +141,7 @@ export default function UpsertModal(
         value={state.name}
         placeholder='New key name'
         onChange={e => {
-          let value = e.target.value;
-          value = value.trim().length < 1 ? '' : value;
+          const value = e.target.value?.trim() || '';
           setState(s => ({ ...s, name: value, isChanged: true } as any));
         }}
       />
@@ -139,7 +149,7 @@ export default function UpsertModal(
 
     if (isActionAdd) {
       if (isSelfArray) {
-        return <></>;
+        return null;
       }
       if (isSelfObject || isParentObject) {
         return KeyInput;
@@ -147,11 +157,11 @@ export default function UpsertModal(
     }
 
     if (isActionUpdate && isParentArray && basicDt.includes(state.valueType)) {
-      return <></>;
+      return null;
     }
 
     return KeyInput;
-  }, [state.name, props.node, isActionAdd, isActionUpdate, checks]);
+  }, [state.name, node, isActionAdd, isActionUpdate, checks]);
 
   const CompValueType = useMemo(() => {
     return isActionAdd ? (
@@ -247,7 +257,7 @@ export default function UpsertModal(
       <Modal
         centered
         trapFocus
-        opened={props.open}
+        opened={open}
         title={<b>{isActionAdd ? 'Add' : 'Modify'}</b>}
         onClose={() => pushChange({ close: true } as CommonModalArgs)}
       >
