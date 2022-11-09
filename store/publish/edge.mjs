@@ -1,28 +1,17 @@
 // https://github.com/PlasmoHQ/edge-addons-api
 
 import { EdgeAddonsAPI } from '@plasmohq/edge-addons-api';
-import dotenv from 'dotenv';
-import args from 'node-args';
+import { edgeConfig, notes } from './helpers.mjs';
 
-dotenv.config();
+const { filePath, ...config } = edgeConfig;
 
-const clientId = process.env.EDGE_CLIENT_ID;
-const clientSecret = process.env.EDGE_CLIENT_SECRET;
-const productId = process.env.EDGE_EXT_ID;
-const accessTokenUrl = process.env.EDGE_ACCESS_TOKEN_URL;
-const notes = args.n || '';
-
-const store = new EdgeAddonsAPI({
-  productId,
-  clientId,
-  clientSecret,
-  accessTokenUrl,
-});
+const store = new EdgeAddonsAPI(config);
 
 try {
-  await store.submit({ filePath: 'dist/ext_chromium.zip', notes });
+  await store.submit({ filePath, notes });
   console.log('Published to Edge');
 } catch (error) {
   console.error('Submit error occurred');
+  console.error(error);
   process.exit(1);
 }

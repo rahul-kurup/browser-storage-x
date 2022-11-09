@@ -27,7 +27,7 @@ const Lib = join(Source, 'lib');
 const Option = join(Source, 'option');
 
 const tsConfigPath = join(Root, 'tsconfig.json');
-const tsConfigJsonStr = fs.readFileSync(tsConfigPath);
+const tsConfigJsonStr = fs.readFileSync(tsConfigPath, { encoding: 'utf-8' });
 const tsConfigJson = JSON.parse(tsConfigJsonStr);
 
 const tsAliasPaths = Object.keys(tsConfigJson.compilerOptions.paths).reduce(

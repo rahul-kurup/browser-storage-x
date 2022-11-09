@@ -3,7 +3,7 @@ import ImgIcon from 'lib-components/img-icon';
 import Select, {
   ChangeHandlerArgs,
   fnFilter,
-  SelectOptionBrowserTab
+  SelectOptionBrowserTab,
 } from 'lib-components/select';
 import { Cookie, Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
@@ -12,7 +12,7 @@ import {
   getAllItems,
   isCookieType,
   setAllItems,
-  StorageTypeList
+  StorageTypeList,
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
@@ -24,7 +24,7 @@ import {
   convertContentToStorage,
   convertCookieToTreeNode,
   convertStorageToTreeNode,
-  stopDefaultEvent
+  stopDefaultEvent,
 } from './helper';
 import DeleteModal from './modal-delete';
 import UpsertModal from './modal-upsert';
@@ -37,7 +37,7 @@ import Form, {
   NodeValue,
   Placeholder,
   SourceContainer,
-  StyledTreeView
+  StyledTreeView,
 } from './style';
 import { CommonModalArgs, ExplorerState, UpsertModalProps } from './type';
 
