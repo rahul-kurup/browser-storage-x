@@ -1,8 +1,9 @@
 const { version, displayName, description } = require('../../../package.json');
 const permissions = require('../permissions');
 
-const getExtName = name =>
-  name + (process.env.NODE_ENV?.includes('dev') ? ' [dev]' : '');
+const isDevMode = process.env.NODE_ENV?.includes('dev');
+
+const getExtName = name => name + (isDevMode ? ' [dev]' : '');
 
 const name = getExtName(displayName);
 
@@ -31,6 +32,7 @@ const defaultManifest = {
 module.exports = {
   name,
   version,
+  isDevMode,
   getExtName,
   displayName,
   description,
