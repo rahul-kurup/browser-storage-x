@@ -3,10 +3,10 @@ import { AcceptedDataType } from 'lib-components/tree-view';
 import { has } from 'lodash';
 import { FormEvent, useCallback, useMemo, useState } from 'react';
 import {
-  basicDt,
   emptyDt,
   getValueByType,
   isPrevNewPathSame,
+  primitiveDt,
   stopDefaultEvent,
 } from './helper';
 import { ModalForm } from './style';
@@ -40,7 +40,7 @@ export default function UpsertModal({
       value: isUpdate ? node.data?.value : '',
       valueType: isUpdate
         ? node.dataType
-        : basicDt.includes(node.dataType)
+        : primitiveDt.includes(node.dataType)
         ? 'string'
         : 'object',
     };
@@ -60,7 +60,11 @@ export default function UpsertModal({
       }
     }
 
-    if (isActionUpdate && isParentArray && basicDt.includes(state.valueType)) {
+    if (
+      isActionUpdate &&
+      isParentArray &&
+      primitiveDt.includes(state.valueType)
+    ) {
       return null;
     }
 
@@ -158,7 +162,8 @@ export default function UpsertModal({
 
   const CompValue = useMemo(() => {
     const showValue =
-      basicDt.includes(state.valueType) || emptyDt.includes(state.valueType);
+      primitiveDt.includes(state.valueType) ||
+      emptyDt.includes(state.valueType);
 
     const valueProps = {
       label: 'Value',

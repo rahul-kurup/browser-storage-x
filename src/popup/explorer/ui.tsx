@@ -13,12 +13,12 @@ import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
 import { FormEvent, memo, useEffect, useState } from 'react';
 import {
-  basicDt,
   containerDt,
   convertContentToCookie,
   convertContentToStorage,
   convertCookieToTreeNode,
   convertStorageToTreeNode,
+  primitiveDt,
   stopDefaultEvent,
 } from './helper';
 import DeleteModal from './modal-delete';
@@ -222,7 +222,7 @@ function ExplorerUI() {
 
                   const showModify =
                     node.dataSubType === 'index'
-                      ? basicDt.includes(node.dataType)
+                      ? primitiveDt.includes(node.dataType)
                       : true;
 
                   const capDataType = startCase(node.dataType) || '';
@@ -302,7 +302,7 @@ function ExplorerUI() {
                         )}
                       </NodeKey>
 
-                      {basicDt.includes(node.dataType) &&
+                      {primitiveDt.includes(node.dataType) &&
                         !Boolean(node.items?.length) && (
                           <NodeValue title={String(value)}>
                             {String(value)}

@@ -12,12 +12,14 @@ import { StorageType } from 'lib-models/storage';
 import { noop } from './common';
 import { getAllItems, removeAllItems, setAllItems } from './storage';
 
-const PREFIX = {
-  d: '.',
-  w3: 'www',
-  w3d: 'www.',
-  dw3d: '.www.',
-};
+const Promised = <T>(fn: Function, args: any) =>
+  new Promise((resolve, reject) => {
+    try {
+      fn(args, resolve);
+    } catch (error) {
+      reject(error);
+    }
+  }) as Promise<T>;
 
 type TabReplaceEvent = (addedTabId: number, removedTabId: number) => void;
 
@@ -53,9 +55,10 @@ export default class Browser {
 
       const storeId = await this.cookie.storeId(tab);
 
-      const result: Cookie[] = await new Promise((resolve, _reject) =>
-        instance.cookies.getAll({ storeId, url: tab.url }, resolve)
-      );
+      const result = await Promised<Cookie[]>(instance.cookies.getAll, {
+        storeId,
+        url: tab.url,
+      });
 
       cbSuccess?.(result);
       return result;
@@ -118,9 +121,8 @@ export default class Browser {
       query: TabQueryInfo = {}
     ) => {
       const { instance } = await this.detect();
-      const result: Tab[] = (await new Promise((resolve, _reject) =>
-        instance.tabs.query(query, resolve)
-      )) as unknown as Tab[];
+      const result = await Promised<Tab[]>(instance.tabs.query, query);
+
       cbSuccess?.(result);
       return result;
     },
@@ -178,16 +180,15 @@ export default class Browser {
        */
       await this.tab.reloadIfDiscarded(tab);
 
-      const execOutput = (await new Promise((resolve, _reject) =>
-        instance.scripting.executeScript(
-          {
-            target: { tabId: tab.id },
-            args,
-            func,
-          },
-          resolve
-        )
-      )) as unknown as [{ result: any }];
+      const execOutput = await Promised<[{ result: any }]>(
+        instance.scripting.executeScript,
+        {
+          target: { tabId: tab.id },
+          args,
+          func,
+        }
+      );
+
       return execOutput?.[0]?.result;
     },
   };

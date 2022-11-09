@@ -7,7 +7,11 @@ document.body.appendChild(container);
 
 const root = createRoot(container);
 root.render(
-  <MantineProvider withGlobalStyles withNormalizeCSS>
+  <MantineProvider
+    withGlobalStyles
+    withNormalizeCSS
+    // theme={{ colorScheme: 'dark' }}
+  >
     <App />
   </MantineProvider>
 );

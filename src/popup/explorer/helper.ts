@@ -7,7 +7,7 @@ import { ExplorerState, ParentIdArgs } from './type';
 type TreeViewNodeItems = TreeViewProps['items'];
 
 export const emptyDt: AcceptedDataType[] = ['null'];
-export const basicDt: AcceptedDataType[] = [
+export const primitiveDt: AcceptedDataType[] = [
   'string',
   'number',
   'bigint',
@@ -39,7 +39,7 @@ export const isPrevNewPathSame = (prevPath?: string[], newPath?: string[]) => {
   }
 };
 
-export function isBasicDataType(arg: any) {
+export function isPrimitiveDataType(arg: any) {
   const ty = typeof arg;
   return (
     ty === 'string' || ty === 'number' || ty === 'boolean' || ty === 'bigint'
@@ -66,7 +66,7 @@ function converter(
       .map((m, i) => {
         const typeofObjItem = getDataType(m);
         const newPath = [...parentPath, String(i)];
-        const items = isBasicDataType(m)
+        const items = isPrimitiveDataType(m)
           ? {
               nodeName: m,
               data: {
