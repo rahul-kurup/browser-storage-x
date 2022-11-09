@@ -3,7 +3,7 @@ import ImgIcon from 'lib-components/img-icon';
 import Select, {
   ChangeHandlerArgs,
   fnFilter,
-  SelectOptionBrowserTab,
+  SelectOptionBrowserTab
 } from 'lib-components/select';
 import { Cookie, Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
@@ -12,11 +12,12 @@ import {
   getAllItems,
   isCookieType,
   setAllItems,
-  StorageTypeList,
+  StorageTypeList
 } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
 import { FormEvent, memo, useEffect, useState } from 'react';
+import { isDevMode } from '../../manifest/base/helper';
 import {
   basicDt,
   containerDt,
@@ -24,7 +25,7 @@ import {
   convertContentToStorage,
   convertCookieToTreeNode,
   convertStorageToTreeNode,
-  stopDefaultEvent,
+  stopDefaultEvent
 } from './helper';
 import DeleteModal from './modal-delete';
 import UpsertModal from './modal-upsert';
@@ -37,7 +38,7 @@ import Form, {
   NodeValue,
   Placeholder,
   SourceContainer,
-  StyledTreeView,
+  StyledTreeView
 } from './style';
 import { CommonModalArgs, ExplorerState, UpsertModalProps } from './type';
 
@@ -234,60 +235,64 @@ function ExplorerUI() {
                   const Empty = containerDt.includes(node.dataType) &&
                     !node.items?.length && <i>{'<empty>'}</i>;
 
+                  const showActions = isDevMode ? true : !isStorageCookie;
+
                   return (
                     <NodeItemContainer>
-                      <Actions className='actions'>
-                        {containerDt.includes(node.dataType) && (
+                      {showActions && (
+                        <Actions className='actions'>
+                          {containerDt.includes(node.dataType) && (
+                            <ActionButton
+                              {...actionProps}
+                              color='green'
+                              title='Add'
+                              onClick={e => {
+                                stopDefaultEvent(e);
+                                setModal({
+                                  open: true,
+                                  action: 'add',
+                                  node,
+                                });
+                              }}
+                            >
+                              <ImgIcon src='plus' />
+                            </ActionButton>
+                          )}
+
+                          {showModify && (
+                            <ActionButton
+                              {...actionProps}
+                              title='Modify'
+                              onClick={e => {
+                                stopDefaultEvent(e);
+                                setModal({
+                                  open: true,
+                                  node,
+                                  action: 'update',
+                                });
+                              }}
+                            >
+                              <ImgIcon src='pen' />
+                            </ActionButton>
+                          )}
+
                           <ActionButton
                             {...actionProps}
-                            color='green'
-                            title='Add'
+                            color='red'
+                            title='Remove'
                             onClick={e => {
                               stopDefaultEvent(e);
                               setModal({
                                 open: true,
-                                action: 'add',
                                 node,
+                                action: 'delete',
                               });
                             }}
                           >
-                            <ImgIcon src='plus' />
+                            <ImgIcon src='trash' />
                           </ActionButton>
-                        )}
-
-                        {showModify && (
-                          <ActionButton
-                            {...actionProps}
-                            title='Modify'
-                            onClick={e => {
-                              stopDefaultEvent(e);
-                              setModal({
-                                open: true,
-                                node,
-                                action: 'update',
-                              });
-                            }}
-                          >
-                            <ImgIcon src='pen' />
-                          </ActionButton>
-                        )}
-
-                        <ActionButton
-                          {...actionProps}
-                          color='red'
-                          title='Remove'
-                          onClick={e => {
-                            stopDefaultEvent(e);
-                            setModal({
-                              open: true,
-                              node,
-                              action: 'delete',
-                            });
-                          }}
-                        >
-                          <ImgIcon src='trash' />
-                        </ActionButton>
-                      </Actions>
+                        </Actions>
+                      )}
 
                       <NodeKey title={String(name)}>
                         {node.dataSubType === 'index' ? (
