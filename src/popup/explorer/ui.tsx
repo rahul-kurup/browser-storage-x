@@ -8,12 +8,7 @@ import Select, {
 import { Cookie, Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
 import Browser from 'lib-utils/browser';
-import {
-  getAllItems,
-  isCookieType,
-  setAllItems,
-  StorageTypeList,
-} from 'lib-utils/storage';
+import { isCookieType, StorageTypeList } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
 import { FormEvent, memo, useEffect, useState } from 'react';
@@ -87,8 +82,9 @@ function ExplorerUI() {
 
       (isStorageCookie
         ? Browser.cookie.getAll(tab).then(convertCookieToTreeNode)
-        : Browser.script
-            .execute(tab, getAllItems, [storage])
+        : Browser.tab
+            .storage(tab)
+            .getAll(storage)
             .then(convertStorageToTreeNode)
       )
         .then(async ({ converted, parsed, originalData }) => {
@@ -134,9 +130,9 @@ function ExplorerUI() {
           : convertStorageToTreeNode(changedContent);
         return {
           ...newState,
+          changes,
           content: parsed,
           treeContent: converted,
-          changes,
         };
       });
     }
@@ -166,7 +162,9 @@ function ExplorerUI() {
     } else {
       const newContent = convertContentToStorage(content);
       try {
-        await Browser.script.execute(tab, setAllItems, [storage, newContent]);
+        const browserTab = Browser.tab.storage(tab);
+        await browserTab.removeAll(storage);
+        await browserTab.setAll(storage, newContent);
       } catch (error) {
         console.error(error);
       }

@@ -155,9 +155,10 @@ export function convertContentToStorage(content: any) {
   const keys = Object.keys(content);
   const changed = {};
   keys.forEach(key => {
-    changed[key] = content[key];
+    const value = content[key];
+    changed[key] = value;
     try {
-      changed[key] = JSON.stringify(content[key]);
+      changed[key] = typeof value === 'object' ? JSON.stringify(value) : value;
     } catch (error) {
       console.error(error);
     }

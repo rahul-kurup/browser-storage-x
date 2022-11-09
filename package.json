@@ -25,7 +25,7 @@
   "scripts": {
     "publish:chrome": "node store/publish/chrome.mjs",
     "publish:edge": "node store/publish/edge.mjs",
-    "publish": "concurrently npm:publish:chrome npm:publish:edge",
+    "publish": "concurrently -n \"chrome,edge\" -c \"red.bold,blue.bold\" \"npm:publish:chrome\" \"npm:publish:edge\"",
     "clean": "rimraf dist",
     "prepare": "husky install",
     "compress": "node scripts/compress.mjs",
@@ -41,7 +41,7 @@
     "watch": "cross-env NODE_ENV=development webpack -w",
     "watch:chrome": "cross-env NODE_ENV=development webpack --config ./webpack/chrome.js -w",
     "watch:firefox": "cross-env NODE_ENV=development webpack --config ./webpack/firefox.js -w",
-    "start": "concurrently npm:watch:chrome npm:watch:firefox",
+    "start": "concurrently -n \"chrome,firefox\" -c \"red.bold,blue.bold\" \"npm:watch:chrome\" \"npm:watch:firefox\"",
     "pretty": "prettier --loglevel=error --write ."
   },
   "lint-staged": {

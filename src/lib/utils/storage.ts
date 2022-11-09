@@ -12,7 +12,7 @@ export function getAllItems(
     }
     return obj;
   } catch (error) {
-    console.error('get', error);
+    console.error('getAll', error);
   }
   return undefined;
 }
@@ -25,8 +25,23 @@ export function setAllItems(storageType: StorageType, data: any) {
       storage.setItem(key, data[key]);
     });
   } catch (error) {
-    console.error('set', error);
+    console.error('setAll', error);
   }
+}
+
+export function removeAllItems(
+  storageType: StorageType
+): Record<string, string> | undefined {
+  try {
+    const storage = storageType === 'local' ? localStorage : sessionStorage;
+    for (let i = 0; i < storage.length; i++) {
+      const key = storage.key(i);
+      storage.removeItem(key);
+    }
+  } catch (error) {
+    console.error('removeAll', error);
+  }
+  return undefined;
 }
 
 export const StorageTypeList = Object.keys(Storages).reduce(

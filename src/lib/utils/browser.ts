@@ -8,7 +8,9 @@ import type {
   Tab,
   TabQueryInfo,
 } from 'lib-models/browser';
+import { StorageType } from 'lib-models/storage';
 import { noop } from './common';
+import { getAllItems, removeAllItems, setAllItems } from './storage';
 
 const PREFIX = {
   d: '.',
@@ -149,6 +151,17 @@ export default class Browser {
         instance.tabs.onReplaced.removeListener(cb);
       },
     },
+
+    storage: (tab: Tab) => ({
+      setAll: (storage: StorageType, content: Object) =>
+        this.script.execute(tab, setAllItems, [storage, content]),
+
+      getAll: (storage: StorageType) =>
+        this.script.execute(tab, getAllItems, [storage]),
+
+      removeAll: (storage: StorageType) =>
+        this.script.execute(tab, removeAllItems, [storage]),
+    }),
   };
 
   static script = {

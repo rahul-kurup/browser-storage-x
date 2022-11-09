@@ -7,12 +7,7 @@ import Select, {
 import { Cookie, Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
 import Browser from 'lib-utils/browser';
-import {
-  getAllItems,
-  isCookieType,
-  setAllItems,
-  StorageTypeList,
-} from 'lib-utils/storage';
+import { isCookieType, StorageTypeList } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { FormEvent, memo, useEffect, useMemo, useRef, useState } from 'react';
 import { PresetAlerts } from './components';
@@ -100,10 +95,7 @@ function ShareUI() {
   async function shareStorageContent(content: any) {
     const { destStorage, destTab } = state;
     if (content) {
-      await Browser.script.execute(destTab, setAllItems, [
-        destStorage,
-        content,
-      ]);
+      await Browser.tab.storage(destTab).setAll(destStorage, content);
       setProgress(Progress.pass);
     } else {
       setProgress(Progress.stopped);
@@ -146,9 +138,7 @@ function ShareUI() {
               convertTreeNodeToStorage(shareState.selectedValues)
             );
           } else {
-            const output = await Browser.script.execute(srcTab, getAllItems, [
-              srcStorage,
-            ]);
+            const output = await Browser.tab.storage(srcTab).getAll(srcStorage);
             await shareStorageContent(output);
           }
         }
