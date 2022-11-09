@@ -17,7 +17,6 @@ import {
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
 import { FormEvent, memo, useEffect, useState } from 'react';
-import { isDevMode } from '../../manifest/base/helper';
 import {
   basicDt,
   containerDt,
@@ -146,11 +145,9 @@ function ExplorerUI() {
   async function modifyCookies(_cookies: Cookie[], op: 'set' | 'remove') {
     for (const cookie of _cookies) {
       try {
-        const { url, domain } = Browser.cookie.genUrlInfoUsingTab(cookie, tab);
         await Browser.cookie[op]({
           ...cookie,
-          url,
-          domain: op === 'remove' ? cookie.domain : domain,
+          url: tab.url,
         });
       } catch (error) {
         console.error(error);
@@ -235,64 +232,60 @@ function ExplorerUI() {
                   const Empty = containerDt.includes(node.dataType) &&
                     !node.items?.length && <i>{'<empty>'}</i>;
 
-                  const showActions = isDevMode ? true : !isStorageCookie;
-
                   return (
                     <NodeItemContainer>
-                      {showActions && (
-                        <Actions className='actions'>
-                          {containerDt.includes(node.dataType) && (
-                            <ActionButton
-                              {...actionProps}
-                              color='green'
-                              title='Add'
-                              onClick={e => {
-                                stopDefaultEvent(e);
-                                setModal({
-                                  open: true,
-                                  action: 'add',
-                                  node,
-                                });
-                              }}
-                            >
-                              <ImgIcon src='plus' />
-                            </ActionButton>
-                          )}
-
-                          {showModify && (
-                            <ActionButton
-                              {...actionProps}
-                              title='Modify'
-                              onClick={e => {
-                                stopDefaultEvent(e);
-                                setModal({
-                                  open: true,
-                                  node,
-                                  action: 'update',
-                                });
-                              }}
-                            >
-                              <ImgIcon src='pen' />
-                            </ActionButton>
-                          )}
-
+                      <Actions className='actions'>
+                        {containerDt.includes(node.dataType) && (
                           <ActionButton
                             {...actionProps}
-                            color='red'
-                            title='Remove'
+                            color='green'
+                            title='Add'
+                            onClick={e => {
+                              stopDefaultEvent(e);
+                              setModal({
+                                open: true,
+                                action: 'add',
+                                node,
+                              });
+                            }}
+                          >
+                            <ImgIcon src='plus' />
+                          </ActionButton>
+                        )}
+
+                        {showModify && (
+                          <ActionButton
+                            {...actionProps}
+                            title='Modify'
                             onClick={e => {
                               stopDefaultEvent(e);
                               setModal({
                                 open: true,
                                 node,
-                                action: 'delete',
+                                action: 'update',
                               });
                             }}
                           >
-                            <ImgIcon src='trash' />
+                            <ImgIcon src='pen' />
                           </ActionButton>
-                        </Actions>
-                      )}
+                        )}
+
+                        <ActionButton
+                          {...actionProps}
+                          color='red'
+                          title='Remove'
+                          onClick={e => {
+                            stopDefaultEvent(e);
+                            setModal({
+                              open: true,
+                              node,
+                              action: 'delete',
+                            });
+                          }}
+                        >
+                          <ImgIcon src='trash' />
+                        </ActionButton>
+                      </Actions>
 
                       <NodeKey title={String(name)}>
                         {node.dataSubType === 'index' ? (

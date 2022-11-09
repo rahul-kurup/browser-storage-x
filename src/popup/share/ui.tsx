@@ -84,7 +84,7 @@ function ShareUI() {
   async function shareCookieContent(cookies: Cookie[]) {
     const { destTab } = state;
     for (const cookie of cookies) {
-      const urlInfo = Browser.cookie.genUrlInfoUsingTab(cookie, destTab);
+      const urlInfo = Browser.tab.genUrlInfo(destTab);
       try {
         await Browser.cookie.set({
           ...cookie,
