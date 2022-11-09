@@ -1,4 +1,3 @@
-import extractDomain from 'extract-domain';
 import type {
   BrowserChrome,
   BrowserVendor,
@@ -34,77 +33,28 @@ export default class Browser {
   }
 
   static cookie = {
-    genUrlInfoUsingTab: (cookie: Cookie, tab: Tab) => {
-      let { domain, protocol } = this.tab.getUrlInfo(tab);
-      const originalDomain = domain;
-      if (
-        (!cookie.domain.startsWith(PREFIX.w3d) ||
-          !cookie.domain.startsWith(PREFIX.dw3d)) &&
-        domain.startsWith(PREFIX.w3d)
-      ) {
-        domain = domain.replace(PREFIX.w3d, '');
-      }
-
-      [PREFIX.w3d, PREFIX.dw3d, PREFIX.d].forEach(prefix => {
-        if (cookie.domain.startsWith(prefix) && !domain.startsWith(prefix)) {
-          domain = `${prefix}${domain}`;
-        }
-      });
-
-      return { domain, url: `${protocol}//${originalDomain}` };
-    },
-
-    genMatchingDomains: (tab: Tab) => {
-      const { domain } = this.tab.getUrlInfo(tab);
-      const originalDomain = domain;
-      const domains = [domain];
-      if (domain.includes(PREFIX.w3)) {
-        domains.push(
-          `${PREFIX.dw3d}${domain}`,
-          domain.replace(PREFIX.w3, ''),
-          domain.replace(PREFIX.w3d, '')
-        );
-      } else {
-        domains.push(
-          `${PREFIX.d}${domain}`,
-          `${PREFIX.w3d}${domain}`,
-          `${PREFIX.dw3d}${domain}`
-        );
-      }
-      const extracted = extractDomain(domain);
-      domains.push(extracted);
-      const origWithSubDomain = originalDomain.replace(extracted, '');
-      if (origWithSubDomain.endsWith(PREFIX.d)) {
-        domains.push(`${PREFIX.d}${extracted}`);
-      }
-      return [...new Set(domains)];
-    },
-
-    storeIds: async (tab: Tab) => {
+    stores: async (tab: Tab) => {
       const { instance } = await this.detect();
       const stores = await instance.cookies.getAllCookieStores();
       return stores.filter(f => f.tabIds.includes(tab.id));
     },
 
-    getAll: async (tab?: Tab, cbSuccess?: (cookies: Cookie[]) => void) => {
+    storeId: async (tab: Tab) => {
+      const store =
+        tab['cookieStoreId'] ||
+        (((await this.cookie.stores(tab)?.[0]) ?? {}) as CookieStore);
+      return store.id as string;
+    },
+
+    getAll: async (tab: Tab, cbSuccess?: (cookies: Cookie[]) => void) => {
       const { instance } = await this.detect();
 
-      const store = ((await this.cookie.storeIds(tab)?.[0]) ||
-        {}) as CookieStore;
+      const storeId = await this.cookie.storeId(tab);
 
       const result: Cookie[] = await new Promise((resolve, _reject) =>
-        instance.cookies.getAll({ storeId: store.id }, resolve)
+        instance.cookies.getAll({ storeId, url: tab.url }, resolve)
       );
 
-      if (tab) {
-        const tabCookieDomains = this.cookie.genMatchingDomains(tab);
-        const filtered = result.filter(f => {
-          const isTabCookie = tabCookieDomains.includes(f.domain);
-          return isTabCookie;
-        });
-        cbSuccess?.(filtered);
-        return filtered;
-      }
       cbSuccess?.(result);
       return result;
     },
@@ -131,6 +81,15 @@ export default class Browser {
   };
 
   static tab = {
+    genUrlInfo: (tab: Tab) => {
+      const [_, domain] =
+        tab.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i) || [];
+      return {
+        url: tab.url,
+        domain: domain || this.tab.getUrlInfo(tab).domain,
+      };
+    },
+
     getUrlInfo: (tab: Tab) => {
       const { origin: url, protocol, hostname: domain } = new URL(tab.url);
       return { url, domain, protocol };
