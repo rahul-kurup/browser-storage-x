@@ -1,3 +1,4 @@
+import extractDomain from 'extract-domain';
 import type {
   BrowserChrome,
   BrowserVendor,
@@ -10,7 +11,15 @@ import type {
 } from 'lib-models/browser';
 import { noop } from './common';
 
+const PREFIX = {
+  d: '.',
+  w3: 'www',
+  w3d: 'www.',
+  dw3d: '.www.',
+};
+
 type TabReplaceEvent = (addedTabId: number, removedTabId: number) => void;
+
 export default class Browser {
   static async detect(): Promise<{
     vendor: BrowserVendor;
@@ -28,18 +37,15 @@ export default class Browser {
     genUrlInfoUsingTab: (cookie: Cookie, tab: Tab) => {
       let { domain, protocol } = this.tab.getUrlInfo(tab);
       const originalDomain = domain;
-      const d = '.';
-      const w3 = 'www.';
-      const dw3d = '.www.';
-
       if (
-        (!cookie.domain.startsWith(w3) || !cookie.domain.startsWith(dw3d)) &&
-        domain.startsWith(w3)
+        (!cookie.domain.startsWith(PREFIX.w3d) ||
+          !cookie.domain.startsWith(PREFIX.dw3d)) &&
+        domain.startsWith(PREFIX.w3d)
       ) {
-        domain = domain.replace(w3, '');
+        domain = domain.replace(PREFIX.w3d, '');
       }
 
-      [w3, dw3d, d].forEach(prefix => {
+      [PREFIX.w3d, PREFIX.dw3d, PREFIX.d].forEach(prefix => {
         if (cookie.domain.startsWith(prefix) && !domain.startsWith(prefix)) {
           domain = `${prefix}${domain}`;
         }
@@ -48,19 +54,30 @@ export default class Browser {
       return { domain, url: `${protocol}//${originalDomain}` };
     },
 
-    genCookieDomains: (tab: Tab) => {
+    genMatchingDomains: (tab: Tab) => {
       const { domain } = this.tab.getUrlInfo(tab);
+      const originalDomain = domain;
       const domains = [domain];
-      if (domain.includes('www')) {
+      if (domain.includes(PREFIX.w3)) {
         domains.push(
-          `.www.${domain}`,
-          domain.replace('www', ''),
-          domain.replace('www.', '')
+          `${PREFIX.dw3d}${domain}`,
+          domain.replace(PREFIX.w3, ''),
+          domain.replace(PREFIX.w3d, '')
         );
       } else {
-        domains.push(`.${domain}`, `www.${domain}`, `.www.${domain}`);
+        domains.push(
+          `${PREFIX.d}${domain}`,
+          `${PREFIX.w3d}${domain}`,
+          `${PREFIX.dw3d}${domain}`
+        );
       }
-      return domains;
+      const extracted = extractDomain(domain);
+      domains.push(extracted);
+      const origWithSubDomain = originalDomain.replace(extracted, '');
+      if (origWithSubDomain.endsWith(PREFIX.d)) {
+        domains.push(`${PREFIX.d}${extracted}`);
+      }
+      return [...new Set(domains)];
     },
 
     storeIds: async (tab: Tab) => {
@@ -80,7 +97,7 @@ export default class Browser {
       );
 
       if (tab) {
-        const tabCookieDomains = this.cookie.genCookieDomains(tab);
+        const tabCookieDomains = this.cookie.genMatchingDomains(tab);
         const filtered = result.filter(f => {
           const isTabCookie = tabCookieDomains.includes(f.domain);
           return isTabCookie;
