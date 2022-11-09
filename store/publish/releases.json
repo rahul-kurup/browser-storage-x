@@ -31,5 +31,10 @@
     "chrome": true,
     "edge": true,
     "firefox": true
+  },
+  "0.0.9": {
+    "chrome": true,
+    "edge": true,
+    "firefox": false
   }
 }
