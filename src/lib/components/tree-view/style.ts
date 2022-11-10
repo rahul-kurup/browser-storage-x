@@ -16,7 +16,7 @@ export const NodeText = styled.div<Expansion>`
   width: 100%;
   position: relative;
   align-items: center;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: ${p => (p.hasItems ? 'auto 1fr' : '1fr')};
   cursor: ${p =>
     p.hasItems ? (p.expanded ? 'n-resize' : 's-resize') : 'default'};
 `;
