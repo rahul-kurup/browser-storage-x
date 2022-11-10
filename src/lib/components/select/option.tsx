@@ -11,9 +11,7 @@ import {
 export const SelectOptionBrowserTab = forwardRef<HTMLDivElement, ItemProps>(
   ({ data, label, ...others }: ItemProps, ref) => (
     <SelectWrapper ref={ref} {...others}>
-      {data.incognito && (
-        <StyledImgIcon sizePx={16} src='anonymous' title='Private/Incognito' />
-      )}
+      {data.incognito && <StyledImgIcon size={15} />}
 
       <Group noWrap>
         <StyledAvatar src={data.favIconUrl} size='sm' />

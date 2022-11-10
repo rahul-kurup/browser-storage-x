@@ -1,3 +1,4 @@
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { ExternalProps } from './type';
 
@@ -7,27 +8,29 @@ export const LabelCheckBox = styled.label`
   cursor: pointer;
 `;
 
-export const NodeText = styled.div<{ expanded: boolean; hasItems: boolean }>`
-  display: flex;
+type Expansion = { expanded: boolean; hasItems: boolean };
+
+export const NodeText = styled.div<Expansion>`
+  display: grid;
   gap: 5px;
   width: 100%;
   position: relative;
   align-items: center;
+  grid-template-columns: auto 1fr;
   cursor: ${p =>
     p.hasItems ? (p.expanded ? 'n-resize' : 's-resize') : 'default'};
 `;
 
-export const TextContainer = styled.div`
+export const TextContainer = styled.div<{ isColorSchemeDark: boolean }>`
   display: flex;
   gap: 5px;
   border: 1px dashed transparent;
   &:hover {
-    background: whitesmoke;
-    border: 1px dashed #d1d1d1;
+    border: 1px dashed ${p => (p.isColorSchemeDark ? '#ddd' : '#444')};
   }
 `;
 
-export const LiNode = styled.li<ExternalProps>`
+export const LiNode = styled.li<ExternalProps & Expansion>`
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -36,6 +39,13 @@ export const LiNode = styled.li<ExternalProps>`
   border-left-width: 1px;
   border-left-style: dashed;
   border-left-color: ${p => (p.showGuidelines ? '#d1d1d1' : 'transparent')};
+  ${p =>
+    p.expanded &&
+    css`
+      & > ul {
+        margin-left: 6px;
+      }
+    `}
 `;
 
 export const View = styled.ul`

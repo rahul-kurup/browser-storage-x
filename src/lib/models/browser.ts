@@ -15,3 +15,5 @@ export type CookieStore = chrome.cookies.CookieStore;
 export type BrowserChrome = typeof chrome;
 
 export type BrowserVendor = 'firefox' | 'chromium' | 'safari';
+
+export type BrowserWindow = chrome.windows.Window;

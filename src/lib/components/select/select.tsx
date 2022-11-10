@@ -13,7 +13,7 @@ export default function Select<T>({
   ...props
 }: SelectProps<T>) {
   const getContent = useCallback(
-    (m: T, keyFor: 'label' | 'value') => {
+    (m: T, keyFor: keyof SelectProps<T>['fieldKey']) => {
       if (checkItem.isNullOrUndefined(m)) {
         return '';
       } else if (fieldKey?.[keyFor]) {
@@ -44,7 +44,12 @@ export default function Select<T>({
       options?.map(m => {
         const label = getContent(m, 'label') ?? '';
         const value = String(getContent(m, 'value'));
-        return { label, value, data: m };
+        const group = getContent(m, 'group');
+        const item = { label, value, data: m };
+        if (group) {
+          item['group'] = group;
+        }
+        return item;
       }) || []
     );
   }, [fieldKey, options, getContent]);

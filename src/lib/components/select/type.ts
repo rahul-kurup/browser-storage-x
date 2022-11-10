@@ -1,6 +1,6 @@
 import { SelectProps as MantineSelectProps } from '@mantine/core';
 
-export type FieldKey<T> = string | ((e: T) => any);
+export type FieldKey<T> = keyof T | ((e: T) => string);
 
 export type ChangeHandlerArgs<T> = { name: string; value: string | T; data: T };
 
@@ -15,6 +15,7 @@ export type SelectProps<T> = Omit<
   fieldKey?: {
     label?: FieldKey<T>;
     value?: FieldKey<T>;
+    group?: FieldKey<T>;
   };
   onChange?: (e: ChangeHandlerArgs<T>) => void;
 };

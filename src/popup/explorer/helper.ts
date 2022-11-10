@@ -1,8 +1,27 @@
+import { IconBallpen, IconPlus, IconTrashX } from '@tabler/icons';
 import { AcceptedDataType, TreeViewProps } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
 import { checkItem } from 'lib-utils/common';
 import { FormEvent } from 'react';
 import { ExplorerState, ParentIdArgs } from './type';
+
+export const actionBtnProps = {
+  add: {
+    color: 'green',
+    title: 'Add',
+    Icon: IconPlus,
+  },
+  update: {
+    color: 'blue',
+    title: 'Edit',
+    Icon: IconBallpen,
+  },
+  remove: {
+    color: 'red',
+    title: 'Delete',
+    Icon: IconTrashX,
+  },
+};
 
 type TreeViewNodeItems = TreeViewProps['items'];
 

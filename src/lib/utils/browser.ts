@@ -127,13 +127,13 @@ export default class Browser {
       return result;
     },
 
-    getActiveTab: async (cbSuccess?: (tabs: Tab) => void) => {
+    getActiveTabOfCurrentWindow: async (cbSuccess?: (tabs: Tab) => void) => {
       const result = await this.tab.getAll(noop, {
         active: true,
         currentWindow: true,
       });
       const tab = result?.[0];
-      cbSuccess(tab);
+      cbSuccess?.(tab);
       return tab;
     },
 

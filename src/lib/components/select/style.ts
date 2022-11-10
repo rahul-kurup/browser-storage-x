@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Avatar } from '@mantine/core';
-import ImgIcon from 'lib-components/img-icon';
+import { IconSpy } from '@tabler/icons';
 
 export const StyledAvatar = styled(Avatar)`
   border: 1px solid whitesmoke;
@@ -14,16 +14,13 @@ export const SelectTextWrapper = styled.div`
   white-space: nowrap;
 `;
 
-export const StyledImgIcon = styled(ImgIcon)`
+export const StyledImgIcon = styled(IconSpy)`
   top: 1px;
   left: 1px;
-  transform: rotate(-15deg);
+  transform: rotate(-20deg);
   position: absolute;
   transform-origin: center;
-  background-color: white;
-  border-radius: 10px;
-  padding-top: 1px;
-`;
+` as unknown as typeof IconSpy;
 
 export default styled.label`
   display: flex;

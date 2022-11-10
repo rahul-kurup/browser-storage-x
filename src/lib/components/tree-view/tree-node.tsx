@@ -1,4 +1,5 @@
-import ImgIcon from 'lib-components/img-icon';
+import { useColorScheme } from '@mantine/hooks';
+import { IconArrowDownRight, IconArrowRight } from '@tabler/icons';
 import { useContext, useState } from 'react';
 import Ctx from './context';
 import UlView, {
@@ -19,6 +20,7 @@ export default function TreeNode({
   ...mainProps
 }: NodeViewProps & ExternalProps) {
   const [expanded, setExpanded] = useState([]);
+  const colorScheme = useColorScheme();
 
   const { selections, setSelections } = useContext(Ctx);
 
@@ -48,13 +50,15 @@ export default function TreeNode({
         return (
           <LiNode
             {...subProps}
+            expanded={isExpanded}
             key={subItemPath}
+            hasItems={hasItems}
             data-item-id={subItemPath}
             aria-expanded={isExpanded}
             showGuidelines={showGuidelines}
             enableSelection={enableSelection}
           >
-            <TextContainer>
+            <TextContainer isColorSchemeDark={colorScheme === 'dark'}>
               {enableSelection && (
                 <LabelCheckBox>
                   <input
@@ -73,9 +77,13 @@ export default function TreeNode({
                 onClick={() => handleExpansion(subItemPath)}
               >
                 {hasItems && (
-                  <ImgIcon
-                    src={isExpanded ? 'arrowheadDown' : 'arrowheadRight'}
-                  />
+                  <>
+                    {isExpanded ? (
+                      <IconArrowDownRight size={15} />
+                    ) : (
+                      <IconArrowRight size={15} />
+                    )}
+                  </>
                 )}
                 {nodeRenderer?.(node, { isExpanded, hasItems }) || subName}
               </NodeText>
