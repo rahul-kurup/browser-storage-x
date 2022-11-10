@@ -7,14 +7,11 @@ import Select, {
 import { Cookie, Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
 import Browser from 'lib-utils/browser';
-import {
-  getAllItems,
-  isCookieType,
-  setAllItems,
-  StorageTypeList,
-} from 'lib-utils/storage';
+import { isCookieType, StorageTypeList } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { FormEvent, memo, useEffect, useMemo, useRef, useState } from 'react';
+import { activeTabButtonProps } from './../helpers';
+import { TabContainer } from './../style';
 import { PresetAlerts } from './components';
 import { convertTreeNodeToCookie, convertTreeNodeToStorage } from './helper';
 import ShareSpecificModal from './modal-share';
@@ -100,10 +97,7 @@ function ShareUI() {
   async function shareStorageContent(content: any) {
     const { destStorage, destTab } = state;
     if (content) {
-      await Browser.script.execute(destTab, setAllItems, [
-        destStorage,
-        content,
-      ]);
+      await Browser.tab.storage(destTab).setAll(destStorage, content);
       setProgress(Progress.pass);
     } else {
       setProgress(Progress.stopped);
@@ -146,9 +140,7 @@ function ShareUI() {
               convertTreeNodeToStorage(shareState.selectedValues)
             );
           } else {
-            const output = await Browser.script.execute(srcTab, getAllItems, [
-              srcStorage,
-            ]);
+            const output = await Browser.tab.storage(srcTab).getAll(srcStorage);
             await shareStorageContent(output);
           }
         }
@@ -173,6 +165,15 @@ function ShareUI() {
     );
   }, [progress]);
 
+  function handleSelectActiveTab(isSrc?: boolean) {
+    Browser.tab.getActiveTabOfCurrentWindow().then(activeTab =>
+      setState(s => ({
+        ...s,
+        ...(isSrc ? { srcTab: activeTab } : { destTab: activeTab }),
+      }))
+    );
+  }
+
   const isSrcSelected = Boolean(state.srcTab && state.srcStorage);
 
   return (
@@ -181,22 +182,33 @@ function ShareUI() {
         <Fieldset>
           <Legend>Source</Legend>
 
-          <Select
-            label='Tab'
-            name='srcTab'
-            options={tabs}
-            valueAsObject
-            value={state.srcTab}
-            onChange={handleChange}
-            disabled={disabledField}
-            itemComponent={SelectOptionBrowserTab}
-            fieldKey={{
-              value: 'id',
-              label: 'title',
-            }}
-            searchable
-            filter={fnFilter}
-          />
+          <TabContainer>
+            <Button
+              {...activeTabButtonProps}
+              onClick={() => handleSelectActiveTab(true)}
+            />
+
+            <Select<Tab>
+              searchable
+              label='Tab'
+              name='srcTab'
+              options={tabs}
+              valueAsObject
+              value={state.srcTab}
+              filter={fnFilter}
+              onChange={handleChange}
+              disabled={disabledField}
+              itemComponent={SelectOptionBrowserTab}
+              fieldKey={{
+                value: 'id',
+                label: 'title',
+                group: e =>
+                  `${e.incognito ? 'Private' : ''} Window (${
+                    e.windowId
+                  })`.trim(),
+              }}
+            />
+          </TabContainer>
 
           <SourceContainer sourceSelected={isSrcSelected}>
             <Select
@@ -225,22 +237,33 @@ function ShareUI() {
         <Fieldset>
           <Legend>Destination</Legend>
 
-          <Select
-            label='Tab'
-            name='destTab'
-            options={tabs}
-            valueAsObject
-            value={state.destTab}
-            onChange={handleChange}
-            disabled={disabledField}
-            itemComponent={SelectOptionBrowserTab}
-            fieldKey={{
-              value: 'id',
-              label: 'title',
-            }}
-            searchable
-            filter={fnFilter}
-          />
+          <TabContainer>
+            <Button
+              {...activeTabButtonProps}
+              onClick={() => handleSelectActiveTab(false)}
+            />
+
+            <Select<Tab>
+              searchable
+              label='Tab'
+              name='destTab'
+              options={tabs}
+              valueAsObject
+              filter={fnFilter}
+              value={state.destTab}
+              onChange={handleChange}
+              disabled={disabledField}
+              itemComponent={SelectOptionBrowserTab}
+              fieldKey={{
+                value: 'id',
+                label: 'title',
+                group: e =>
+                  `${e.incognito ? 'Private' : ''} Window (${
+                    e.windowId
+                  })`.trim(),
+              }}
+            />
+          </TabContainer>
 
           <Select
             label='Storage'

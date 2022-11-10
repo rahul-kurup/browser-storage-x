@@ -34,7 +34,7 @@ export type ExplorerState = {
 export type UpsertModalProps = {
   node: NodeWithIdProps;
   open: boolean;
-  action: 'add' | 'update' | 'delete';
+  action: 'add' | 'update' | 'remove';
   explorerState: ExplorerState;
 };
 

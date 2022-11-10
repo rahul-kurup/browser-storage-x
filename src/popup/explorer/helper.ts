@@ -1,13 +1,32 @@
+import { IconBallpen, IconPlus, IconTrashX } from '@tabler/icons';
 import { AcceptedDataType, TreeViewProps } from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
 import { checkItem } from 'lib-utils/common';
 import { FormEvent } from 'react';
 import { ExplorerState, ParentIdArgs } from './type';
 
+export const actionBtnProps = {
+  add: {
+    color: 'green',
+    title: 'Add',
+    Icon: IconPlus,
+  },
+  update: {
+    color: 'blue',
+    title: 'Edit',
+    Icon: IconBallpen,
+  },
+  remove: {
+    color: 'red',
+    title: 'Delete',
+    Icon: IconTrashX,
+  },
+};
+
 type TreeViewNodeItems = TreeViewProps['items'];
 
 export const emptyDt: AcceptedDataType[] = ['null'];
-export const basicDt: AcceptedDataType[] = [
+export const primitiveDt: AcceptedDataType[] = [
   'string',
   'number',
   'bigint',
@@ -39,7 +58,7 @@ export const isPrevNewPathSame = (prevPath?: string[], newPath?: string[]) => {
   }
 };
 
-export function isBasicDataType(arg: any) {
+export function isPrimitiveDataType(arg: any) {
   const ty = typeof arg;
   return (
     ty === 'string' || ty === 'number' || ty === 'boolean' || ty === 'bigint'
@@ -66,7 +85,7 @@ function converter(
       .map((m, i) => {
         const typeofObjItem = getDataType(m);
         const newPath = [...parentPath, String(i)];
-        const items = isBasicDataType(m)
+        const items = isPrimitiveDataType(m)
           ? {
               nodeName: m,
               data: {
@@ -155,9 +174,10 @@ export function convertContentToStorage(content: any) {
   const keys = Object.keys(content);
   const changed = {};
   keys.forEach(key => {
-    changed[key] = content[key];
+    const value = content[key];
+    changed[key] = value;
     try {
-      changed[key] = JSON.stringify(content[key]);
+      changed[key] = typeof value === 'object' ? JSON.stringify(value) : value;
     } catch (error) {
       console.error(error);
     }

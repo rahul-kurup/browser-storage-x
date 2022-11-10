@@ -1,35 +1,31 @@
 import { Alert, Button, ButtonProps, Loader } from '@mantine/core';
-import ImgIcon from 'lib-components/img-icon';
 import Select, {
   ChangeHandlerArgs,
   fnFilter,
-  SelectOptionBrowserTab,
+  SelectOptionBrowserTab
 } from 'lib-components/select';
 import { Cookie, Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
 import Browser from 'lib-utils/browser';
-import {
-  getAllItems,
-  isCookieType,
-  setAllItems,
-  StorageTypeList,
-} from 'lib-utils/storage';
+import { isCookieType, StorageTypeList } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
-import { FormEvent, memo, useEffect, useState } from 'react';
+import { activeTabButtonProps } from 'popup/helpers';
+import { TabContainer } from 'popup/style';
+import { FormEvent, memo, useCallback, useEffect, useState } from 'react';
 import {
-  basicDt,
+  actionBtnProps,
   containerDt,
   convertContentToCookie,
   convertContentToStorage,
   convertCookieToTreeNode,
   convertStorageToTreeNode,
+  primitiveDt,
   stopDefaultEvent,
 } from './helper';
 import DeleteModal from './modal-delete';
 import UpsertModal from './modal-upsert';
 import Form, {
-  ActionButton,
   Actions,
   DataType,
   NodeItemContainer,
@@ -41,12 +37,9 @@ import Form, {
 } from './style';
 import { CommonModalArgs, ExplorerState, UpsertModalProps } from './type';
 
-const actionProps: ButtonProps = {
-  radius: 'xl',
-  size: 'xs',
-  compact: true,
-  variant: 'light',
-};
+type ModalArgs = Omit<UpsertModalProps, 'explorerState'>;
+
+const emptyContent = '<empty>';
 
 function ExplorerUI() {
   const { tabs, replaced } = useBrowserTabs();
@@ -55,9 +48,7 @@ function ExplorerUI() {
     progress: Progress.idle,
   } as ExplorerState);
 
-  const [modal, setModal] = useState(
-    {} as Omit<UpsertModalProps, 'explorerState'>
-  );
+  const [modal, setModal] = useState({} as ModalArgs);
 
   function handleChange({ name, value }: ChangeHandlerArgs<Tab>) {
     setState(s => ({ ...s, [name]: value }));
@@ -81,14 +72,34 @@ function ExplorerUI() {
 
   const isStorageCookie = isCookieType(storage);
 
+  const getActionProps = useCallback((args: Partial<ModalArgs>) => {
+    const { Icon, ...prps } = actionBtnProps[args.action];
+    return {
+      ...prps,
+      radius: 'xl',
+      size: 'sm',
+      compact: true,
+      variant: 'filled',
+      onClick: (e: FormEvent<Element>) => {
+        stopDefaultEvent(e);
+        setModal({
+          ...args,
+          open: true,
+        } as ModalArgs);
+      },
+      children: <Icon size={16} />,
+    } as unknown as ButtonProps;
+  }, []);
+
   useEffect(() => {
     if (tab && storage) {
       setLoading(true);
 
       (isStorageCookie
         ? Browser.cookie.getAll(tab).then(convertCookieToTreeNode)
-        : Browser.script
-            .execute(tab, getAllItems, [storage])
+        : Browser.tab
+            .storage(tab)
+            .getAll(storage)
             .then(convertStorageToTreeNode)
       )
         .then(async ({ converted, parsed, originalData }) => {
@@ -134,9 +145,9 @@ function ExplorerUI() {
           : convertStorageToTreeNode(changedContent);
         return {
           ...newState,
+          changes,
           content: parsed,
           treeContent: converted,
-          changes,
         };
       });
     }
@@ -166,7 +177,9 @@ function ExplorerUI() {
     } else {
       const newContent = convertContentToStorage(content);
       try {
-        await Browser.script.execute(tab, setAllItems, [storage, newContent]);
+        const browserTab = Browser.tab.storage(tab);
+        await browserTab.removeAll(storage);
+        await browserTab.setAll(storage, newContent);
       } catch (error) {
         console.error(error);
       }
@@ -177,28 +190,42 @@ function ExplorerUI() {
     }, 1000);
   }
 
+  function handleSelectActiveTab() {
+    Browser.tab
+      .getActiveTabOfCurrentWindow()
+      .then(tab => setState(s => ({ ...s, tab })));
+  }
+
   const disabledField = state.progress === Progress.started;
 
   return (
     <>
       <Form onSubmit={onSubmit}>
         <SourceContainer>
-          <Select
-            label='Tab'
-            name='tab'
-            options={tabs}
-            valueAsObject
-            value={state.tab}
-            onChange={handleChange}
-            itemComponent={SelectOptionBrowserTab}
-            disabled={disabledField}
-            searchable
-            filter={fnFilter}
-            fieldKey={{
-              value: 'id',
-              label: 'title',
-            }}
-          />
+          <TabContainer>
+            <Button {...activeTabButtonProps} onClick={handleSelectActiveTab} />
+
+            <Select<Tab>
+              searchable
+              label='Tab'
+              name='tab'
+              options={tabs}
+              valueAsObject
+              value={state.tab}
+              onChange={handleChange}
+              itemComponent={SelectOptionBrowserTab}
+              disabled={disabledField}
+              filter={fnFilter}
+              fieldKey={{
+                value: 'id',
+                label: 'title',
+                group: e =>
+                  `${e.incognito ? 'Private' : ''} Window (${
+                    e.windowId
+                  })`.trim(),
+              }}
+            />
+          </TabContainer>
 
           <Select
             label='Storage'
@@ -224,67 +251,32 @@ function ExplorerUI() {
 
                   const showModify =
                     node.dataSubType === 'index'
-                      ? basicDt.includes(node.dataType)
+                      ? primitiveDt.includes(node.dataType)
                       : true;
 
                   const capDataType = startCase(node.dataType) || '';
 
                   const Empty = containerDt.includes(node.dataType) &&
-                    !node.items?.length && <i>{'<empty>'}</i>;
+                    !node.items?.length && <i>{emptyContent}</i>;
 
                   return (
                     <NodeItemContainer>
                       <Actions className='actions'>
                         {containerDt.includes(node.dataType) && (
-                          <ActionButton
-                            {...actionProps}
-                            color='green'
-                            title='Add'
-                            onClick={e => {
-                              stopDefaultEvent(e);
-                              setModal({
-                                open: true,
-                                action: 'add',
-                                node,
-                              });
-                            }}
-                          >
-                            <ImgIcon src='plus' />
-                          </ActionButton>
+                          <Button
+                            {...getActionProps({ action: 'add', node })}
+                          />
                         )}
 
                         {showModify && (
-                          <ActionButton
-                            {...actionProps}
-                            title='Modify'
-                            onClick={e => {
-                              stopDefaultEvent(e);
-                              setModal({
-                                open: true,
-                                node,
-                                action: 'update',
-                              });
-                            }}
-                          >
-                            <ImgIcon src='pen' />
-                          </ActionButton>
+                          <Button
+                            {...getActionProps({ node, action: 'update' })}
+                          />
                         )}
 
-                        <ActionButton
-                          {...actionProps}
-                          color='red'
-                          title='Remove'
-                          onClick={e => {
-                            stopDefaultEvent(e);
-                            setModal({
-                              open: true,
-                              node,
-                              action: 'delete',
-                            });
-                          }}
-                        >
-                          <ImgIcon src='trash' />
-                        </ActionButton>
+                        <Button
+                          {...getActionProps({ node, action: 'remove' })}
+                        />
                       </Actions>
 
                       <NodeKey title={String(name)}>
@@ -304,10 +296,10 @@ function ExplorerUI() {
                         )}
                       </NodeKey>
 
-                      {basicDt.includes(node.dataType) &&
+                      {primitiveDt.includes(node.dataType) &&
                         !Boolean(node.items?.length) && (
                           <NodeValue title={String(value)}>
-                            {String(value)}
+                            {String(value) || emptyContent}
                           </NodeValue>
                         )}
                     </NodeItemContainer>
@@ -339,7 +331,7 @@ function ExplorerUI() {
 
       {modal.open &&
         modal.node &&
-        (modal.action === 'delete' ? (
+        (modal.action === 'remove' ? (
           <DeleteModal
             {...modal}
             explorerState={state}

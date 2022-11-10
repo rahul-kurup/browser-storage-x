@@ -1,10 +1,9 @@
 import styled from '@emotion/styled';
-import { Button } from '@mantine/core';
 import TreeView from 'lib-components/tree-view';
 
 export const SourceContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 100px;
   gap: 5px;
 `;
 
@@ -17,11 +16,6 @@ export const ModalForm = styled.form`
 export const DataType = styled.span`
   font-size: 0.8rem;
 `;
-
-export const ActionButton = styled(Button)`
-  border: 1px solid grey;
-  cursor: pointer;
-` as unknown as typeof Button;
 
 export const Actions = styled.span`
   display: none;
@@ -70,12 +64,13 @@ export const StyledTreeView = styled(TreeView)`
   white-space: nowrap;
   overflow-x: hidden;
   overflow-y: auto;
-  max-height: 300px;
+  max-height: 400px;
 `;
 
 export default styled.form`
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 10px;
+  width: 100%;
   min-height: 280px;
 `;

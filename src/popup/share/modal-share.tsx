@@ -1,7 +1,7 @@
 import { Button, Modal } from '@mantine/core';
 import { Cookie } from 'lib-models/browser';
 import Browser from 'lib-utils/browser';
-import { getAllItems, isCookieType } from 'lib-utils/storage';
+import { isCookieType } from 'lib-utils/storage';
 import { useEffect, useState } from 'react';
 import { convertCookieToTreeNode, convertStorageToTreeNode } from './helper';
 import { NodeKey, NodeValue, StyledTreeView } from './style';
@@ -35,19 +35,17 @@ export default function ShareSpecificModal({
 
   useEffect(() => {
     if (treeDataState !== 'HIDDEN' && srcTab && srcStorage) {
-      if (isCookie) {
-        Browser.cookie.getAll(srcTab).then(output => {
-          setStorageContent(convertCookieToTreeNode(output));
-          setTreeDataState('LOADED');
-        });
-      } else {
-        Browser.script
-          .execute(srcTab, getAllItems, [srcStorage])
-          .then(output => {
-            setStorageContent(convertStorageToTreeNode(output || {}));
-            setTreeDataState('LOADED');
-          });
-      }
+      (isCookie
+        ? Browser.cookie
+            .getAll(srcTab)
+            .then(output => setStorageContent(convertCookieToTreeNode(output)))
+        : Browser.tab
+            .storage(srcTab)
+            .getAll(srcStorage)
+            .then(output =>
+              setStorageContent(convertStorageToTreeNode(output || {}))
+            )
+      ).finally(() => setTreeDataState('LOADED'));
     }
   }, [treeDataState, srcTab, srcStorage]);
 
