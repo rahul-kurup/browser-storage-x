@@ -77,7 +77,7 @@ function ExplorerUI() {
     return {
       ...prps,
       radius: 'xl',
-      size: 'sm',
+      size: 'xs',
       compact: true,
       variant: 'filled',
       onClick: (e: FormEvent<Element>) => {
@@ -264,7 +264,7 @@ function ExplorerUI() {
                       <Actions className='actions'>
                         {containerDt.includes(node.dataType) && (
                           <Button
-                            {...getActionProps({ action: 'add', node })}
+                            {...getActionProps({ node, action: 'add' })}
                           />
                         )}
 
