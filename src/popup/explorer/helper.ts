@@ -196,7 +196,12 @@ export function convertContentToCookie(
     originalCookies.find(f => f.name === name);
 
   keys.forEach(cookieName => {
-    const cookieValue = encodeURIComponent(JSON.stringify(content[cookieName]));
+    // TODO: Just trying this solution(checking type and stringfying), clean this up
+    const cookieValue = encodeURIComponent(
+      typeof content[cookieName] == 'object'
+        ? JSON.stringify(content[cookieName])
+        : content[cookieName]
+    );
     // TODO: Find a better way to track cookie, whose name gets changed
     let found = findOrigCookie(cookieName);
 
