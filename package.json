@@ -12,6 +12,7 @@
     "Rahul Kurup <me@rahulkurup.com> (https://rahulkurup.com/)"
   ],
   "private": true,
+  "sideEffects": false,
   "bugs": {
     "email": "me@rahulkurup.com"
   },
@@ -29,19 +30,15 @@
     "clean": "rimraf dist",
     "prepare": "husky install",
     "compress": "node scripts/compress.mjs",
-    "prebuild": "yarn clean",
-    "build": "cross-env NODE_ENV=production webpack",
-    "postbuild": "yarn compress",
-    "prebuild:local": "yarn clean",
-    "build:local": "cross-env NODE_ENV=development webpack",
-    "postbuild:local": "yarn compress",
+    "build": "yarn clean && cross-env NODE_ENV=production webpack && yarn compress",
+    "build:stats": "yarn clean && cross-env STATS=1 NODE_ENV=production webpack",
+    "build:local": "yarn clean && cross-env NODE_ENV=development webpack && yarn compress",
     "build:chrome": "cross-env NODE_ENV=development webpack --config ./webpack/chrome.js",
     "build:firefox": "cross-env NODE_ENV=development webpack --config ./webpack/firefox.js",
-    "prewatch": "yarn clean",
-    "watch": "cross-env NODE_ENV=development webpack -w",
+    "watch": "yarn clean && cross-env NODE_ENV=development webpack -w",
     "watch:chrome": "cross-env NODE_ENV=development webpack --config ./webpack/chrome.js -w",
     "watch:firefox": "cross-env NODE_ENV=development webpack --config ./webpack/firefox.js -w",
-    "start": "concurrently -n \"chrome,firefox\" -c \"red.bold,blue.bold\" \"npm:watch:chrome\" \"npm:watch:firefox\"",
+    "start": "yarn clean && concurrently -n \"chrome,firefox\" -c \"red.bold,blue.bold\" \"npm:watch:chrome\" \"npm:watch:firefox\"",
     "pretty": "prettier --loglevel=error --write ."
   },
   "lint-staged": {
@@ -52,7 +49,7 @@
     "@emotion/styled": "^11.10.5",
     "@mantine/core": "^5.7.1",
     "@mantine/hooks": "^5.7.1",
-    "@tabler/icons": "^1.110.0",
+    "@tabler/icons": "^1.111.0",
     "emotion": "^11.0.0",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
