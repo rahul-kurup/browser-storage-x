@@ -1,7 +1,9 @@
 const { name, permissions, defaultManifest } = require('./helper');
+const icons = require('./icons');
 
 module.exports = {
   ...defaultManifest,
+  icons,
   manifest_version: 2,
   permissions: [...permissions, 'https://*/*'],
   browser_action: {

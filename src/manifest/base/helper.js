@@ -13,13 +13,6 @@ const defaultManifest = {
   description,
   short_name: name,
   permissions,
-  icons: [16, 32, 48, 64, 128, 512, 1024].reduce(
-    (a, c) => ({
-      ...a,
-      [c]: `assets/images/logo/${c}.png`,
-    }),
-    {}
-  ),
   content_scripts: [
     {
       matches: ['<all_urls>'],
