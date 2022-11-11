@@ -23,8 +23,8 @@
     "node": "16.18.0"
   },
   "scripts": {
-    "publish:chrome": "node store/publish/chrome.mjs",
-    "publish:edge": "node store/publish/edge.mjs",
+    "publish:chrome": "node scripts/publish/chrome.mjs",
+    "publish:edge": "node scripts/publish/edge.mjs",
     "publish": "concurrently -n \"chrome,edge\" -c \"red.bold,blue.bold\" \"npm:publish:chrome\" \"npm:publish:edge\"",
     "clean": "rimraf dist",
     "prepare": "husky install",

@@ -1,4 +1,5 @@
 import { Button, Modal, Radio, Textarea, TextInput } from '@mantine/core';
+import { useDidUpdate } from '@mantine/hooks';
 import { AcceptedDataType } from 'lib-components/tree-view';
 import { has } from 'lodash';
 import { FormEvent, useCallback, useMemo, useState } from 'react';
@@ -9,7 +10,7 @@ import {
   primitiveDt,
   stopDefaultEvent,
 } from './helper';
-import { ModalForm } from './style';
+import { Decoded, ModalForm } from './style';
 import { CommonModalArgs, UpsertModalProps } from './type';
 
 export default function UpsertModal({
@@ -21,6 +22,7 @@ export default function UpsertModal({
 }: UpsertModalProps & {
   onUpdate: (args: CommonModalArgs) => void;
 }) {
+  const [decode, setDecode] = useState<Boolean>(false);
   const isActionAdd = action === 'add';
   const isActionUpdate = action === 'update';
 
@@ -70,6 +72,13 @@ export default function UpsertModal({
 
     return true;
   }, [state.name, node, isActionAdd, isActionUpdate, checks]);
+
+  useDidUpdate(() => {
+    setState(s => ({
+      ...s,
+      value: (decode ? decodeURIComponent : encodeURIComponent)(s.value),
+    }));
+  }, [decode]);
 
   const pushChange = useCallback(
     (args: Omit<CommonModalArgs, 'changes'>) => {
@@ -207,7 +216,28 @@ export default function UpsertModal({
             title='Enter number only'
           />
         ) : state.valueType === 'string' || state.valueType === 'null' ? (
-          <Textarea {...valueProps} autosize minRows={1} />
+          <>
+            <Textarea
+              {...valueProps}
+              autosize
+              minRows={1}
+              label={
+                <>
+                  <span>{valueProps.label}</span>
+                  &nbsp;
+                  <Decoded
+                    title={`Show ${decode ? 'encoded' : 'decoded'} value`}
+                    onClick={e => {
+                      stopDefaultEvent(e);
+                      setDecode(s => !s);
+                    }}
+                  >
+                    ({decode ? 'encode' : 'decode'})
+                  </Decoded>
+                </>
+              }
+            />
+          </>
         ) : (
           <></>
         )}
@@ -223,7 +253,7 @@ export default function UpsertModal({
         }
       />
     ) : undefined;
-  }, [state.value, state.valueType]);
+  }, [state.value, state.valueType, decode]);
 
   return (
     <>
