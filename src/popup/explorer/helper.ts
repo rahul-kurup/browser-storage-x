@@ -160,7 +160,10 @@ export function convertCookieToTreeNode(originalData: Cookie[] | Object) {
       const { name, value } = cookie;
       parsed[name] = value;
       try {
-        parsed[name] = JSON.parse(decodeURIComponent(value));
+        const decoded = decodeURIComponent(value);
+        const decodedObj = JSON.parse(decoded);
+        parsed[name] =
+          decodedObj && typeof decodedObj === 'object' ? decodedObj : value;
       } catch (error) {
         console.error(error);
       }
@@ -196,12 +199,6 @@ export function convertContentToCookie(
     originalCookies.find(f => f.name === name);
 
   keys.forEach(cookieName => {
-    // TODO: Just trying this solution(checking type and stringfying), clean this up
-    const cookieValue = encodeURIComponent(
-      typeof content[cookieName] == 'object'
-        ? JSON.stringify(content[cookieName])
-        : content[cookieName]
-    );
     // TODO: Find a better way to track cookie, whose name gets changed
     let found = findOrigCookie(cookieName);
 
@@ -213,6 +210,11 @@ export function convertContentToCookie(
     }
 
     if (found) {
+      let cookieValue = content[cookieName];
+      if (cookieValue && typeof cookieValue === 'object') {
+        cookieValue = encodeURIComponent(JSON.stringify(cookieValue));
+      }
+
       changed.push({
         ...found,
         name: cookieName,

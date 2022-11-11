@@ -2,7 +2,7 @@ import { Alert, Button, ButtonProps, Loader } from '@mantine/core';
 import Select, {
   ChangeHandlerArgs,
   fnFilter,
-  SelectOptionBrowserTab
+  SelectOptionBrowserTab,
 } from 'lib-components/select';
 import { Cookie, Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';

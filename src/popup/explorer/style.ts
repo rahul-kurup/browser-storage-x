@@ -1,6 +1,11 @@
 import styled from '@emotion/styled';
 import TreeView from 'lib-components/tree-view';
 
+export const Decoded = styled.small`
+  text-decoration: underline;
+  cursor: pointer;
+`;
+
 export const SourceContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 100px;
