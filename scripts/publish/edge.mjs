@@ -9,9 +9,8 @@ const store = new EdgeAddonsAPI(config);
 
 try {
   await store.submit({ filePath, notes });
-  console.log('Published to Edge');
+  console.log('Edge: Published');
 } catch (error) {
-  console.error('Submit error occurred');
-  console.error(error);
+  console.error('Edge: Submit error occurred', error);
   process.exit(1);
 }

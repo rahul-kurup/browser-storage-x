@@ -10,26 +10,22 @@ const store = chromeWebstoreUpload(config);
 const token = await store.fetchToken();
 
 // https://developer.chrome.com/webstore/webstore_api/items#resource
-const uploadStatus = await store
-  .uploadExisting(fs.createReadStream(filePath), token)
-  .then(({ uploadState }) => uploadState);
+const upload = await store.uploadExisting(fs.createReadStream(filePath), token);
 
-if (uploadStatus === 'SUCCESS') {
-  console.log('Uploaded to chrome');
+if (upload.uploadState === 'SUCCESS') {
+  console.log('Chrome: Zip uploaded');
 } else {
-  console.error('Upload error occurred');
+  console.error('Chrome: Upload error occurred', upload);
   process.exit(1);
 }
 
 const target = 'default'; // optional. Can also be 'trustedTesters'
 // https://developer.chrome.com/webstore/webstore_api/items/publish
-const publishStatus = await store
-  .publish(target, token)
-  .then(({ status }) => status);
+const publish = await store.publish(target, token);
 
-if (publishStatus.includes('OK')) {
-  console.log('Published to Chrome');
+if (publish.status.includes('OK')) {
+  console.log('Chrome: Published');
 } else {
-  console.error('Publish error occurred');
+  console.error('Chrome: Publish error occurred', publish);
   process.exit(1);
 }
