@@ -57,7 +57,8 @@ const config = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: 'ts-loader',
+        use: ['babel-loader', 'ts-loader'],
+        exclude: /node_modules/,
       },
       {
         test: /\.jsx?$/,
@@ -100,10 +101,6 @@ const config = {
         ],
       },
       {
-        test: /\.svg$/,
-        use: ['@svgr/webpack'],
-      },
-      {
         test: /\.s[ac]ss$/i,
         use: ['style-loader', 'css-loader', 'sass-loader'],
       },
@@ -140,7 +137,7 @@ const config = {
     ...prodPlugins,
   ],
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.png', '.svg'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
       lib: Lib,
       background: Background,
@@ -152,6 +149,7 @@ const config = {
     },
   },
   optimization: {
+    usedExports: isProd,
     minimize: isProd,
     minimizer: [
       new TerserPlugin({
