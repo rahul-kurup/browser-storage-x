@@ -1,8 +1,8 @@
 # StorageX
 
-![StorageX logo](/src/assets/images/logo/128.png)
+![StorageX logo](social/assets/img/logo/128.png)
 
-An all in one localstorage/sessionstorage/cookie manager browser extension for chrome based/firefox browsers.
+An all-in-one localStorage/sessionStorage/cookie manager browser extension for Chrome/Edge/Firefox browser.
 
 ## Features
 
