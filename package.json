@@ -1,6 +1,6 @@
 {
   "name": "browser-ext-storage-x",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "displayName": "StorageX",
   "description": "StorageX extension is a toolset to manage browser's Application Storage",
   "author": {
