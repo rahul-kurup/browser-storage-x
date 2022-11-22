@@ -19,14 +19,13 @@ export const Legend = styled.legend`
   font-size: 0.9rem;
 `;
 
-export const NodeKey = styled.b`
+export const NodeLabel = styled.b`
   display: inline-block;
 `;
 
 export const NodeValue = styled.i`
   display: inline-block;
   font-size: 0.8rem;
-  margin-left: 5px;
 `;
 
 export const StyledTreeView = styled(TreeView)`

@@ -2,6 +2,7 @@ import { Alert, Button } from '@mantine/core';
 import Select, {
   ChangeHandlerArgs,
   fnFilter,
+  genRightIcon,
   SelectOptionBrowserTab,
 } from 'lib-components/select';
 import { Cookie, Tab } from 'lib-models/browser';
@@ -10,8 +11,6 @@ import Browser from 'lib-utils/browser';
 import { isCookieType, StorageTypeList } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { FormEvent, memo, useEffect, useMemo, useRef, useState } from 'react';
-import { activeTabButtonProps } from './../helpers';
-import { TabContainer } from './../style';
 import { PresetAlerts } from './components';
 import { convertTreeNodeToCookie, convertTreeNodeToStorage } from './helper';
 import ShareSpecificModal from './modal-share';
@@ -182,33 +181,25 @@ function ShareUI() {
         <Fieldset>
           <Legend>Source</Legend>
 
-          <TabContainer>
-            <Button
-              {...activeTabButtonProps}
-              onClick={() => handleSelectActiveTab(true)}
-            />
-
-            <Select<Tab>
-              searchable
-              label='Tab'
-              name='srcTab'
-              options={tabs}
-              valueAsObject
-              value={state.srcTab}
-              filter={fnFilter}
-              onChange={handleChange}
-              disabled={disabledField}
-              itemComponent={SelectOptionBrowserTab}
-              fieldKey={{
-                value: 'id',
-                label: 'title',
-                group: e =>
-                  `${e.incognito ? 'Private' : ''} Window (${
-                    e.windowId
-                  })`.trim(),
-              }}
-            />
-          </TabContainer>
+          <Select<Tab>
+            searchable
+            label='Tab'
+            name='srcTab'
+            options={tabs}
+            valueAsObject
+            value={state.srcTab}
+            filter={fnFilter}
+            onChange={handleChange}
+            disabled={disabledField}
+            itemComponent={SelectOptionBrowserTab}
+            fieldKey={{
+              value: 'id',
+              label: 'title',
+              group: e =>
+                `${e.incognito ? 'Private' : ''} Window (${e.windowId})`.trim(),
+            }}
+            {...genRightIcon({ onClick: () => handleSelectActiveTab(true) })}
+          />
 
           <SourceContainer sourceSelected={isSrcSelected}>
             <Select
@@ -237,33 +228,25 @@ function ShareUI() {
         <Fieldset>
           <Legend>Destination</Legend>
 
-          <TabContainer>
-            <Button
-              {...activeTabButtonProps}
-              onClick={() => handleSelectActiveTab(false)}
-            />
-
-            <Select<Tab>
-              searchable
-              label='Tab'
-              name='destTab'
-              options={tabs}
-              valueAsObject
-              filter={fnFilter}
-              value={state.destTab}
-              onChange={handleChange}
-              disabled={disabledField}
-              itemComponent={SelectOptionBrowserTab}
-              fieldKey={{
-                value: 'id',
-                label: 'title',
-                group: e =>
-                  `${e.incognito ? 'Private' : ''} Window (${
-                    e.windowId
-                  })`.trim(),
-              }}
-            />
-          </TabContainer>
+          <Select<Tab>
+            searchable
+            label='Tab'
+            name='destTab'
+            options={tabs}
+            valueAsObject
+            filter={fnFilter}
+            value={state.destTab}
+            onChange={handleChange}
+            disabled={disabledField}
+            itemComponent={SelectOptionBrowserTab}
+            fieldKey={{
+              value: 'id',
+              label: 'title',
+              group: e =>
+                `${e.incognito ? 'Private' : ''} Window (${e.windowId})`.trim(),
+            }}
+            {...genRightIcon({ onClick: () => handleSelectActiveTab(false) })}
+          />
 
           <Select
             label='Storage'

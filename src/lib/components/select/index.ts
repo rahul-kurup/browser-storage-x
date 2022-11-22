@@ -1,5 +1,4 @@
-export { default } from './select';
-
+export * from './components';
 export * from './helpers';
-export * from './option';
+export { default } from './select';
 export * from './type';

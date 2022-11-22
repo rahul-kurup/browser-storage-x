@@ -31,7 +31,7 @@ export const Actions = styled.span`
   gap: 5px;
 `;
 
-export const NodeKey = styled.span`
+export const NodeLabel = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 5px;

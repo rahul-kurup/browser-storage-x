@@ -1,10 +1,10 @@
-import { Button, Modal } from '@mantine/core';
+import { Button, Modal, Tooltip } from '@mantine/core';
 import { Cookie } from 'lib-models/browser';
 import Browser from 'lib-utils/browser';
 import { isCookieType } from 'lib-utils/storage';
 import { useEffect, useState } from 'react';
 import { convertCookieToTreeNode, convertStorageToTreeNode } from './helper';
-import { NodeKey, NodeValue, StyledTreeView } from './style';
+import { NodeLabel, NodeValue, StyledTreeView } from './style';
 import { SpecificProps, TreeDataState } from './type';
 
 export default function ShareSpecificModal({
@@ -51,16 +51,18 @@ export default function ShareSpecificModal({
 
   return (
     <>
-      <Button
-        type='button'
-        color='cyan'
-        fullWidth={false}
-        disabled={disabled}
-        onClick={() => setTreeDataState('LOADING')}
-        loading={treeDataState === 'LOADING'}
-      >
-        Pick items
-      </Button>
+      <Tooltip withArrow offset={2} label='Pick items'>
+        <Button
+          type='button'
+          color='cyan'
+          fullWidth={false}
+          disabled={disabled}
+          onClick={() => setTreeDataState('LOADING')}
+          loading={treeDataState === 'LOADING'}
+        >
+          Items
+        </Button>
+      </Tooltip>
 
       <Modal
         centered
@@ -91,7 +93,7 @@ export default function ShareSpecificModal({
             }
             return (
               <>
-                <NodeKey title={`${name} ⇒ ${value}`}>{name}</NodeKey>
+                <NodeLabel title={`${name} ⇒ ${value}`}>{name}</NodeLabel>
                 <NodeValue title={value}>{value}</NodeValue>
               </>
             );
