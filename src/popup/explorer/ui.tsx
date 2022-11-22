@@ -2,16 +2,16 @@ import { Alert, Button, ButtonProps, Loader } from '@mantine/core';
 import Select, {
   ChangeHandlerArgs,
   fnFilter,
+  genRightIcon,
   SelectOptionBrowserTab,
 } from 'lib-components/select';
 import { Cookie, Tab } from 'lib-models/browser';
 import { Progress } from 'lib-models/progress';
 import Browser from 'lib-utils/browser';
+import { checkItem } from 'lib-utils/common';
 import { isCookieType, StorageTypeList } from 'lib-utils/storage';
 import { useBrowserTabs } from 'lib/context/browser-tab';
 import { set, startCase, unset } from 'lodash';
-import { activeTabButtonProps } from 'popup/helpers';
-import { TabContainer } from 'popup/style';
 import { FormEvent, memo, useCallback, useEffect, useState } from 'react';
 import {
   actionBtnProps,
@@ -29,7 +29,7 @@ import Form, {
   Actions,
   DataType,
   NodeItemContainer,
-  NodeKey,
+  NodeLabel,
   NodeValue,
   Placeholder,
   SourceContainer,
@@ -202,30 +202,25 @@ function ExplorerUI() {
     <>
       <Form onSubmit={onSubmit}>
         <SourceContainer>
-          <TabContainer>
-            <Button {...activeTabButtonProps} onClick={handleSelectActiveTab} />
-
-            <Select<Tab>
-              searchable
-              label='Tab'
-              name='tab'
-              options={tabs}
-              valueAsObject
-              value={state.tab}
-              onChange={handleChange}
-              itemComponent={SelectOptionBrowserTab}
-              disabled={disabledField}
-              filter={fnFilter}
-              fieldKey={{
-                value: 'id',
-                label: 'title',
-                group: e =>
-                  `${e.incognito ? 'Private' : ''} Window (${
-                    e.windowId
-                  })`.trim(),
-              }}
-            />
-          </TabContainer>
+          <Select<Tab>
+            searchable
+            label='Tab'
+            name='tab'
+            options={tabs}
+            valueAsObject
+            value={state.tab}
+            onChange={handleChange}
+            itemComponent={SelectOptionBrowserTab}
+            disabled={disabledField}
+            filter={fnFilter}
+            fieldKey={{
+              value: 'id',
+              label: 'title',
+              group: e =>
+                `${e.incognito ? 'Private' : ''} Window (${e.windowId})`.trim(),
+            }}
+            {...genRightIcon({ onClick: handleSelectActiveTab })}
+          />
 
           <Select
             label='Storage'
@@ -249,20 +244,26 @@ function ExplorerUI() {
                 nodeRenderer={node => {
                   const { name, value } = node.data || {};
 
-                  const showModify =
-                    node.dataSubType === 'index'
-                      ? primitiveDt.includes(node.dataType)
-                      : true;
-
+                  const strName = String(name);
+                  const strValue = checkItem.isNullOrUndefined(value)
+                    ? value
+                    : String(value);
                   const capDataType = startCase(node.dataType) || '';
+                  const hasContent = !!node.items?.length;
+                  const isPrimitiveType = primitiveDt.includes(node.dataType);
+                  const isContainerType = containerDt.includes(node.dataType);
 
-                  const Empty = containerDt.includes(node.dataType) &&
-                    !node.items?.length && <i>{emptyContent}</i>;
+                  const showModify =
+                    node.dataSubType === 'index' ? isPrimitiveType : true;
+
+                  const Empty = isContainerType && !hasContent && (
+                    <i>{emptyContent}</i>
+                  );
 
                   return (
                     <NodeItemContainer>
                       <Actions className='actions'>
-                        {containerDt.includes(node.dataType) && (
+                        {isContainerType && (
                           <Button
                             {...getActionProps({ node, action: 'add' })}
                           />
@@ -279,7 +280,7 @@ function ExplorerUI() {
                         />
                       </Actions>
 
-                      <NodeKey title={String(name)}>
+                      <NodeLabel title={strName}>
                         {node.dataSubType === 'index' ? (
                           <>
                             <DataType title={`index ${name}`}>
@@ -288,20 +289,19 @@ function ExplorerUI() {
                           </>
                         ) : (
                           <>
-                            {String(name)}{' '}
+                            {strName}{' '}
                             <DataType>
                               ({capDataType}) {Empty}
                             </DataType>
                           </>
                         )}
-                      </NodeKey>
+                      </NodeLabel>
 
-                      {primitiveDt.includes(node.dataType) &&
-                        !Boolean(node.items?.length) && (
-                          <NodeValue title={String(value)}>
-                            {String(value) || emptyContent}
-                          </NodeValue>
-                        )}
+                      {isPrimitiveType && !hasContent && (
+                        <NodeValue title={strValue}>
+                          {strValue ?? emptyContent}
+                        </NodeValue>
+                      )}
                     </NodeItemContainer>
                   );
                 }}

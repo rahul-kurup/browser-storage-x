@@ -5,7 +5,7 @@ import Ctx from './context';
 import UlView, {
   LabelCheckBox,
   LiNode,
-  NodeText,
+  NodeWrapper,
   TextContainer,
 } from './style';
 import { ExternalProps, NodeViewProps } from './type';
@@ -71,7 +71,7 @@ export default function TreeNode({
                 </LabelCheckBox>
               )}
 
-              <NodeText
+              <NodeWrapper
                 hasItems={hasItems}
                 expanded={isExpanded}
                 onClick={() => handleExpansion(subItemPath)}
@@ -86,7 +86,7 @@ export default function TreeNode({
                   </>
                 )}
                 {nodeRenderer?.(node, { isExpanded, hasItems }) || subName}
-              </NodeText>
+              </NodeWrapper>
             </TextContainer>
 
             {hasItems && isExpanded && (

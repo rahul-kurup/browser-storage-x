@@ -1,8 +1,11 @@
 import { GenNodeArgs, NodeViewProps, NodeWithIdProps } from './type';
 
 export const CONSTANTS = {
-  separator: { itemPath: '§' },
   rootItemPath: 'root',
+  separator: {
+    itemPath: '§',
+    cookieKey: '✶',
+  },
 };
 
 export function genNodes({

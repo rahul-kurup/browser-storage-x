@@ -10,7 +10,7 @@ export const LabelCheckBox = styled.label`
 
 type Expansion = { expanded: boolean; hasItems: boolean };
 
-export const NodeText = styled.div<Expansion>`
+export const NodeWrapper = styled.div<Expansion>`
   display: grid;
   gap: 5px;
   width: 100%;

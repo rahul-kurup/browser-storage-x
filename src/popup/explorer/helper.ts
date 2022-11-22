@@ -1,5 +1,9 @@
 import { IconBallpen, IconPlus, IconTrashX } from '@tabler/icons';
-import { AcceptedDataType, TreeViewProps } from 'lib-components/tree-view';
+import {
+  AcceptedDataType,
+  CONSTANTS,
+  TreeViewProps,
+} from 'lib-components/tree-view';
 import { Cookie } from 'lib-models/browser';
 import { checkItem } from 'lib-utils/common';
 import { FormEvent } from 'react';
@@ -156,13 +160,16 @@ export function convertCookieToTreeNode(originalData: Cookie[] | Object) {
   let parsed = originalData;
   if (Array.isArray(originalData)) {
     parsed = {};
-    for (const cookie of originalData) {
-      const { name, value } = cookie;
-      parsed[name] = value;
+    for (const cookie of originalData as Cookie[]) {
+      const { name, path, domain, storeId, value } = cookie;
+      const key = [name /*, path, domain, storeId */].join(
+        CONSTANTS.separator.cookieKey
+      );
+      parsed[key] = value;
       try {
         const decoded = decodeURIComponent(value);
         const decodedObj = JSON.parse(decoded);
-        parsed[name] =
+        parsed[key] =
           decodedObj && typeof decodedObj === 'object' ? decodedObj : value;
       } catch (error) {
         console.error(error);
@@ -222,7 +229,7 @@ export function convertContentToCookie(
       });
     } else {
       console.error(
-        `COOKIE_NOT_FOUND: Didn't find '${cookieName}' to match with in the original cookie data`
+        `NOT_FOUND: Didn't find '${cookieName}' to match with in the original cookie data`
       );
     }
   });

@@ -76,6 +76,7 @@ export default function UpsertModal({
   useDidUpdate(() => {
     setState(s => ({
       ...s,
+      isChanged: true,
       value: (decode ? decodeURIComponent : encodeURIComponent)(s.value),
     }));
   }, [decode]);

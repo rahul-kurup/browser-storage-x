@@ -1197,34 +1197,34 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@mantine/core@^5.8.0":
-  version "5.8.0"
-  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-5.8.0.tgz#b1281d3a4d926a3a0e1a1a573855b7d96602b471"
-  integrity sha512-GGQJqVXI3cbY5OzFrg3S3bJUypPktJIFeb2hI65qskFJViL6F8dUynRuKZfi8B4GHteG86zqiZCUo0cUVRTiaQ==
+"@mantine/core@^5.8.2":
+  version "5.8.2"
+  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-5.8.2.tgz#865d2a03522d59555cc51749487932d9ff899f98"
+  integrity sha512-F+m+FUN8vn/LRiD/Z0v8eC0lodZEsta+f4hJ7JjchX+6+ehi1GnbPgRkH37HOoGzrqe4DC16mqmF2JTVkgRINw==
   dependencies:
     "@floating-ui/react-dom-interactions" "^0.10.1"
-    "@mantine/styles" "5.8.0"
-    "@mantine/utils" "5.8.0"
+    "@mantine/styles" "5.8.2"
+    "@mantine/utils" "5.8.2"
     "@radix-ui/react-scroll-area" "1.0.0"
     react-textarea-autosize "8.3.4"
 
-"@mantine/hooks@^5.8.0":
-  version "5.8.0"
-  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.8.0.tgz#9858cffcea8000e893be0b2bdb84e7f759407294"
-  integrity sha512-838TKK0jTvU9sy7OcbDYc2P9fXyyca4HQxKRP2kRJnsnL6ZAHWFlFosGIcN97FiWh+8uQA7jCoD8jyrUjrFDXg==
+"@mantine/hooks@^5.8.2":
+  version "5.8.2"
+  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.8.2.tgz#1dddf11904475bff2511acf9f55a073b2fecf266"
+  integrity sha512-j/jdEqp0NgJzel6hdVfU4U3YGFOrCo5UKHBzvRKxpF8+PSY2i2nRY8XqkR0qp5yGjhgwl9uiZRbUTK9a1MxNwg==
 
-"@mantine/styles@5.8.0":
-  version "5.8.0"
-  resolved "https://registry.yarnpkg.com/@mantine/styles/-/styles-5.8.0.tgz#68ae3622a62286c62e4253f7532466b2c8900df7"
-  integrity sha512-sCKPEJpiSF97ISrbJ6tr9GdYCLoX0vWA0aKWc5GGnpZLVTr5WlqMdqY7u0J00aAfjPHqeuN3hIrnEs7bn0qmVg==
+"@mantine/styles@5.8.2":
+  version "5.8.2"
+  resolved "https://registry.yarnpkg.com/@mantine/styles/-/styles-5.8.2.tgz#7406f1a3659619fdb06d650cca2ffde4aebfc0bd"
+  integrity sha512-mXuQFPS/pSP1zKypnUXWUQ35SWhF+rJhI/7YxdIvJgkzVy9i6DoQAd895bETMrejokGxxguvZHPsGGJGqsLM3A==
   dependencies:
     clsx "1.1.1"
     csstype "3.0.9"
 
-"@mantine/utils@5.8.0":
-  version "5.8.0"
-  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.8.0.tgz#daa5a0d88324fdd637971d6c3a0f7e7af4f57985"
-  integrity sha512-gVE4U3apoE53MUWgKqst9H0iWgurzBccZNSSGRv3kD62vAFcI1JJhxxuW7X271bc9IMhKjgezEH14ApH1jlwCA==
+"@mantine/utils@5.8.2":
+  version "5.8.2"
+  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.8.2.tgz#f33382a91b0b649fcacf96540c6267e2beac1bb5"
+  integrity sha512-ZTxZeTyRO2l9dQ7pYsaV3AC7Cjz1HAPi1Ukd9GtiVYq74UuA3iBMLbPV4obxcHAqgUqgIHAP2ulCKHN3DPhaDQ==
 
 "@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents.3":
   version "2.1.8-no-fsevents.3"
@@ -1378,10 +1378,10 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@tabler/icons@^1.111.0":
-  version "1.111.0"
-  resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-1.111.0.tgz#0538fdd8b5de7072ae60fc5d2f13a9a636d2d0e3"
-  integrity sha512-TZWYiMT5ccqfHxRE0Qtgvl+sGsMbNkrv7cJMt/tm8TN9l/CDXx/o7d8uAwUN+3PAlSFfF5e/rD1bi1WJs2xNIA==
+"@tabler/icons@^1.112.0":
+  version "1.112.0"
+  resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-1.112.0.tgz#6119c6046085a06d4246b1ffab7f1c1435d736b5"
+  integrity sha512-M1FmEXqeOUG1iZOLue1aLKEl+E3HHU1JaXb/LmZuOjOWuhHHpfQnSv+mgSmupehophq5piwSPhqnytt1Uh6oLw==
 
 "@types/body-parser@*":
   version "1.19.2"
@@ -2300,10 +2300,10 @@ concat-map@0.0.1:
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
   integrity sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==
 
-concurrently@^7.5.0:
-  version "7.5.0"
-  resolved "https://registry.yarnpkg.com/concurrently/-/concurrently-7.5.0.tgz#4dd432d4634a8251f27ab000c4974e78e3906bd3"
-  integrity sha512-5E3mwiS+i2JYBzr5BpXkFxOnleZTMsG+WnE/dCG4/P+oiVXrbmrBwJ2ozn4SxwB2EZDrKR568X+puVohxz3/Mg==
+concurrently@^7.6.0:
+  version "7.6.0"
+  resolved "https://registry.yarnpkg.com/concurrently/-/concurrently-7.6.0.tgz#531a6f5f30cf616f355a4afb8f8fcb2bba65a49a"
+  integrity sha512-BKtRgvcJGeZ4XttiDiNcFiRlxoAeZOseqUvyYRUp/Vtd+9p1ULmeoSqGsDA+2ivdeDFpqrJvGvmI+StKfKl5hw==
   dependencies:
     chalk "^4.1.0"
     date-fns "^2.29.1"
