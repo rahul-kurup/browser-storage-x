@@ -74,11 +74,14 @@ export default function UpsertModal({
   }, [state.name, node, isActionAdd, isActionUpdate, checks]);
 
   useDidUpdate(() => {
-    setState(s => ({
-      ...s,
-      isChanged: true,
-      value: (decode ? decodeURIComponent : encodeURIComponent)(s.value),
-    }));
+    setState(s => {
+      const newState = {
+        ...s,
+        value: (decode ? decodeURIComponent : encodeURIComponent)(s.value),
+      };
+      newState.isChanged = newState.value !== node.data?.value;
+      return newState;
+    });
   }, [decode]);
 
   const pushChange = useCallback(
