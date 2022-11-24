@@ -40,7 +40,6 @@ export default function UpsertModal({
       isChanged: false,
       name: isUpdate ? node.nodeName : '',
       value: isUpdate ? node.data?.value : '',
-      updatedValue: isUpdate ? node.data?.value : '',
       valueType: isUpdate
         ? node.dataType
         : primitiveDt.includes(node.dataType)
@@ -75,12 +74,14 @@ export default function UpsertModal({
   }, [state.name, node, isActionAdd, isActionUpdate, checks]);
 
   useDidUpdate(() => {
-    setState(s => ({
-      ...s,
-      updatedValue: (decode ? decodeURIComponent : encodeURIComponent)(s.value),
-      isChanged: !(s.updatedValue === s.value),
-      value: s.isChanged ? s.updatedValue : s.value,
-    }));
+    setState(s => {
+      const newState = {
+        ...s,
+        value: (decode ? decodeURIComponent : encodeURIComponent)(s.value),
+      };
+      newState.isChanged = newState.value !== node.data?.value;
+      return newState;
+    });
   }, [decode]);
 
   const pushChange = useCallback(
