@@ -40,6 +40,7 @@ export default function UpsertModal({
       isChanged: false,
       name: isUpdate ? node.nodeName : '',
       value: isUpdate ? node.data?.value : '',
+      updatedValue: isUpdate ? node.data?.value : '',
       valueType: isUpdate
         ? node.dataType
         : primitiveDt.includes(node.dataType)
@@ -76,8 +77,9 @@ export default function UpsertModal({
   useDidUpdate(() => {
     setState(s => ({
       ...s,
-      isChanged: true,
-      value: (decode ? decodeURIComponent : encodeURIComponent)(s.value),
+      updatedValue: (decode ? decodeURIComponent : encodeURIComponent)(s.value),
+      isChanged: !(s.updatedValue === s.value),
+      value: s.isChanged ? s.updatedValue : s.value,
     }));
   }, [decode]);
 
